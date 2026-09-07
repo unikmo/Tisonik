@@ -10,9 +10,13 @@ test('homepage exposes the hotel and resort vertical and canonical operator iden
   await expect(page.locator('.entity-links')).toContainText('Hotel/Resorts')
 })
 
-test('resort vertical links back to Tisonik home and carries the operator identity', async ({ page }) => {
+test('resort vertical is the approved PR14 experience and links back to Tisonik home', async ({ page }) => {
   await page.goto('/all-inclusive-resorts/')
 
+  await expect(page.getByRole('heading', { name: /Make more of.*every stay/i })).toBeVisible()
+  await expect(page.getByText('Help guests get more from every day of their stay.')).toHaveCount(0)
+  await expect(page.locator('.resort-phone')).toBeVisible()
+  await expect(page.getByText('More ancillary revenue moments.')).toBeVisible()
   await expect(page.locator('.resort-header .brand')).toHaveAttribute('href', '/')
   await expect(page.locator('.site-footer')).toContainText(operatorStatement)
 })
