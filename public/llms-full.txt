@@ -1,6 +1,6 @@
 # Tisonik — Public Product Reference
 
-Tisonik is a product of TSquare Ventures LLC for guest-experience activation in cruise lines and all-inclusive hotels and resorts. It is designed as a white-label interaction layer inside an operator's existing digital journey rather than as a separate consumer destination.
+Tisonik is operated by TSquare Ventures LLC, a Wyoming (USA) limited liability company. Tisonik provides guest-experience activation for cruise lines and all-inclusive hotels and resorts. It is designed as a white-label interaction layer inside an operator's existing digital journey rather than as a separate consumer destination.
 
 ## All-inclusive hotels and resorts
 
@@ -89,7 +89,8 @@ Tisonik is a product of TSquare Ventures LLC for guest-experience activation in 
 - https://tisonik.com/hotel-ancillary-revenue-software/
 
 ## Operator and contact
-- Operator: TSquare Ventures LLC, 30 N Gould St Ste R, Sheridan, WY 82801, USA.
+- Tisonik is operated by TSquare Ventures LLC, a Wyoming (USA) limited liability company.
+- Business address: 30 N Gould St Ste R, Sheridan, WY 82801, USA.
 - Resort live-demo and pilot enquiries: https://tisonik.com/resort-pilot/#contact
 - Cruise pilot and enterprise enquiries: https://tisonik.com/pilot/#contact
 - Website: https://tisonik.com/
