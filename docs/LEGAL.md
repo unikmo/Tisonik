@@ -9,7 +9,9 @@ Version 0.5.0 adds business-specific legal pages:
 
 ## Operator identity
 
-Tisonik is a product of **TSquare Ventures LLC**, 30 N Gould St Ste R, Sheridan, WY 82801, USA. Contact: info@tisonik.com.
+Tisonik is operated by **TSquare Ventures LLC**, a Wyoming (USA) limited liability company.
+
+Business address: 30 N Gould St Ste R, Sheridan, WY 82801, USA. Contact: info@tisonik.com.
 
 **REQUIRES QUALIFIED LEGAL REVIEW before production publication following this operator change.**
 
