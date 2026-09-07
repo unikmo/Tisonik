@@ -36,7 +36,7 @@
     "seo:generate": "node scripts/generate-sitemap.mjs"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.112.4",
+    "@supabase/supabase-js": "^2.115.0",
     "@vitejs/plugin-react": "latest",
     "react": "latest",
     "react-dom": "latest",
