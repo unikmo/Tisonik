@@ -40,7 +40,7 @@ const resortPageFromPath = (path: string): ResortPageKey => {
 
 const Header = ({ compact = false }: { compact?: boolean }) => (
   <header className="site-header resort-header">
-    <a className="brand" href="/all-inclusive-resorts/" aria-label="Tisonik resorts home">TISONIK</a>
+    <a className="brand" href="/" aria-label="Tisonik home">TISONIK</a>
     {!compact && <nav className="resort-header-nav" aria-label="Resort navigation">
       <a href="/all-inclusive-resorts/#experience">Experience</a>
       <a href="/all-inclusive-resorts/#revenue">Revenue</a>
@@ -57,9 +57,10 @@ const Header = ({ compact = false }: { compact?: boolean }) => (
 
 const Footer = () => (
   <footer className="site-footer resort-footer">
-    <div><strong>TISONIK</strong><span>A product of TSquare Ventures LLC</span></div>
+    <div><strong>TISONIK</strong><span>Tisonik is operated by TSquare Ventures LLC, a Wyoming (USA) limited liability company.</span></div>
     <p>Guest experience activation for all-inclusive hotels and resorts: discovery, ancillary revenue, in-stay ratings, service recovery and staff recognition.</p>
     <nav className="footer-links" aria-label="Footer navigation">
+      <a href="/">Tisonik home</a>
       <a href="/all-inclusive-resorts/">Resorts</a>
       <a href={liveDemoHref}>Live demo</a>
       <a href="/hotel-ancillary-revenue-software/">Ancillary revenue</a>
