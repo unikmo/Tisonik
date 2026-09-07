@@ -30,7 +30,7 @@ npm run build
 
 ## Company
 
-Tisonik is a product of **TSquare Ventures LLC**.
+Tisonik is operated by **TSquare Ventures LLC**, a Wyoming (USA) limited liability company.
 
 30 N Gould St Ste R  
 Sheridan, WY 82801  
@@ -47,6 +47,8 @@ USA
 - `/resort-experience-discovery/`
 - `/resort-upselling-software/`
 - `/hotel-ancillary-revenue-software/`
+
+The public homepage links to the all-inclusive hotel/resort vertical, and resort pages link back to the Tisonik homepage.
 
 ### Resort rating model
 

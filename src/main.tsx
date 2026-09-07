@@ -5,6 +5,8 @@ import { registerOfflineShell } from './offline'
 registerOfflineShell()
 
 const path = window.location.pathname
+const operatorStatement = 'Tisonik is operated by TSquare Ventures LLC, a Wyoming (USA) limited liability company.'
+const hotelResortLabel = 'Hotel/Resorts'
 const useLegacyProductShell = path.startsWith('/product-app/')
 const useLegacyLegalShell = ['/imprint/', '/privacy/', '/terms/', '/cookies/'].some((route) => path.startsWith(route))
 const usePortal = path.startsWith('/portal/')
@@ -34,14 +36,26 @@ const loadRoute = async () => {
 const Route = await loadRoute()
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><Route /></React.StrictMode>)
 
-if (!useLegacyProductShell && !useLegacyLegalShell && !usePortal && !useSandbox) {
-  requestAnimationFrame(() => {
-    const footer = document.querySelector<HTMLElement>('.footer-links')
-    if (!footer || footer.querySelector('a[href="/all-inclusive-resorts/"]')) return
-    const link = document.createElement('a')
-    link.href = '/all-inclusive-resorts/'
-    link.textContent = 'All-Inclusive Hotels & Resorts'
-    link.dataset.resortPreview = 'true'
-    footer.prepend(link)
+const syncImprintOperator = () => {
+  if (!path.startsWith('/imprint/')) return
+
+  const operatorParagraph = document.querySelector<HTMLElement>('#operator p')
+  if (operatorParagraph) operatorParagraph.innerHTML = '<strong>Tisonik</strong> is operated by <strong>TSquare Ventures LLC</strong>, a Wyoming (USA) limited liability company.'
+
+  const metaDescription = `Legal operator and contact information for Tisonik. ${operatorStatement}`
+  document.querySelector('meta[name="description"]')?.setAttribute('content', metaDescription)
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content', metaDescription)
+  document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', metaDescription)
+}
+
+const syncHotelResortLabel = () => {
+  if (useResort || useLegacyProductShell || useLegacyLegalShell || usePortal || useSandbox) return
+  document.querySelectorAll<HTMLAnchorElement>('a[href="/all-inclusive-resorts/"]').forEach(link => {
+    link.textContent = hotelResortLabel
   })
 }
+
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  if (useLegacyLegalShell) syncImprintOperator()
+  syncHotelResortLabel()
+}))

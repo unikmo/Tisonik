@@ -145,6 +145,7 @@ const Header = ({ page }: { page: PageKey }) => (
       <a href="/service-recovery/">Service Recovery</a>
       <a href="/engagement/">Engagement</a>
       <a href="/ancillary-revenue/">Ancillary Revenue</a>
+      <a href="/all-inclusive-resorts/">Hotels &amp; Resorts</a>
     </nav>
     <div className="header-actions"><a className="header-cta" href={page === 'pilot' ? contactHref : demoHref}>{page === 'pilot' ? 'Request a pilot' : 'View product demo'} <Arrow /></a><a className="menu-link" href="/integration/">How it integrates <span className="menu-lines" aria-hidden="true"><i/><i/><i/></span></a></div>
   </header>
@@ -152,9 +153,9 @@ const Header = ({ page }: { page: PageKey }) => (
 
 const Footer = () => (
   <footer className="site-footer">
-    <div><strong>TISONIK</strong><span>A product of TSquare Ventures LLC</span></div>
+    <div><strong>TISONIK</strong><span>Tisonik is operated by TSquare Ventures LLC, a Wyoming (USA) limited liability company.</span></div>
     <p>Passenger experience, crew recognition, service recovery, engagement and ancillary-revenue discovery for cruise lines.</p>
-    <nav className="footer-links" aria-label="Footer navigation"><a href={contactHref}>Contact</a><a href="/imprint/">Imprint</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/cookies/">Cookies</a></nav>
+    <nav className="footer-links" aria-label="Footer navigation"><a href="/all-inclusive-resorts/">Hotels &amp; Resorts</a><a href={contactHref}>Contact</a><a href="/imprint/">Imprint</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/cookies/">Cookies</a></nav>
   </footer>
 )
 
@@ -171,7 +172,7 @@ const EntityDefinition = () => (
     <h2 id="what-is-tisonik">Not another app. One add-on inside the app guests already use.</h2>
     <p>Tisonik is a white-label guest-experience interaction layer that integrates with the cruise line’s existing app. There is no separate guest download and no replacement of the operator’s booking or commerce stack. The cruise line retains control of its brand, app, inventory, pricing, checkout and payment.</p>
     <div className="entity-links" aria-label="Tisonik product areas">
-      <a href="/passenger-experience/">Passenger experience</a><a href="/crew-recognition/">Crew recognition</a><a href="/service-recovery/">Service recovery</a><a href="/engagement/">Engagement</a><a href="/ancillary-revenue/">Ancillary revenue</a><a href="/integration/">Integration</a>
+      <a href="/passenger-experience/">Passenger experience</a><a href="/crew-recognition/">Crew recognition</a><a href="/service-recovery/">Service recovery</a><a href="/engagement/">Engagement</a><a href="/ancillary-revenue/">Ancillary revenue</a><a href="/integration/">Integration</a><a href="/all-inclusive-resorts/">Hotels &amp; resorts</a>
     </div>
   </section>
 )
