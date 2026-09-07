@@ -5,9 +5,9 @@ const operatorStatement = 'Tisonik is operated by TSquare Ventures LLC, a Wyomin
 test('homepage exposes the hotel and resort vertical and canonical operator identity', async ({ page }) => {
   await page.goto('/')
 
-  await expect(page.getByRole('link', { name: 'Hotels & Resorts' }).first()).toHaveAttribute('href', '/all-inclusive-resorts/')
+  await expect(page.getByRole('link', { name: 'Hotel/Resorts' }).first()).toHaveAttribute('href', '/all-inclusive-resorts/')
   await expect(page.locator('.site-footer')).toContainText(operatorStatement)
-  await expect(page.locator('.entity-links')).toContainText('Hotels & resorts')
+  await expect(page.locator('.entity-links')).toContainText('Hotel/Resorts')
 })
 
 test('resort vertical links back to Tisonik home and carries the operator identity', async ({ page }) => {
