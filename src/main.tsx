@@ -6,6 +6,7 @@ registerOfflineShell()
 
 const path = window.location.pathname
 const operatorStatement = 'Tisonik is operated by TSquare Ventures LLC, a Wyoming (USA) limited liability company.'
+const hotelResortLabel = 'Hotel/Resorts'
 const useLegacyProductShell = path.startsWith('/product-app/')
 const useLegacyLegalShell = ['/imprint/', '/privacy/', '/terms/', '/cookies/'].some((route) => path.startsWith(route))
 const usePortal = path.startsWith('/portal/')
@@ -47,6 +48,14 @@ const syncImprintOperator = () => {
   document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', metaDescription)
 }
 
-if (useLegacyLegalShell) {
-  requestAnimationFrame(() => requestAnimationFrame(syncImprintOperator))
+const syncHotelResortLabel = () => {
+  if (useResort || useLegacyProductShell || useLegacyLegalShell || usePortal || useSandbox) return
+  document.querySelectorAll<HTMLAnchorElement>('a[href="/all-inclusive-resorts/"]').forEach(link => {
+    link.textContent = hotelResortLabel
+  })
 }
+
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  if (useLegacyLegalShell) syncImprintOperator()
+  syncHotelResortLabel()
+}))
