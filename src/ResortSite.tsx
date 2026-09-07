@@ -3,12 +3,12 @@ import { useState, type FormEvent, type ReactNode } from 'react'
 const Arrow = () => <span aria-hidden="true">→</span>
 
 const resortImages = {
-  hero: 'https://images.unsplash.com/photo-1741316041551-ed5d92b2f14f?auto=format&fit=crop&fm=jpg&q=82&w=2200',
-  pool: 'https://images.unsplash.com/photo-1783931420467-e54029948fc9?auto=format&fit=crop&fm=jpg&q=82&w=1800',
-  staff: 'https://images.unsplash.com/photo-1759143545924-beb85b33c0f1?auto=format&fit=crop&fm=jpg&q=82&w=1800',
-  dining: 'https://images.unsplash.com/photo-1760669348715-b2314a8af89a?auto=format&fit=crop&fm=jpg&q=82&w=1800',
-  spa: 'https://images.unsplash.com/photo-1639162906614-0603b0ae95fd?auto=format&fit=crop&fm=jpg&q=82&w=1800',
-  sunset: 'https://images.unsplash.com/photo-1772064901616-00264a6c4104?auto=format&fit=crop&fm=jpg&q=82&w=1800',
+  hero: '/media/resort-hero.jpg',
+  pool: '/media/resort-pool.jpg',
+  staff: '/media/resort-staff.jpg',
+  dining: '/media/resort-dining.jpg',
+  spa: '/media/resort-spa.jpg',
+  sunset: '/media/resort-sunset.jpg',
 }
 
 const liveDemoHref = '/resort-live-demo/'
@@ -249,11 +249,11 @@ const ResortPillar = () => (
           <p>Help guests move naturally from poolside to activities, dining, entertainment and shared experiences. Less “we didn&apos;t know that was happening.” More of the stay actually experienced.</p>
         </Feature>
 
-        <Feature number="02" eyebrow="SERVICE RECOVERY" title="Fix the moment before it becomes the review." image={resortImages.staff} alt="Guest-service team member assisting at a hotel reception" reverse>
+        <Feature number="02" eyebrow="SERVICE RECOVERY" title="Fix the moment before it becomes the review." image={resortImages.staff} alt="Resort team member helping a guest during her stay" reverse>
           <p>Give guests a private path to say when something is wrong while they are still on property. Route the signal, acknowledge it, resolve it and follow up before departure.</p>
         </Feature>
 
-        <Feature number="03" eyebrow="STAFF RECOGNITION" title="Celebrate the people who make the difference." image={resortImages.dining} alt="Guests enjoying a premium dining experience at a tropical resort">
+        <Feature number="03" eyebrow="STAFF RECOGNITION" title="Celebrate the people who make the difference." image={resortImages.dining} alt="A couple enjoying a premium resort restaurant">
           <p>Let guests recognize the waiter, housekeeper, bartender, kids-club host, concierge or activity team member who made the stay better—without turning hospitality into a public employee leaderboard.</p>
         </Feature>
 
@@ -511,7 +511,7 @@ const seoPages: Record<Exclude<ResortPageKey, 'pillar' | 'demo' | 'pilot'>, {
     title: 'Act while the guest is still there.',
     intro: 'A post-stay complaint is information. An in-stay signal is an opportunity to change the outcome.',
     image: resortImages.staff,
-    alt: 'Guest-service team member assisting at a hotel reception',
+    alt: 'Resort team member helping a guest during her stay',
     points: [
       { title: 'Capture early', body: 'Give the guest an easy route to signal friction while the team still has time to act.' },
       { title: 'Route and acknowledge', body: 'Send the issue to the right operational owner and make the response visible.' },
@@ -535,7 +535,7 @@ const seoPages: Record<Exclude<ResortPageKey, 'pillar' | 'demo' | 'pilot'>, {
     title: 'Show more of the stay’s revenue opportunity.',
     intro: 'Spa, speciality dining, excursions, transfers, cabanas, watersports and celebrations can all become relevant bookable moments inside the guest journey.',
     image: resortImages.dining,
-    alt: 'Couple dining by the ocean at a tropical resort',
+    alt: 'A couple enjoying a premium resort restaurant',
     points: [
       { title: 'More than one upsell', body: 'Surface different paid experiences across the day and across the stay instead of relying on one generic offer.' },
       { title: 'Context before offer', body: 'Make the opportunity feel useful to the guest by matching timing and resort context.' },
