@@ -140,10 +140,10 @@ const Header = ({ page }: { page: PageKey }) => (
   <header className="site-header">
     <a className="brand" href="/" aria-label="Tisonik home">TISONIK</a>
     <nav className="desktop-nav" aria-label="Primary navigation">
-      <a href="/passenger-experience/">Passenger Experience</a>
-      <a href="/crew-recognition/">Crew Recognition</a>
+      <a href="/">Cruise Lines</a>
+      <a href="/all-inclusive-resorts/">Hotels &amp; Resorts</a>
       <a href="/service-recovery/">Service Recovery</a>
-      <a href="/engagement/">Engagement</a>
+      <a href="/crew-recognition/">Recognition</a>
       <a href="/ancillary-revenue/">Ancillary Revenue</a>
     </nav>
     <div className="header-actions"><a className="header-cta" href={page === 'pilot' ? contactHref : demoHref}>{page === 'pilot' ? 'Request a pilot' : 'View product demo'} <Arrow /></a><a className="menu-link" href="/integration/">How it integrates <span className="menu-lines" aria-hidden="true"><i/><i/><i/></span></a></div>
@@ -153,7 +153,7 @@ const Header = ({ page }: { page: PageKey }) => (
 const Footer = () => (
   <footer className="site-footer">
     <div><strong>TISONIK</strong><span>A product of TSquare Ventures LLC</span></div>
-    <p>Passenger experience, crew recognition, service recovery, engagement and ancillary-revenue discovery for cruise lines.</p>
+    <p>Guest experience activation for cruise lines and all-inclusive hotels &amp; resorts: service recovery, recognition, engagement, discovery and ancillary revenue.</p>
     <nav className="footer-links" aria-label="Footer navigation"><a href={contactHref}>Contact</a><a href="/imprint/">Imprint</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/cookies/">Cookies</a></nav>
   </footer>
 )
@@ -168,10 +168,10 @@ const Section = ({ id, eyebrow, title, children, crop, reverse = false, alt }: {
 const EntityDefinition = () => (
   <section className="entity-definition" aria-labelledby="what-is-tisonik">
     <p className="eyebrow">WHAT TISONIK IS</p>
-    <h2 id="what-is-tisonik">Not another app. One add-on inside the app guests already use.</h2>
-    <p>Tisonik is a white-label guest-experience interaction layer that integrates with the cruise line’s existing app. There is no separate guest download and no replacement of the operator’s booking or commerce stack. The cruise line retains control of its brand, app, inventory, pricing, checkout and payment.</p>
+    <h2 id="what-is-tisonik">Not another app. One experience layer inside the guest journey you already own.</h2>
+    <p>Tisonik is a white-label guest-experience interaction layer for cruise lines and all-inclusive hotels and resorts. It fits into the operator’s existing app or digital guest journey without replacing the booking, property-management or commerce stack. The operator retains control of its brand, inventory, pricing, checkout and payment.</p>
     <div className="entity-links" aria-label="Tisonik product areas">
-      <a href="/passenger-experience/">Passenger experience</a><a href="/crew-recognition/">Crew recognition</a><a href="/service-recovery/">Service recovery</a><a href="/engagement/">Engagement</a><a href="/ancillary-revenue/">Ancillary revenue</a><a href="/integration/">Integration</a>
+      <a href="/">Cruise lines</a><a href="/all-inclusive-resorts/">Hotels &amp; resorts</a><a href="/service-recovery/">Service recovery</a><a href="/crew-recognition/">Recognition</a><a href="/ancillary-revenue/">Ancillary revenue</a><a href="/integration/">Cruise integration</a>
     </div>
   </section>
 )
@@ -204,16 +204,27 @@ const BuyerReadiness = () => <section className="buyer-readiness" aria-labelledb
 const Home = () => (
   <>
     <section id="top" className="hero">
-      <p className="eyebrow hero-eyebrow">DESIGNED FOR CRUISE LINES</p>
-      <h1>Turn more onboard moments into <span>unforgettable experiences.</span></h1>
-      <p className="hero-positioning">A white-label add-on inside your existing cruise app—not another app for guests to download.</p>
+      <p className="eyebrow hero-eyebrow">GUEST EXPERIENCE FOR CRUISE LINES &amp; ALL-INCLUSIVE RESORTS</p>
+      <h1>Turn more guest moments into <span>unforgettable experiences.</span></h1>
+      <p className="hero-positioning">A white-label experience layer inside the digital journey you already own—not another app for guests to download.</p>
       <figure className="hero-visual"><img src="/media/hero-centered-black-crew-amara.jpg" alt="Black cruise crew member welcoming guests onboard" fetchPriority="high" /></figure>
     </section>
     <section className="hero-after" aria-labelledby="hero-after-title">
-      <p id="hero-after-title" className="hero-after-copy">Tisonik helps your team personalise interactions, recognise excellence and create more timely opportunities to improve the guest journey.</p>
-      <a className="pilot-link" href={demoHref}>VIEW PRODUCT DEMO <Arrow /></a>
+      <p id="hero-after-title" className="hero-after-copy">Tisonik helps cruise lines and resort operators personalise interactions, recognise excellence, recover service issues earlier and surface more relevant experiences.</p>
+      <div className="pilot-actions">
+        <a className="pilot-link" href={demoHref}>VIEW CRUISE PRODUCT DEMO <Arrow /></a>
+        <a className="pilot-link" href="/all-inclusive-resorts/">EXPLORE HOTELS &amp; RESORTS <Arrow /></a>
+      </div>
     </section>
-    <section className="manifesto" aria-label="Tisonik promise"><p className="eyebrow">FOR THE CRUISE JOURNEY</p><h2>Built to feel natural onboard.</h2><p className="manifesto-copy">A quieter interaction layer for guests, crew and the moments between the itinerary.</p></section>
+    <section className="quiet-proof" aria-label="Tisonik hospitality environments">
+      <p className="eyebrow">ONE EXPERIENCE LAYER · TWO HOSPITALITY ENVIRONMENTS</p>
+      <div className="proof-grid">
+        <article><strong>Cruise lines</strong><span>Passenger experience, crew recognition, service recovery, engagement and onboard revenue discovery.</span><a className="pilot-link" href="#passenger-experience">Explore cruise <Arrow /></a></article>
+        <article><strong>Hotels &amp; all-inclusive resorts</strong><span>Guest discovery, in-stay service recovery, staff recognition, ratings and ancillary-revenue activation.</span><a className="pilot-link" href="/all-inclusive-resorts/">Explore resorts <Arrow /></a></article>
+        <article><strong>Controlled pilots</strong><span>Start with one ship or one property, define success measures first, then scale, iterate or stop on evidence.</span></article>
+      </div>
+    </section>
+    <section className="manifesto" aria-label="Tisonik cruise promise"><p className="eyebrow">FOR THE CRUISE JOURNEY</p><h2>Built to feel natural onboard.</h2><p className="manifesto-copy">A quieter interaction layer for guests, crew and the moments between the itinerary.</p></section>
     <Section id="passenger-experience" eyebrow="PASSENGER EXPERIENCE" title="Make the app feel more alive." crop="passenger" alt="Multicultural cruise passengers of different ages relaxing together"><p>Give guests more relevant reasons to interact throughout the sailing—without making the experience feel busy, intrusive or transactional.</p></Section>
     <Section id="crew-recognition" eyebrow="CREW RECOGNITION" title="Let great service be seen." crop="crew" alt="Diverse cruise crew members sharing a candid end-of-shift moment" reverse><p>A simple moment of recognition becomes visible, measurable and memorable—for the guest, the crew member and the operator.</p></Section>
     <Section id="service-recovery" eyebrow="SERVICE RECOVERY" title="Resolve the moment while it still matters." crop="recovery" alt="Cruise crew member returning a child’s toy beside their parent"><p>Give guests a discreet way to signal friction during the journey, creating the opportunity to respond before the experience is over.</p></Section>
