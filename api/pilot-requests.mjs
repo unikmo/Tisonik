@@ -11,7 +11,7 @@ export const enquirySchema = z.object({
   message: z.string().trim().min(10).max(4000),
   privacyConsent: z.literal(true),
   website: z.string().max(200).optional().default(''),
-  sourcePath: z.enum(['/pilot/', '/resort-pilot/']).optional().default('/pilot/'),
+  sourcePath: z.enum(['/pilot/', '/resort-pilot/', '/contact/']).optional().default('/pilot/'),
 }).strict()
 
 export function normalizeEnquiry(value) {
@@ -64,6 +64,6 @@ export default async function handler(request, response) {
     if (error instanceof SyntaxError) return sendJson(response, 400, { error: 'invalid_json' })
     if (error?.message === 'PAYLOAD_TOO_LARGE') return sendJson(response, 413, { error: 'payload_too_large' })
     console.error('pilot-request-failed', error?.message || error)
-    return sendJson(response, 503, { error: 'enquiry_temporarily_unavailable', email: 'info@tisonik.com' })
+    return sendJson(response, 503, { error: 'enquiry_temporarily_unavailable' })
   }
 }
