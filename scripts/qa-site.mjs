@@ -73,14 +73,15 @@ if (existsSync(pilot)) {
   const html = readFileSync(pilot, 'utf8')
   if (!clientBundles.includes('/api/pilot-requests')) fail('pilot page contact form is not connected to the first-party enquiry API')
   if (html.includes('formsubmit.co') || clientBundles.includes('formsubmit.co')) fail('pilot page still exposes a third-party form relay')
-  if (!html.includes('mailto:info@tisonik.com')) fail('pilot page lacks the configured direct email fallback')
+  if (/mailto:[^\"']*@tisonik\.com/i.test(html) || /mailto:[^\"']*@tisonik\.com/i.test(clientBundles)) fail('public site exposes a direct Tisonik mailbox')
   if (!/complete Tisonik|complete connected product/i.test(html)) fail('pilot page does not present the complete product experience')
   if (!/existing app/i.test(html)) fail('pilot page does not identify Tisonik as an add-on to the existing app')
 }
 
 if (/Cruise Connection/i.test(clientBundles)) fail('client bundle contains legacy Cruise Connection branding')
 if (/does not transmit data yet|production CRM\/API connection is intentionally pending/i.test(clientBundles)) fail('client bundle contains a disconnected demo-form path')
-if (!clientBundles.includes('/pilot/#contact')) fail('client bundle does not contain the single pilot contact destination')
+if (!clientBundles.includes('/pilot/#contact')) fail('client bundle does not contain the pilot contact destination')
+if (!clientBundles.includes('/contact/#contact')) fail('client bundle does not contain the general secure contact-form destination')
 if (/Open the interactive product walkthrough|EXPLORE THE WORKFLOWS/.test(clientBundles)) fail('pilot journey contains a circular link back to product workflows')
 if (!clientBundles.includes('CruiseConnect appears inside the app guests already use')) fail('executive walkthrough is missing the host-app CruiseConnect entry')
 if (!clientBundles.includes('Management sees experience, recovery and attributed revenue together')) fail('executive walkthrough is missing the management experience')
