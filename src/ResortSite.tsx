@@ -64,6 +64,7 @@ const Footer = () => (
       <a href={liveDemoHref}>Live demo</a>
       <a href="/hotel-ancillary-revenue-software/">Ancillary revenue</a>
       <a href="/resort-pilot/">Pilot</a>
+      <a href="/contact/">Contact</a>
       <a href="/privacy/">Privacy</a>
       <a href="/imprint/">Imprint</a>
     </nav>
@@ -442,7 +443,7 @@ const ResortPilotForm = () => {
     <button className="resort-primary-button" type="submit" disabled={status === 'sending' || status === 'sent'}>
       {status === 'sending' ? 'Sending…' : status === 'sent' ? 'Enquiry received' : <>Request a live demo or pilot <Arrow /></>}
     </button>
-    {status === 'error' && <p className="resort-form-status">The form could not be sent. Email <a href="mailto:info@tisonik.com">info@tisonik.com</a>.</p>}
+    {status === 'error' && <p className="resort-form-status">The form could not be sent. Please try again later.</p>}
   </form>
 }
 
