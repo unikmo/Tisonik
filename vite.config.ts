@@ -22,6 +22,7 @@ const fallbackDetails: Record<string, string[]> = {
   '/hotel-guest-rating-software/': ['Maximum five-minute in-stay rating flow', 'Exactly 10 standard questions: eight guest pain-point ratings scored 1–10, then What was good? and What could be improved?', 'Each written answer is capped at 400 characters and submitted ratings publish for participating properties'],
   '/product-app/': ['Private interactive walkthrough with illustrative data', 'Public product information is available on the main Tisonik pages'],
   '/pilot/': ['Deploy the complete connected product experience', 'Integrate inside the cruise line’s existing app', 'Measure passenger, crew, recovery, engagement and commercial outcomes end to end'],
+  '/contact/': ['Secure first-party contact form', 'Product, partnership, privacy and enterprise enquiries', 'Direct response to the work email supplied in the form'],
   '/imprint/': ['TSquare Ventures LLC operator information', 'Tisonik contact details'],
   '/privacy/': ['Website and business enquiry privacy', 'Passenger and crew deployment roles', 'Contact and data-subject rights'],
   '/terms/': ['Website and demonstration terms', 'Positive-interaction rules', 'Pilot and deployment boundaries'],
@@ -38,14 +39,14 @@ const staticSeoFallback = () => ({
     const canonical = html.match(/<link rel="canonical" href="(.*?)"/)?.[1] || 'https://tisonik.com/'
     const path = new URL(canonical, 'https://tisonik.com').pathname
     const details = fallbackDetails[path] || fallbackDetails['/']
-    const isContactPage = path === '/pilot/' || path === '/resort-pilot/'
-    const contactHeading = path === '/resort-pilot/' ? 'Book a live resort demo or discuss a one-property pilot' : 'Request a complete one-ship Tisonik pilot'
-    const contactBody = path === '/resort-pilot/' ? 'Tisonik is a guest-experience layer for all-inclusive hotels and resorts. Enable JavaScript to use our secure first-party enquiry form, or email info@tisonik.com.' : 'Tisonik is an add-on inside the cruise line’s existing app—not a separate guest app.'
-    const contact = isContactPage ? `<section id="contact"><h2>${escapeHtml(contactHeading)}</h2><p>${escapeHtml(contactBody)}</p><p>Email <a href="mailto:info@tisonik.com">info@tisonik.com</a>.</p></section>` : ''
-    const resortNav = '<a href="/all-inclusive-resorts/">All-inclusive resorts</a> · <a href="/resort-live-demo/">Resort live demo</a> · <a href="/hotel-guest-rating-software/">In-stay ratings</a> · <a href="/hotel-ancillary-revenue-software/">Ancillary revenue</a> · <a href="/resort-pilot/#contact">Resort pilot</a>'
-    const cruiseNav = '<a href="/">Tisonik</a> · <a href="/passenger-experience/">Passenger experience</a> · <a href="/crew-recognition/">Crew recognition</a> · <a href="/service-recovery/">Service recovery</a> · <a href="/engagement/">Engagement</a> · <a href="/ancillary-revenue/">Ancillary revenue</a> · <a href="/pilot/#contact">Contact</a>'
+    const isContactPage = path === '/pilot/' || path === '/resort-pilot/' || path === '/contact/'
+    const contactHeading = path === '/resort-pilot/' ? 'Book a live resort demo or discuss a one-property pilot' : path === '/contact/' ? 'Contact Tisonik' : 'Request a complete one-ship Tisonik pilot'
+    const contactBody = path === '/resort-pilot/' ? 'Tisonik is a guest-experience layer for all-inclusive hotels and resorts. Enable JavaScript to use our secure first-party enquiry form.' : path === '/contact/' ? 'Enable JavaScript to use the secure first-party Tisonik contact form.' : 'Tisonik is an add-on inside the cruise line’s existing app—not a separate guest app.'
+    const contact = isContactPage ? `<section id="contact"><h2>${escapeHtml(contactHeading)}</h2><p>${escapeHtml(contactBody)}</p></section>` : ''
+    const resortNav = '<a href="/all-inclusive-resorts/">All-inclusive resorts</a> · <a href="/resort-live-demo/">Resort live demo</a> · <a href="/hotel-guest-rating-software/">In-stay ratings</a> · <a href="/hotel-ancillary-revenue-software/">Ancillary revenue</a> · <a href="/resort-pilot/#contact">Resort pilot</a> · <a href="/contact/">Contact</a>'
+    const cruiseNav = '<a href="/">Tisonik</a> · <a href="/passenger-experience/">Passenger experience</a> · <a href="/crew-recognition/">Crew recognition</a> · <a href="/service-recovery/">Service recovery</a> · <a href="/engagement/">Engagement</a> · <a href="/ancillary-revenue/">Ancillary revenue</a> · <a href="/pilot/#contact">Pilot</a> · <a href="/contact/">Contact</a>'
     const navigation = path.includes('resort') || path.includes('hotel-') || path === '/all-inclusive-resorts/' ? resortNav : cruiseNav
-    const fallback = `<main class="seo-fallback" style="max-width:980px;margin:0 auto;padding:48px 24px 72px;font-family:Inter,Arial,sans-serif;color:#171715;background:#faf8f4"><nav aria-label="Primary">${navigation}</nav><article><p style="margin-top:64px;letter-spacing:.18em;font-size:12px;color:#3d7580">TISONIK · A PRODUCT OF TSQUARE VENTURES LLC</p><h1 style="max-width:850px;font-size:clamp(38px,6vw,72px);line-height:1.02;font-weight:400">${escapeHtml(title)}</h1><p style="max-width:760px;font-size:19px;line-height:1.65;color:#5f5a54">${escapeHtml(description)}</p><h2>What this page covers</h2><ul>${details.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>${contact}</article><footer style="margin-top:64px"><a href="mailto:info@tisonik.com">info@tisonik.com</a> · <a href="/privacy/">Privacy</a> · <a href="/imprint/">Imprint</a></footer></main>`
+    const fallback = `<main class="seo-fallback" style="max-width:980px;margin:0 auto;padding:48px 24px 72px;font-family:Inter,Arial,sans-serif;color:#171715;background:#faf8f4"><nav aria-label="Primary">${navigation}</nav><article><p style="margin-top:64px;letter-spacing:.18em;font-size:12px;color:#3d7580">TISONIK · A PRODUCT OF TSQUARE VENTURES LLC</p><h1 style="max-width:850px;font-size:clamp(38px,6vw,72px);line-height:1.02;font-weight:400">${escapeHtml(title)}</h1><p style="max-width:760px;font-size:19px;line-height:1.65;color:#5f5a54">${escapeHtml(description)}</p><h2>What this page covers</h2><ul>${details.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>${contact}</article><footer style="margin-top:64px"><a href="/contact/">Contact</a> · <a href="/privacy/">Privacy</a> · <a href="/imprint/">Imprint</a></footer></main>`
     const socialTags = [
       html.includes('property="og:type"') ? '' : '<meta property="og:type" content="website"/>',
       html.includes('property="og:description"') ? '' : `<meta property="og:description" content="${escapeHtml(description)}"/>`,
@@ -83,6 +84,7 @@ export default defineConfig({
         'hotel-guest-rating-software/index.html',
         'product-app/index.html',
         'pilot/index.html',
+        'contact/index.html',
         'portal/index.html',
         'sandbox/index.html',
         'imprint/index.html',
