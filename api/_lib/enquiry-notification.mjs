@@ -3,17 +3,52 @@ import { createHash } from 'node:crypto'
 const dashboardUrl = 'https://tisonik.com/portal/'
 export const notificationConfigured = () => Boolean(process.env.RESEND_API_KEY && process.env.TISONIK_ENQUIRY_TO && process.env.TISONIK_ENQUIRY_FROM)
 
+const cleanHeader = value => String(value || '').replace(/[\r\n]+/g, ' ').trim()
+
 export async function deliverEnquiryNotification(database, pilotRequestId) {
   if (!notificationConfigured()) return { configured: false }
   try {
+    const { data: enquiry, error: enquiryError } = await database
+      .from('pilot_requests')
+      .select('name,work_email,company,role_title,message,source_path,created_at')
+      .eq('id', pilotRequestId)
+      .single()
+
+    if (enquiryError || !enquiry) throw new Error('enquiry_lookup_failed')
+
+    const type =
+      enquiry.source_path === '/resort-pilot/' ? 'resort pilot' :
+      enquiry.source_path === '/contact/' ? 'website contact' :
+      'cruise pilot'
+
+    const company = cleanHeader(enquiry.company)
+    const subject = `New Tisonik ${type} enquiry${company ? ` — ${company}` : ''}`
+    const text = [
+      'New Tisonik enquiry',
+      '',
+      `Type: ${type}`,
+      `Name: ${enquiry.name}`,
+      `Work email: ${enquiry.work_email}`,
+      `Company: ${enquiry.company}`,
+      `Role: ${enquiry.role_title || 'Not provided'}`,
+      `Submitted: ${enquiry.created_at || 'Unknown'}`,
+      '',
+      'Message:',
+      enquiry.message,
+      '',
+      `Reference: ${pilotRequestId}`,
+      `Portal: ${dashboardUrl}`,
+    ].join('\n')
+
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: process.env.TISONIK_ENQUIRY_FROM,
         to: [process.env.TISONIK_ENQUIRY_TO],
-        subject: 'New Tisonik pilot enquiry',
-        text: `A new pilot enquiry is available in the access-controlled Tisonik portal.\n\nOpen: ${dashboardUrl}\n\nReference: ${pilotRequestId}\n\nNo passenger, crew or enquiry content is included in this notification.`,
+        reply_to: enquiry.work_email,
+        subject,
+        text,
       }),
     })
     if (!response.ok) throw new Error(`notification_provider_${response.status}`)
