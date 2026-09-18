@@ -1,11 +1,12 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 
 const Arrow = () => <span aria-hidden="true">→</span>
-const contactHref = '/pilot/#contact'
+const contactHref = '/contact/#contact'
+const pilotContactHref = '/pilot/#contact'
 const demoHref = '/product-app/'
 
 type StoryCrop = 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue'
-type PageKey = 'home' | 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue' | 'dashboard' | 'integration' | 'pilot'
+type PageKey = 'home' | 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue' | 'dashboard' | 'integration' | 'pilot' | 'contact'
 
 type Detail = {
   eyebrow: string
@@ -17,7 +18,7 @@ type Detail = {
   note?: string
 }
 
-const details: Record<Exclude<PageKey, 'home'>, Detail> = {
+const details: Record<Exclude<PageKey, 'home' | 'contact'>, Detail> = {
   passenger: {
     eyebrow: 'PASSENGER EXPERIENCE',
     title: 'Turn a good passenger moment into an anonymous vibe.',
@@ -133,6 +134,7 @@ const pageFromPath = (path: string): PageKey => {
   if (normalized === '/cruise-dashboard') return 'dashboard'
   if (normalized === '/integration') return 'integration'
   if (normalized === '/pilot') return 'pilot'
+  if (normalized === '/contact') return 'contact'
   return 'home'
 }
 
@@ -146,7 +148,7 @@ const Header = ({ page }: { page: PageKey }) => (
       <a href="/crew-recognition/">Recognition</a>
       <a href="/ancillary-revenue/">Ancillary Revenue</a>
     </nav>
-    <div className="header-actions"><a className="header-cta" href={page === 'pilot' ? contactHref : demoHref}>{page === 'pilot' ? 'Request a pilot' : 'View product demo'} <Arrow /></a><a className="menu-link" href="/integration/">How it integrates <span className="menu-lines" aria-hidden="true"><i/><i/><i/></span></a></div>
+    <div className="header-actions"><a className="header-cta" href={page === 'pilot' ? pilotContactHref : page === 'contact' ? contactHref : demoHref}>{page === 'pilot' ? 'Request a pilot' : page === 'contact' ? 'Contact' : 'View product demo'} <Arrow /></a><a className="menu-link" href="/integration/">How it integrates <span className="menu-lines" aria-hidden="true"><i/><i/><i/></span></a></div>
   </header>
 )
 
@@ -233,11 +235,11 @@ const Home = () => (
     <EntityDefinition />
     <section className="quiet-proof"><p className="eyebrow">BUILT TO FIT THE CRUISE JOURNEY</p><div className="proof-grid"><article><strong>Inside the existing app</strong><span>No competing destination for the guest.</span></article><article><strong>Immediate operational feedback</strong><span>Structured event ratings reach leaders while they can still act.</span></article><article><strong>Revenue evidence without identity</strong><span>Confirmed booking value is attributed through opaque references and aggregated outcomes.</span></article></div></section>
     <BuyerReadiness />
-    <section id="pilot" className="pilot-section"><p className="eyebrow">ONE SHIP. THE COMPLETE EXPERIENCE.</p><h2>See the product, then pilot it inside the cruise app guests already use.</h2><p>Walk through the connected passenger and management experience, then request a complete one-ship pilot.</p><div className="pilot-actions"><a className="pilot-button" href={demoHref}>View product demo <Arrow /></a><a className="pilot-button pilot-button--secondary" href={contactHref}>Request a pilot <Arrow /></a></div></section>
+    <section id="pilot" className="pilot-section"><p className="eyebrow">ONE SHIP. THE COMPLETE EXPERIENCE.</p><h2>See the product, then pilot it inside the cruise app guests already use.</h2><p>Walk through the connected passenger and management experience, then request a complete one-ship pilot.</p><div className="pilot-actions"><a className="pilot-button" href={demoHref}>View product demo <Arrow /></a><a className="pilot-button pilot-button--secondary" href={pilotContactHref}>Request a pilot <Arrow /></a></div></section>
   </>
 )
 
-const PilotContactForm = () => {
+const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) => {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>(new URLSearchParams(window.location.search).get('sent') === '1' ? 'sent' : 'idle')
   const [errorMessage, setErrorMessage] = useState('')
   const submitEnquiry = async (event: FormEvent<HTMLFormElement>) => {
@@ -257,6 +259,7 @@ const PilotContactForm = () => {
           message: form.get('message'),
           privacyConsent: form.get('privacy_consent') === 'yes',
           website: form.get('_honey') || '',
+          sourcePath: mode === 'contact' ? '/contact/' : '/pilot/',
         }),
       })
       if (!response.ok) {
@@ -265,36 +268,38 @@ const PilotContactForm = () => {
           const labels: Record<string,string> = { workEmail:'work email', name:'name', company:'company', roleTitle:'role', message:'pilot details', privacyConsent:'privacy consent' }
           const fields = (problem.invalidFields || []).map(field => labels[field] || field).join(', ')
           setErrorMessage(fields ? `Please check: ${fields}.` : 'Please check the form details and try again.')
-        } else setErrorMessage('The secure form is temporarily unavailable. Please email info@tisonik.com.')
+        } else setErrorMessage('The secure form is temporarily unavailable. Please try again later.')
         setStatus('error')
         return
       }
       setStatus('sent')
       event.currentTarget.reset()
     } catch {
-      setErrorMessage('The secure form is temporarily unavailable. Please email info@tisonik.com.')
+      setErrorMessage('The secure form is temporarily unavailable. Please try again later.')
       setStatus('error')
     }
   }
+  const isGeneral = mode === 'contact'
   return <section id="contact" className="contact-form-section" aria-labelledby="pilot-contact-title">
-    <div className="contact-form-copy"><p className="eyebrow">REQUEST A PILOT</p><h1 id="pilot-contact-title">Plan a complete one-ship Tisonik pilot.</h1><p>You have seen the product. Tell us about your existing app, target ship and timing, and we’ll respond personally about a complete one-ship pilot.</p><div className="contact-confidence"><span>One short form</span><span>Direct response from TSquare Ventures LLC</span><span>No mailing list</span></div><a href="mailto:info@tisonik.com">info@tisonik.com <Arrow /></a></div>
+    <div className="contact-form-copy"><p className="eyebrow">{isGeneral ? 'CONTACT TISONIK' : 'REQUEST A PILOT'}</p><h1 id="pilot-contact-title">{isGeneral ? 'Tell us what you need.' : 'Plan a complete one-ship Tisonik pilot.'}</h1><p>{isGeneral ? 'Use the secure form for product, partnership, privacy or enterprise enquiries. We’ll respond directly to the work email you provide.' : 'You have seen the product. Tell us about your existing app, target ship and timing, and we’ll respond personally about a complete one-ship pilot.'}</p><div className="contact-confidence"><span>Secure contact form</span><span>Direct response from TSquare Ventures LLC</span><span>No mailing list</span></div></div>
     <form className="pilot-contact-form" onSubmit={submitEnquiry}>
       <input className="form-honeypot" type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden="true" />
       {status === 'sent' && <p className="form-success" role="status">Thank you. Your Tisonik enquiry is safely recorded. We’ll reply personally.</p>}
-      {status === 'error' && <p className="form-error" role="alert">{errorMessage || <>The secure form is temporarily unavailable. Please email <a href="mailto:info@tisonik.com">info@tisonik.com</a>.</>}</p>}
+      {status === 'error' && <p className="form-error" role="alert">{errorMessage || 'The secure form is temporarily unavailable. Please try again later.'}</p>}
       <label>Work email<input required name="email" type="email" autoComplete="email" placeholder="name@cruiseline.com" /></label>
       <div className="contact-form-row"><label>Name<input required name="name" autoComplete="name" placeholder="Your name" /></label><label>Role<input name="role" autoComplete="organization-title" placeholder="Guest Experience, Digital…" /></label></div>
-      <label>Cruise line or company<input required name="company" autoComplete="organization" placeholder="Organisation" /></label>
-      <label>What should we know about your current app or pilot?<textarea required name="message" rows={5} placeholder="Current cruise app, target ship or sailing, integration priorities, timing…" /></label>
+      <label>{isGeneral ? 'Company or organisation' : 'Cruise line or company'}<input required name="company" autoComplete="organization" placeholder="Organisation" /></label>
+      <label>{isGeneral ? 'How can we help?' : 'What should we know about your current app or pilot?'}<textarea required name="message" rows={5} placeholder={isGeneral ? 'Product, partnership, privacy or enterprise enquiry…' : 'Current cruise app, target ship or sailing, integration priorities, timing…'} /></label>
       <label className="form-consent"><input required type="checkbox" name="privacy_consent" value="yes" /><span>I agree that TSquare Ventures LLC may use these details to respond to my enquiry, as described in the <a href="/privacy/">privacy policy</a>.</span></label>
-      <button className="pilot-button contact-submit" type="submit" disabled={status === 'sending' || status === 'sent'}>{status === 'sending' ? 'Sending securely…' : status === 'sent' ? 'Enquiry received' : <>Request a pilot conversation <Arrow /></>}</button>
+      <button className="pilot-button contact-submit" type="submit" disabled={status === 'sending' || status === 'sent'}>{status === 'sending' ? 'Sending securely…' : status === 'sent' ? 'Enquiry received' : isGeneral ? <>Send enquiry <Arrow /></> : <>Request a pilot conversation <Arrow /></>}</button>
     </form>
   </section>
 }
 
 const DetailPage = ({ page }: { page: Exclude<PageKey, 'home'> }) => {
+  if (page === 'pilot') return <PilotContactForm mode="pilot" />
+  if (page === 'contact') return <PilotContactForm mode="contact" />
   const detail = details[page]
-  if (page === 'pilot') return <PilotContactForm />
   return <>
     <section className="detail-hero"><p className="eyebrow">{detail.eyebrow}</p><h1>{detail.title}</h1><p className="detail-intro">{detail.intro}</p><figure className={`detail-visual story-visual--${detail.crop}`} role="img" aria-label={detail.alt} /></section>
     <section className="detail-facts" id="details">{detail.facts.map((fact,index)=><article key={fact.title}><span>0{index+1}</span><h2>{fact.title}</h2><p>{fact.body}</p></article>)}</section>
