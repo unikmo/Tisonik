@@ -34,13 +34,13 @@ html { scroll-behavior: smooth; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
 a { color: inherit; }
 .container { max-width: 1080px; margin: 0 auto; padding-left: max(22px, env(safe-area-inset-left, 0px)); padding-right: max(22px, env(safe-area-inset-right, 0px)); }
-.eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.26em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
+.eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 0.29em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
 h1, h2, h3 { font-weight: 400; margin: 0; text-wrap: balance; }
-h1 { font-size: clamp(30px, 4.8vw, 52px); line-height: 1.04; letter-spacing: -0.045em; }
+h1 { font-size: clamp(32px, 3.65vw, 55px); line-height: 1.055; letter-spacing: -0.046em; }
 h2 { font-size: clamp(26px, 3.6vw, 40px); line-height: 1.1; letter-spacing: -0.04em; }
 h3 { font-size: 22px; line-height: 1.2; letter-spacing: -0.03em; }
 .accent { color: var(--accent); }
-.lede { color: var(--muted); font-size: 18px; max-width: 54ch; margin: 18px 0 0; }
+.lede { color: var(--muted); font-size: clamp(14px, 1vw, 17px); max-width: 54ch; margin: 18px 0 0; }
 
 /* header */
 .site-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 16px; padding-left: max(22px, env(safe-area-inset-left, 0px)); padding-right: max(22px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--line); }
@@ -168,6 +168,7 @@ footer a:hover { color: var(--accent); }
 
 </head>
 <body>
+
 <header class="site-head">
   <a class="brand" href="/">TISONIK</a>
   <nav class="nav" aria-label="Main">
@@ -258,21 +259,17 @@ footer a:hover { color: var(--accent); }
         <div class="fields" id="g-ship"></div>
       </fieldset>
       <fieldset><legend>What you print today</legend>
-        <p class="hint">Daily programs, promotions, welcome packs and the time spent delivering them.</p>
+        <p class="hint">Daily programs, promotions and welcome packs, all in. Use your total for one voyage, not the parts.</p>
         <div class="fields" id="g-print"></div>
       </fieldset>
-      <fieldset><legend>Environment</legend>
-        <p class="hint">Use your own sustainability factors if you have them.</p>
-        <div class="fields" id="g-esg"></div>
-      </fieldset>
-      <fieldset><legend>UNIKMO bundle and card sales</legend>
-        <p class="hint">The price is the bundle fee. The card sales settings are optional: guests can also buy private cards from your shop, and you keep a commission, calculated before taxes. It is shown on top of the other results.</p>
+      <fieldset><legend>UNIKMO bundle</legend>
         <div class="fields" id="g-bundle"></div>
       </fieldset>
-      <fieldset><legend>Guest experience value (estimates)</legend>
-        <p class="hint">These benefits depend on your guests. Use your own data where you have it, or set a value to zero to leave it out.</p>
+      <fieldset><legend>Sharpen the estimates (optional)</legend>
+        <p class="hint">Three figures that drive the value estimates. Everything else uses stated defaults, listed in the PDF.</p>
         <div class="fields" id="g-value"></div>
       </fieldset>
+      <div hidden id="g-fixed"></div>
     </form>
 
     <aside class="result" aria-live="polite">
@@ -361,46 +358,39 @@ footer a:hover { color: var(--accent); }
 <script id="calc-src">
 (function () {
   var F = [
-    // group, id, label, default, step, unit
+    // group, id, label, default, step, unit. 'fixed' fields are held at our defaults and listed in the report.
     ['ship', 'guests', 'Guests per voyage', 3000, 1, ''],
     ['ship', 'cabins', 'Cabins', 1500, 1, ''],
     ['ship', 'nights', 'Nights per voyage', 7, 1, ''],
     ['ship', 'voyages', 'Voyages per ship per year', 45, 1, ''],
     ['ship', 'ships', 'Ships', 1, 1, ''],
-    ['ship', 'costGD', 'Your operating cost per guest per day', 150, 5, 'used to show the fee as a share of cost'],
-    ['print', 'copies', 'Daily program copies per cabin per day', 1, 0.5, ''],
-    ['print', 'sheets', 'Sheets per daily program', 2, 1, ''],
-    ['print', 'inserts', 'Promo flyers and inserts per cabin per day', 2, 0.5, ''],
-    ['print', 'sheetCost', 'All-in cost per printed sheet', 0.04, 0.01, 'paper, ink, machine time'],
-    ['print', 'welcome', 'Welcome pack and brochures per cabin', 0.6, 0.05, 'once per voyage'],
-    ['print', 'secs', 'Delivery time per cabin per day', 30, 5, 'seconds'],
-    ['print', 'wage', 'Crew cost per hour', 12, 1, ''],
-    ['print', 'removed', 'Printed material removed', 70, 5, '% of today\'s printing'],
-    ['esg', 'sheetG', 'Weight of one printed sheet', 4.5, 0.5, 'grams (A4, 80gsm)'],
-    ['esg', 'cardG', 'Weight of one UNIKMO card and envelope', 9, 1, 'grams'],
-    ['esg', 'co2', 'Carbon per kilogram of paper', 1.2, 0.1, 'kg CO2e, your own factor if you have one'],
-    ['value', 'issueRate', 'Guests with a problem nobody hears about on board', 2, 0.5, '% of guests'],
-    ['value', 'caught', 'Of those, caught and fixed before they leave', 50, 5, '%'],
-    ['value', 'noRebook', 'Of those, who would not book again', 15, 1, '%'],
-    ['value', 'bookProfit', 'Profit from one future booking', 600, 50, 'after cost of delivering it'],
-    ['value', 'rebookUp', 'Extra guests who book again because of the keepsake', 0.5, 0.1, 'percentage points of guests'],
+    ['print', 'printCost', 'Printing cost per voyage, all-in', 3630, 100, 'whole ship: paper, ink, machines and the crew time to deliver it'],
+    ['print', 'removed', 'Share of printing the card replaces', 70, 5, '%'],
     ['value', 'spendPD', 'Onboard spend per guest per day', 95, 5, ''],
-    ['value', 'uplift', 'Extra onboard spend from better engagement', 0.5, 0.1, '%'],
-    ['value', 'margin', 'Margin on extra onboard sales', 40, 5, '%'],
-    ['value', 'revShare', 'Revenue share paid to UNIKMO after pilot', 0, 1, '% of extra sales'],
-    ['value', 'recogPart', 'Guests who recognise a crew member', 30, 5, '% of guests'],
-    ['value', 'recogEach', 'Recognitions per participating guest', 2, 1, ''],
+    ['value', 'bookProfit', 'Profit from one future booking', 600, 50, 'after cost of delivering it'],
     ['value', 'crew', 'Crew on board', 1200, 10, ''],
-    ['value', 'turnCut', 'Crew turnover reduction from recognition', 0.5, 0.1, 'percentage points per year'],
-    ['value', 'replCost', 'Cost to replace one crew member', 5000, 250, ''],
-    ['value', 'shareRate', 'Guests who share the keepsake', 5, 1, '% of guests'],
-    ['value', 'shareEach', 'Shares per sharing guest', 2, 1, ''],
-    ['value', 'reach', 'People reached per share', 300, 25, ''],
-    ['value', 'cpm', 'What you pay for 1,000 ad impressions', 8, 1, 'sets the value of the exposure'],
-    ['value', 'surveyPP', 'What your post-cruise survey costs per passenger', 2, 0.25, 'software, analysis and follow-up, per passenger invited'],
-    ['value', 'surveyShare', 'Share of that cost UNIKMO and TISONIK could replace or reduce', 20, 5, '%'],
-    ['value', 'surveyRate', 'Guests who complete your post-cruise survey today', 10, 1, '% of guests'],
-    ['value', 'tisRate', 'Guests expected to give feedback during the voyage', 30, 5, '% of guests, one tap on the card']
+    ['fixed', 'sheetG', 'Weight of one printed sheet', 4.5, 0.5, 'grams (A4, 80gsm)'],
+    ['fixed', 'cardG', 'Weight of one UNIKMO card and envelope', 9, 1, 'grams'],
+    ['fixed', 'co2', 'Carbon per kilogram of paper', 1.2, 0.1, 'kg CO2e'],
+    ['fixed', 'issueRate', 'Guests with a problem nobody hears about on board', 2, 0.5, '% of guests'],
+    ['fixed', 'caught', 'Of those, caught and fixed before they leave', 50, 5, '%'],
+    ['fixed', 'noRebook', 'Of those, who would not book again', 15, 1, '%'],
+    ['fixed', 'rebookUp', 'Extra guests who book again because of the keepsake', 0.5, 0.1, 'percentage points of guests'],
+    ['fixed', 'uplift', 'Extra onboard spend from better engagement', 0.5, 0.1, '%'],
+    ['fixed', 'margin', 'Margin on extra onboard sales', 40, 5, '%'],
+    ['fixed', 'revShare', 'Revenue share paid to UNIKMO after pilot', 0, 1, '% of extra sales'],
+    ['fixed', 'recogPart', 'Guests who recognise a crew member', 30, 5, '% of guests'],
+    ['fixed', 'recogEach', 'Recognitions per participating guest', 2, 1, ''],
+    ['fixed', 'turnCut', 'Crew turnover reduction from recognition', 0.5, 0.1, 'percentage points per year'],
+    ['fixed', 'replCost', 'Cost to replace one crew member', 5000, 250, ''],
+    ['fixed', 'shareRate', 'Guests who share the keepsake', 5, 1, '% of guests'],
+    ['fixed', 'shareEach', 'Shares per sharing guest', 2, 1, ''],
+    ['fixed', 'reach', 'People reached per share', 300, 25, ''],
+    ['fixed', 'cpm', 'What you pay for 1,000 ad impressions', 8, 1, 'sets the value of the exposure'],
+    ['fixed', 'surveyPP', 'Post-cruise survey cost per passenger', 2, 0.25, 'per passenger invited'],
+    ['fixed', 'surveyShare', 'Share of survey cost UNIKMO and TISONIK could replace', 20, 5, '%'],
+    ['fixed', 'surveyRate', 'Guests who complete the post-cruise survey today', 10, 1, '% of guests'],
+    ['fixed', 'tisRate', 'Guests expected to give feedback during the voyage', 30, 5, '% of guests']
   ];
   var cur = 'USD';
 
@@ -415,21 +405,16 @@ footer a:hover { color: var(--accent); }
         '<input type="number" inputmode="decimal" id="' + f[1] + '" value="' + f[3] + '" step="' + f[4] + '" min="0">'));
     });
     document.getElementById('g-ship').appendChild(field('cur', 'Currency', '', '<select id="cur"><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select>'));
-    var gb = document.getElementById('g-bundle');
-    gb.appendChild(field('plan', 'Bundle price per guest per voyage', 'covers the card, welcome, keepsake hosting, TISONIK and guest recognition of crew, with no extra charge. Standard falls with fleet size: 5.00 up to 4 ships, 4.00 for 5 to 14, 3.00 for 15 or more',
+    var gb = document.getElementById('g-bundle'), gx = document.getElementById('g-fixed');
+    gb.appendChild(field('plan', 'Bundle price per guest per voyage', 'covers the card, welcome, keepsake hosting, TISONIK and guest recognition of crew. Standard falls with fleet size: 5.00 up to 4 ships, 4.00 for 5 to 14, 3.00 for 15 or more',
       '<select id="plan"><option value="3">Pilot: 3.00</option><option value="tier" selected>Standard, by number of ships</option><option value="custom">Enter my own</option></select>'));
-    gb.appendChild(field('custom', 'Your own bundle price', 'used when "Enter my own" is chosen',
-      '<input type="number" inputmode="decimal" id="custom" value="4" step="0.25" min="0">'));
-    gb.appendChild(field('cap', 'Annual cap on UNIKMO cost', 'for all ships in this deal, 0 for no cap',
-      '<input type="number" inputmode="decimal" id="cap" value="0" step="10000" min="0">'));
-    gb.appendChild(field('comm', 'Your commission on card sales', '',
-      '<select id="comm"><option value="25" selected>Pilot: 25%</option><option value="30">After the pilot: 30%</option></select>'));
-    gb.appendChild(field('attach', 'Guests who buy a card', '% of guests',
-      '<input type="number" inputmode="decimal" id="attach" value="8" step="1" min="0" max="100">'));
-    gb.appendChild(field('basket', 'Average basket at list price', 'private cards sell from 24 to 72 per purchase',
-      '<input type="number" inputmode="decimal" id="basket" value="40" step="1" min="0">'));
-    gb.appendChild(field('disc', 'Guest discount on cards', 'standard 10%, the most a ship can offer',
-      '<input type="number" inputmode="decimal" id="disc" value="10" step="1" min="0" max="10">'));
+    var cf = field('custom', 'Your own bundle price', '', '<input type="number" inputmode="decimal" id="custom" value="4" step="0.25" min="0">');
+    cf.hidden = true; gb.appendChild(cf);
+    gx.appendChild(field('comm', 'Commission on card sales', '', '<select id="comm"><option value="25" selected>Pilot: 25%</option><option value="30">After the pilot: 30%</option></select>'));
+    gx.appendChild(field('attach', 'Guests who buy a card', '% of guests', '<input type="number" id="attach" value="8" step="1" min="0" max="100">'));
+    gx.appendChild(field('basket', 'Average basket at list price', '', '<input type="number" id="basket" value="40" step="1" min="0">'));
+    gx.appendChild(field('disc', 'Guest discount on cards', '%', '<input type="number" id="disc" value="10" step="1" min="0" max="10">'));
+    document.getElementById('plan').addEventListener('change', function () { cf.hidden = this.value !== 'custom'; });
     document.getElementById('form').addEventListener('input', calc);
   }
   function v(id) { var n = parseFloat(document.getElementById(id).value); return isFinite(n) && n > 0 ? n : 0; }
@@ -454,11 +439,8 @@ footer a:hover { color: var(--accent); }
     var guests = v('guests'), cabins = v('cabins'), nights = v('nights'), voy = v('voyages'), ships = v('ships') || 1;
 
     // printing today
-    var sheetsPerCabinDay = v('copies') * v('sheets') + v('inserts');
-    var sheetsToday = cabins * nights * sheetsPerCabinDay;
-    var paper = sheetsToday * v('sheetCost') + cabins * v('welcome');
-    var labour = cabins * nights * v('secs') / 3600 * v('wage');
-    var today = paper + labour;
+    var today = v('printCost');
+    var sheetsToday = today / 0.0864; // about 11.6 printed sheets per unit of all-in cost
     var removed = pc('removed');
     var saved = today * removed;
 
@@ -473,7 +455,7 @@ footer a:hover { color: var(--accent); }
     var tier = ships >= 15 ? 3 : ships >= 5 ? 4 : 5;
     var listPrice = plan === 'custom' ? v('custom') : plan === 'tier' ? tier : parseFloat(plan);
     var annualList = listPrice * guests * voy * ships;
-    var cap = v('cap');
+    var cap = 0;
     var annualFee = cap > 0 ? Math.min(annualList, cap) : annualList;
     var fee = voy * ships ? annualFee / (voy * ships) : 0;
     var price = guests ? fee / guests : 0;
@@ -555,8 +537,7 @@ footer a:hover { color: var(--accent); }
     function ctxText() {
       var perGD = nights ? price / nights : 0;
       var ctx = money(perGD, 2) + ' per guest per day';
-      if (v('costGD')) ctx += ' is ' + (perGD / v('costGD') * 100).toFixed(2) + '% of your ' + money(v('costGD')) + ' operating cost per guest per day';
-      if (v('spendPD')) ctx += ', and ' + (perGD / v('spendPD') * 100).toFixed(2) + '% of ' + money(v('spendPD')) + ' onboard spend per guest per day';
+      if (v('spendPD')) ctx += ', or ' + (perGD / v('spendPD') * 100).toFixed(2) + '% of ' + money(v('spendPD')) + ' onboard spend per guest per day';
       ctx += '. UNIKMO costs ' + money(annualFee) + ' a year for these ships' + (cap > 0 && annualList > cap ? ' (capped from ' + money(annualList) + ')' : '');
       var surveyYear = surveySpend * voy * ships;
       if (surveyYear) ctx += ', compared with about ' + money(surveyYear) + ' a year you spend on post-cruise surveys for the same ships';
@@ -620,12 +601,12 @@ footer a:hover { color: var(--accent); }
 
   // Every figure you entered, with a flag for the ones you changed from our illustrative default.
   function collectInputs() {
-    var MONEY = { costGD: 1, sheetCost: 1, welcome: 1, wage: 1, bookProfit: 1, spendPD: 1, replCost: 1, cpm: 1, surveyPP: 1, basket: 1, cap: 1, custom: 1 };
-    var groups = [['ship', 'Your ship'], ['print', 'What you print today'], ['esg', 'Environment'], ['bundle', 'UNIKMO bundle and card sales'], ['value', 'Guest experience value (estimates)']];
+    var MONEY = { printCost: 1, bookProfit: 1, spendPD: 1, replCost: 1, cpm: 1, surveyPP: 1, basket: 1, custom: 1 };
+    var groups = [['ship', 'Your ship'], ['print', 'What you print today'], ['bundle', 'UNIKMO bundle'], ['value', 'Your own figures for the estimates'], ['fixed', 'Assumptions held at our defaults']];
     var extra = {
       ship: [['cur', 'Currency', '']],
-      bundle: [['plan', 'Bundle price per guest per voyage', ''], ['custom', 'Your own bundle price', ''], ['cap', 'Annual cap on UNIKMO cost', ''],
-        ['comm', 'Your commission on card sales', ''], ['attach', 'Guests who buy a card', '%'], ['basket', 'Average basket at list price', ''], ['disc', 'Guest discount on cards', '%']]
+      bundle: [['plan', 'Bundle price per guest per voyage', ''], ['custom', 'Your own bundle price', '']],
+      fixed: [['comm', 'Commission on card sales', ''], ['attach', 'Guests who buy a card', '%'], ['basket', 'Average basket at list price', ''], ['disc', 'Guest discount on cards', '%']]
     };
     function read(id, unit) {
       var el = document.getElementById(id), val, changed;
