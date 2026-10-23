@@ -262,7 +262,7 @@ footer a:hover { color: var(--accent); }
         <p class="hint">Daily programs, promotions and welcome packs, all in. Use your total for one voyage, not the parts.</p>
         <div class="fields" id="g-print"></div>
       </fieldset>
-      <fieldset><legend>UNIKMO bundle</legend>
+      <fieldset><legend>TISONIK / UNIKMO bundle</legend>
         <div class="fields" id="g-bundle"></div>
       </fieldset>
       <fieldset><legend>Sharpen the estimates (optional)</legend>
@@ -274,21 +274,21 @@ footer a:hover { color: var(--accent); }
 
     <aside class="result" aria-live="polite">
       <div class="card">
-        <p class="kicker">Printing saved against the bundle fee</p>
+        <p class="kicker">Your benefit over one year, printing only</p>
         <p class="big" id="r-hard">0</p>
         <p class="sub" id="r-hard-sub"></p>
         <div class="track" id="bar" role="img" aria-label="Savings and commission compared with the bundle fee"></div>
-        <div class="legend"><span class="l-paper">Printing saved</span><span class="l-value">Estimated value</span><span class="l-comm">Card sales (optional)</span><span class="l-fee">Bundle fee</span></div>
+        <div class="legend"><span class="l-paper">Printing saved</span><span class="l-value">Estimated value</span><span class="l-comm">Card sales (optional)</span><span class="l-fee">TISONIK / UNIKMO bundle fee</span></div>
       </div>
       <div class="card">
-        <p class="kicker">With estimated guest experience value</p>
+        <p class="kicker">Your benefit over one year, with guest value</p>
         <p class="big" id="r-all">0</p>
         <p class="sub" id="r-all-sub"></p>
         <p class="sub" id="r-be"></p>
         <p class="sub" id="r-sales"></p>
       </div>
       <div class="card">
-        <p class="kicker">The fee in context</p>
+        <p class="kicker">The bundle fee in context</p>
         <p class="sub" id="r-ctx"></p>
       </div>
       <div class="card">
@@ -378,7 +378,7 @@ footer a:hover { color: var(--accent); }
     ['fixed', 'rebookUp', 'Extra guests who book again because of the keepsake', 0.5, 0.1, 'percentage points of guests'],
     ['fixed', 'uplift', 'Extra onboard spend from better engagement', 0.5, 0.1, '%'],
     ['fixed', 'margin', 'Margin on extra onboard sales', 40, 5, '%'],
-    ['fixed', 'revShare', 'Revenue share paid to UNIKMO after pilot', 0, 1, '% of extra sales'],
+    ['fixed', 'revShare', 'Revenue share paid to TISONIK / UNIKMO after pilot', 0, 1, '% of extra sales'],
     ['fixed', 'recogPart', 'Guests who recognise a crew member', 30, 5, '% of guests'],
     ['fixed', 'recogEach', 'Recognitions per participating guest', 2, 1, ''],
     ['fixed', 'turnCut', 'Crew turnover reduction from recognition', 0.5, 0.1, 'percentage points per year'],
@@ -514,13 +514,13 @@ footer a:hover { color: var(--accent); }
 
     // results
     var hardEl = document.getElementById('r-hard');
-    hardEl.textContent = signed(hard); hardEl.className = 'big ' + (hard >= 0 ? 'pos' : 'neg');
+    hardEl.textContent = signed(hard * mult); hardEl.className = 'big ' + (hard >= 0 ? 'pos' : 'neg');
     document.getElementById('r-hard-sub').textContent = fee > 0
-      ? 'per voyage. Printing saved covers ' + Math.round(saved / fee * 100) + '% of the ' + money(fee) + ' fee before any estimate.'
-      : 'per voyage. Enter a bundle price to compare.';
+      ? 'after the bundle fee, across ' + ships + (ships === 1 ? ' ship' : ' ships') + ' and ' + voy + ' voyages each. Printing saved covers ' + Math.round(saved / fee * 100) + '% of the fee before any estimate.'
+      : 'across ' + ships + (ships === 1 ? ' ship' : ' ships') + '. Enter a bundle price to compare.';
     var allEl = document.getElementById('r-all');
-    allEl.textContent = signed(all); allEl.className = 'big ' + (all >= 0 ? 'pos' : 'neg');
-    document.getElementById('r-all-sub').textContent = 'per voyage, or ' + signed(all * mult) + ' per year across ' + ships + (ships === 1 ? ' ship' : ' ships') + '.';
+    allEl.textContent = signed(all * mult); allEl.className = 'big ' + (all >= 0 ? 'pos' : 'neg');
+    document.getElementById('r-all-sub').textContent = 'after the bundle fee, or ' + signed(all) + ' per voyage.';
     function beText() {
       var unitMargin = pc('margin') - pc('revShare');
       var gap = -hard - (value - extraMargin + share);
@@ -531,17 +531,17 @@ footer a:hover { color: var(--accent); }
     }
     document.getElementById('r-be').textContent = beText();
     document.getElementById('r-sales').textContent = comm > 0
-      ? 'Card sales are on top: if guests buy cards in your shop, your commission adds ' + money(comm) + ' per voyage, ' + signed(withSales) + ' in total.'
+      ? 'Card sales are on top: if guests buy cards in your shop, your commission adds ' + money(comm) + ' per voyage, ' + signed(withSales * mult) + ' over the year in total.'
       : '';
 
     function ctxText() {
       var perGD = nights ? price / nights : 0;
       var ctx = money(perGD, 2) + ' per guest per day';
       if (v('spendPD')) ctx += ', or ' + (perGD / v('spendPD') * 100).toFixed(2) + '% of ' + money(v('spendPD')) + ' onboard spend per guest per day';
-      ctx += '. UNIKMO costs ' + money(annualFee) + ' a year for these ships' + (cap > 0 && annualList > cap ? ' (capped from ' + money(annualList) + ')' : '');
       var surveyYear = surveySpend * voy * ships;
-      if (surveyYear) ctx += ', compared with about ' + money(surveyYear) + ' a year you spend on post-cruise surveys for the same ships';
-      return ctx + '.';
+      ctx += '.';
+      if (surveyYear) ctx += ' Your post-cruise surveys cost about ' + money(surveyYear) + ' a year for the same ships.';
+      return ctx;
     }
     document.getElementById('r-ctx').textContent = ctxText();
 
@@ -557,12 +557,12 @@ footer a:hover { color: var(--accent); }
       ['head', 'Per voyage', ''],
       ['', 'Printing and delivery today', money(today)],
       ['', 'Printing removed (' + Math.round(removed * 100) + '%)', money(saved)],
-      ['', 'UNIKMO bundle fee (' + money(price, 2) + ' per guest)', minus() + money(fee)],
+      ['', 'TISONIK / UNIKMO bundle fee (' + money(price, 2) + ' per guest)', minus() + money(fee)],
       ['total', 'Net without estimates', signed(hard)],
       ['head', 'Estimated value', ''],
       ['', 'Problems fixed before guests leave', money(issuesVal)],
       ['', 'Margin on extra onboard sales', money(extraMargin)],
-      ['', 'Revenue share to UNIKMO', share ? minus() + money(share) : money(0)],
+      ['', 'Revenue share to TISONIK / UNIKMO', share ? minus() + money(share) : money(0)],
       ['', 'Lower crew turnover', money(crewVal)],
       ['', 'Survey software cost reduced', money(surveyVal)],
       ['', 'Guests who book again', money(keepVal)],
@@ -572,9 +572,10 @@ footer a:hover { color: var(--accent); }
       ['', 'Card sales to guests, after ' + Math.round(disc * 100) + '% discount', money(sales)],
       ['', 'Your commission', money(comm)],
       ['total', 'Net including card sales', signed(withSales)],
-      ['head', 'Per year', ''],
-      ['', 'UNIKMO cost' + (cap > 0 && annualList > cap ? ' (capped)' : ''), minus() + money(annualFee)],
-      ['', 'Across ' + ships + (ships === 1 ? ' ship' : ' ships') + ', ' + voy + ' voyages each', signed(all * mult)],
+      ['head', 'Your benefit over one year', ''],
+      ['', 'Printing removed (' + ships + (ships === 1 ? ' ship' : ' ships') + ', ' + voy + ' voyages each)', money(saved * mult)],
+      ['', 'Estimated guest value', money(value * mult)],
+      ['total', 'Net benefit after the bundle fee', signed(all * mult)],
       ['', 'With card sales on top', signed(withSales * mult)]
     ]; }    document.getElementById('rows').innerHTML = rowList().map(function (r) {
       return '<tr class="' + r[0] + '"><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>';
@@ -602,7 +603,7 @@ footer a:hover { color: var(--accent); }
   // Every figure you entered, with a flag for the ones you changed from our illustrative default.
   function collectInputs() {
     var MONEY = { printCost: 1, bookProfit: 1, spendPD: 1, replCost: 1, cpm: 1, surveyPP: 1, basket: 1, custom: 1 };
-    var groups = [['ship', 'Your ship'], ['print', 'What you print today'], ['bundle', 'UNIKMO bundle'], ['value', 'Your own figures for the estimates'], ['fixed', 'Assumptions held at our defaults']];
+    var groups = [['ship', 'Your ship'], ['print', 'What you print today'], ['bundle', 'TISONIK / UNIKMO bundle'], ['value', 'Your own figures for the estimates'], ['fixed', 'Assumptions held at our defaults']];
     var extra = {
       ship: [['cur', 'Currency', '']],
       bundle: [['plan', 'Bundle price per guest per voyage', ''], ['custom', 'Your own bundle price', '']],
@@ -710,22 +711,22 @@ footer a:hover { color: var(--accent); }
       y = 98;
       LABEL('Executive summary', L, y);
       y += 10;
-      var headline = m.hard >= 0 ? 'UNIKMO pays for itself before any estimate.'
+      var headline = m.hard >= 0 ? 'The TISONIK / UNIKMO bundle pays for itself before any estimate.'
         : m.all >= 0 ? 'Printing saved covers ' + pct + '% of the fee. Guest experience value covers the rest.'
         : 'Printing saved covers ' + pct + '% of the fee. At these figures the estimates do not close the gap.';
       y = P(headline, L, y, CW - 6, { s: 17, b: 1, lh: 8 });
       y += 4;
       var body = 'At ' + num(m.guests) + ' guests per voyage and ' + num(m.mult) + ' voyages a year across ' + m.ships + (m.ships === 1 ? ' ship' : ' ships') +
-        ', the bundle fee is ' + money(m.fee) + ' per voyage and ' + money(m.annualFee) + ' a year. Each voyage, printing saved is ' + money(m.saved) +
-        '. Estimated guest experience value adds ' + money(m.value) + ', which takes the net to ' + signed(m.all) + ' per voyage.' +
-        (m.comm > 0 ? ' If guests also buy cards in your shop, your commission adds ' + money(m.comm) + ' on top.' : '');
+        ', printing saved is ' + money(m.saved) + ' per voyage against a bundle fee of ' + money(m.fee) + '. Estimated guest experience value adds ' + money(m.value) +
+        ', which takes the net to ' + signed(m.all) + ' per voyage and ' + signed(m.all * m.mult) + ' over one year.' +
+        (m.comm > 0 ? ' If guests also buy cards in your shop, your commission adds ' + money(m.comm * m.mult) + ' over the year on top.' : '');
       y = P(body, L, y, CW - 6, { s: 10.2, c: C.ink2, lh: 5.3 });
       y += 9;
 
       var tw = (CW - 12) / 3, tiles = [
-        ['Net per voyage', 'without estimates', signed(m.hard), 'Printing saved - fee'],
-        ['Net per voyage', 'with estimates', signed(m.all), 'Includes guest experience value'],
-        ['Net per year', 'with estimates', signed(m.all * m.mult), num(m.mult) + ' voyages a year']
+        ['Net per year', 'without estimates', signed(m.hard * m.mult), 'Printing saved less the bundle fee'],
+        ['Net per year', 'with estimates', signed(m.all * m.mult), 'Includes guest experience value'],
+        ['Net per voyage', 'with estimates', signed(m.all), num(m.mult) + ' voyages a year']
       ];
       tiles.forEach(function (t, i) {
         var x = L + i * (tw + 6);
@@ -747,7 +748,7 @@ footer a:hover { color: var(--accent); }
       });
       var mx = L + Math.min(m.fee / max, 0.995) * CW;
       drawC(C.navy); doc.setLineWidth(0.7); doc.line(mx, y - 3, mx, y + bh + 3);
-      T('Fee ' + money(m.fee), mx > L + CW * 0.7 ? mx - 1.8 : mx + 1.8, y - 1.2, { s: 7.6, b: 1, a: mx > L + CW * 0.7 ? 'right' : 'left' });
+      T('Bundle fee ' + money(m.fee), mx > L + CW * 0.7 ? mx - 1.8 : mx + 1.8, y - 1.2, { s: 7.6, b: 1, a: mx > L + CW * 0.7 ? 'right' : 'left' });
       y += bh + 9;
       var lx = L;
       [['Printing saved ' + money(m.saved), C.teal], ['Estimated value ' + money(m.value), C.tealLt], ['Card sales, optional ' + money(m.comm), C.green]].forEach(function (l) {
