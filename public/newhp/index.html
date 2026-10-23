@@ -541,7 +541,7 @@ footer a:hover { color: var(--accent); }
 
     function ctxText() {
       var perGD = nights ? price / nights : 0;
-      var ctx = money(price, 2) + ' per guest per voyage is about ' + money(perGD, 2) + ' per guest per day. Daily gratuities typically run ' + money(10) + ' to ' + money(20) + ' per guest, so the bundle is a small fraction of what guests already pay each day';
+      var ctx = money(price, 2) + ' per guest per voyage is about ' + money(perGD, 2) + ' per guest per day. Daily gratuities on major cruise lines typically run ' + money(16) + ' to ' + money(25) + ' per guest, so the bundle is a small fraction of what guests already pay each day';
       var surveyYear = surveySpend * voy * ships;
       ctx += '.';
       if (surveyYear) ctx += ' Your post-cruise surveys cost about ' + money(surveyYear) + ' a year for the same ships.';
