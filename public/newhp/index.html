@@ -276,6 +276,11 @@ footer a:hover { color: var(--accent); }
 
     <aside class="result" aria-live="polite">
       <div class="card">
+        <p class="kicker">What we take, against what guests already pay</p>
+        <p class="big" id="r-frac">0</p>
+        <p class="sub" id="r-ctx"></p>
+      </div>
+      <div class="card">
         <p class="kicker">Your benefit over one year</p>
         <p class="big" id="r-all">0</p>
         <p class="sub" id="r-all-sub"></p>
@@ -283,10 +288,6 @@ footer a:hover { color: var(--accent); }
         <p class="sub" id="r-sales"></p>
         <div class="track" id="bar" role="img" aria-label="What comes back compared with the bundle fee"></div>
         <div class="legend"><span class="l-paper">Printing saved</span><span class="l-value">Estimated value</span><span class="l-comm">Card sales (optional)</span><span class="l-fee">TISONIK / UNIKMO bundle fee</span></div>
-      </div>
-      <div class="card">
-        <p class="kicker">The price, in context</p>
-        <p class="sub" id="r-ctx"></p>
       </div>
       <div class="card">
         <table><tbody id="rows"></tbody></table>
@@ -366,6 +367,7 @@ footer a:hover { color: var(--accent); }
     ['value', 'spendPD', 'Onboard spend per guest per day', 95, 5, ''],
     ['value', 'bookProfit', 'Profit from one future booking', 600, 50, 'after cost of delivering it'],
     ['value', 'crew', 'Crew on board', 1200, 10, ''],
+    ['fixed', 'tipPD', 'Daily gratuity per guest on your ship', 18, 1, 'default: average of published standard rates on major lines'],
     ['fixed', 'sheetG', 'Weight of one printed sheet', 4.5, 0.5, 'grams (A4, 80gsm)'],
     ['fixed', 'cardG', 'Weight of one UNIKMO card and envelope', 9, 1, 'grams'],
     ['fixed', 'co2', 'Carbon per kilogram of paper', 1.2, 0.1, 'kg CO2e'],
@@ -540,13 +542,14 @@ footer a:hover { color: var(--accent); }
       : '';
 
     function ctxText() {
-      var perGD = nights ? price / nights : 0;
-      var ctx = money(price, 2) + ' per guest per voyage is about ' + money(perGD, 2) + ' per guest per day. Daily gratuities on major cruise lines typically run ' + money(16) + ' to ' + money(25) + ' per guest, so the bundle is a small fraction of what guests already pay each day';
+      var tip = v('tipPD'), perGD = nights ? price / nights : 0;
+      var ctx = 'Guests on major lines already pay about ' + money(tip) + ' a day in gratuities, ' + money(tip * nights) + ' over ' + nights + (nights === 1 ? ' night' : ' nights') + '. The bundle is ' + money(price, 2) + ' per guest per voyage, about ' + money(perGD, 2) + ' a day. In return, your ship gets ' + signed(all * mult) + ' a year after the fee.';
       var surveyYear = surveySpend * voy * ships;
-      ctx += '.';
       if (surveyYear) ctx += ' Your post-cruise surveys cost about ' + money(surveyYear) + ' a year for the same ships.';
       return ctx;
     }
+    var fracEl = document.getElementById('r-frac'), tipTotal = v('tipPD') * nights;
+    fracEl.textContent = tipTotal > 0 ? (price / tipTotal * 100 < 10 ? (price / tipTotal * 100).toFixed(1) : Math.round(price / tipTotal * 100)) + '% of the tips' : '';
     document.getElementById('r-ctx').textContent = ctxText();
 
     var offset = saved + Math.max(value, 0) + comm;
