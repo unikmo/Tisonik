@@ -276,21 +276,16 @@ footer a:hover { color: var(--accent); }
 
     <aside class="result" aria-live="polite">
       <div class="card">
-        <p class="kicker">Your benefit over one year, printing only</p>
-        <p class="big" id="r-hard">0</p>
-        <p class="sub" id="r-hard-sub"></p>
-        <div class="track" id="bar" role="img" aria-label="Savings and commission compared with the bundle fee"></div>
-        <div class="legend"><span class="l-paper">Printing saved</span><span class="l-value">Estimated value</span><span class="l-comm">Card sales (optional)</span><span class="l-fee">TISONIK / UNIKMO bundle fee</span></div>
-      </div>
-      <div class="card">
-        <p class="kicker">Your benefit over one year, with guest value</p>
+        <p class="kicker">Your benefit over one year</p>
         <p class="big" id="r-all">0</p>
         <p class="sub" id="r-all-sub"></p>
         <p class="sub" id="r-be"></p>
         <p class="sub" id="r-sales"></p>
+        <div class="track" id="bar" role="img" aria-label="What comes back compared with the bundle fee"></div>
+        <div class="legend"><span class="l-paper">Printing saved</span><span class="l-value">Estimated value</span><span class="l-comm">Card sales (optional)</span><span class="l-fee">TISONIK / UNIKMO bundle fee</span></div>
       </div>
       <div class="card">
-        <p class="kicker">The bundle fee in context</p>
+        <p class="kicker">The price, in context</p>
         <p class="sub" id="r-ctx"></p>
       </div>
       <div class="card">
@@ -528,14 +523,9 @@ footer a:hover { color: var(--accent); }
     }).join('');
 
     // results
-    var hardEl = document.getElementById('r-hard');
-    hardEl.textContent = signed(hard * mult); hardEl.className = 'big ' + (hard >= 0 ? 'pos' : 'neg');
-    document.getElementById('r-hard-sub').textContent = fee > 0
-      ? 'after the bundle fee, across ' + ships + (ships === 1 ? ' ship' : ' ships') + ' and ' + voy + ' voyages each. Printing saved covers ' + Math.round(saved / fee * 100) + '% of the fee before any estimate.'
-      : 'across ' + ships + (ships === 1 ? ' ship' : ' ships') + '. Enter a bundle price to compare.';
     var allEl = document.getElementById('r-all');
     allEl.textContent = signed(all * mult); allEl.className = 'big ' + (all >= 0 ? 'pos' : 'neg');
-    document.getElementById('r-all-sub').textContent = 'after the bundle fee, or ' + signed(all) + ' per voyage.';
+    document.getElementById('r-all-sub').textContent = 'after the bundle fee, across ' + ships + (ships === 1 ? ' ship' : ' ships') + ' and ' + voy + ' voyages each. That is ' + signed(all) + ' per voyage.';
     function beText() {
       var unitMargin = pc('margin') - pc('revShare');
       var gap = -hard - (value - extraMargin + share);
@@ -551,8 +541,7 @@ footer a:hover { color: var(--accent); }
 
     function ctxText() {
       var perGD = nights ? price / nights : 0;
-      var ctx = money(perGD, 2) + ' per guest per day';
-      if (v('spendPD')) ctx += ', or ' + (perGD / v('spendPD') * 100).toFixed(2) + '% of ' + money(v('spendPD')) + ' onboard spend per guest per day';
+      var ctx = money(price, 2) + ' per guest per voyage is about ' + money(perGD, 2) + ' per guest per day. Daily gratuities typically run ' + money(10) + ' to ' + money(20) + ' per guest, so the bundle is a small fraction of what guests already pay each day';
       var surveyYear = surveySpend * voy * ships;
       ctx += '.';
       if (surveyYear) ctx += ' Your post-cruise surveys cost about ' + money(surveyYear) + ' a year for the same ships.';
@@ -727,7 +716,7 @@ footer a:hover { color: var(--accent); }
       LABEL('Executive summary', L, y);
       y += 10;
       var headline = m.hard >= 0 ? 'The TISONIK / UNIKMO bundle pays for itself before any estimate.'
-        : m.all >= 0 ? 'Printing saved covers ' + pct + '% of the fee. Guest experience value covers the rest.'
+        : m.all >= 0 ? 'Your ship gains ' + money(m.all * m.mult) + ' a year after the bundle fee.'
         : 'Printing saved covers ' + pct + '% of the fee. At these figures the estimates do not close the gap.';
       y = P(headline, L, y, CW - 6, { s: 17, b: 1, lh: 8 });
       y += 4;
@@ -739,8 +728,8 @@ footer a:hover { color: var(--accent); }
       y += 9;
 
       var tw = (CW - 12) / 3, tiles = [
-        ['Net per year', 'without estimates', signed(m.hard * m.mult), 'Printing saved less the bundle fee'],
-        ['Net per year', 'with estimates', signed(m.all * m.mult), 'Includes guest experience value'],
+        ['Net per year', 'with estimates', signed(m.all * m.mult), 'After the bundle fee, with guest value'],
+        ['Printing saved', 'per year', signed(m.saved * m.mult), 'Card and app replace paper'],
         ['Net per voyage', 'with estimates', signed(m.all), num(m.mult) + ' voyages a year']
       ];
       tiles.forEach(function (t, i) {
