@@ -111,7 +111,9 @@ h2.sub-h { font-size: 24px; margin: 0 0 14px; }
 @media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 .inputs { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 fieldset { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); margin: 0; padding: 18px; min-width: 0; }
-legend { font-size: 15px; font-weight: 500; padding: 0 8px; letter-spacing: -0.01em; }
+legend { float: left; width: 100%; font-size: 15px; font-weight: 500; padding: 0 0 12px; margin: 0; letter-spacing: -0.01em; }
+legend + * { clear: both; }
+[hidden] { display: none !important; }
 .hint { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
 .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px 16px; }
 .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -314,11 +316,11 @@ footer a:hover { color: var(--accent); }
     <strong>How this is worked out</strong>
     <ul>
       <li>Figures are per voyage unless marked per year. Annual figures multiply by voyages per ship and number of ships.</li>
-      <li>Printing saved is today's printing and delivery cost multiplied by the share removed. That covers your cruise app as well as the card.</li>
+      <li>Printing saved is your all-in printing cost per voyage multiplied by the share the card replaces. That covers your cruise app as well as the card.</li>
       <li>The results lead with the ship's own benefits. Card sales are optional and are shown on top, never mixed into the first two results.</li>
-      <li>Card commission is guests, times the share who buy, times the average basket after discount, times your commission rate. Taxes are excluded.</li>
-      <li>The standard price per guest falls as more ships join, and an annual cap limits total cost. Both are shown here as proposals for discussion.</li>
-      <li>Paper avoided is net of the card and envelope UNIKMO adds. Carbon uses the factor you enter, so treat it as a rough guide, not a certified figure.</li>
+      <li>Card commission uses fixed defaults for the share of guests who buy, the basket and the discount, and is shown on top. Taxes are excluded.</li>
+      <li>The standard price per guest falls as more ships join. The prices are proposals for discussion.</li>
+      <li>Paper avoided is net of the card and envelope UNIKMO adds. Carbon uses our default factors, so treat it as a rough guide, not a certified figure.</li>
       <li>Rows marked as estimates depend on your inputs. UNIKMO has not verified any default shown here, and a pilot is how these get measured.</li>
     </ul>
   </div>
