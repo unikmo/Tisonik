@@ -162,6 +162,21 @@ button.primary[disabled] { opacity: 0.6; cursor: progress; }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
 .report p.hint { margin: 0; }
 .report h2 { font-size: 24px; margin: 0; }
+.feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px 40px; }
+.feat { border-top: 1px solid var(--ink); padding-top: 18px; }
+.feat p { color: var(--muted); margin: 10px 0 0; }
+.feat .card-line { color: var(--ink); font-size: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 0; padding: 0; list-style: none; }
+.chips li { border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 13px; color: var(--muted); }
+details.faq { border-top: 1px solid var(--line); padding: 16px 0; }
+details.faq:last-of-type { border-bottom: 1px solid var(--line); }
+details.faq summary { cursor: pointer; font-weight: 500; font-size: 16px; letter-spacing: -0.02em; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+details.faq summary::-webkit-details-marker { display: none; }
+details.faq summary::after { content: "+"; color: var(--muted); }
+details.faq[open] summary::after { content: "\2212"; }
+details.faq p { color: var(--muted); margin: 12px 0 0; max-width: 70ch; }
+.faq-wrap { max-width: 820px; }
+@media (max-width: 820px) { .feats { grid-template-columns: minmax(0, 1fr); gap: 32px; } }
 details.code { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); padding: 14px 18px; }
 details.code summary { cursor: pointer; font-weight: 500; }
 details.code p { color: var(--muted); font-size: 13px; margin: 10px 0; }
@@ -243,6 +258,52 @@ footer a:hover { color: var(--accent); }
   </div>
 </section>
 
+<section class="band" id="features">
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">For the cruise journey</p>
+      <h2>Built to feel natural onboard.</h2>
+      <p class="lede">A quieter interaction layer for guests, crew and the moments between the itinerary.</p>
+    </div>
+    <div class="feats">
+      <div class="feat">
+        <p class="eyebrow">Passenger experience</p>
+        <h3>Make the app feel more alive.</h3>
+        <p>Give guests more relevant reasons to interact throughout the sailing, without making the experience feel busy, intrusive or transactional.</p>
+        <p class="card-line">The card gets them started: it is on the bed when they arrive.</p>
+      </div>
+      <div class="feat">
+        <p class="eyebrow">Crew recognition</p>
+        <h3>Let great service be seen.</h3>
+        <p>A simple moment of recognition becomes visible, measurable and memorable, for the guest, the crew member and the operator.</p>
+        <p class="card-line">Your cruise director&rsquo;s message tells guests they can thank crew in the moment.</p>
+      </div>
+      <div class="feat">
+        <p class="eyebrow">Service recovery</p>
+        <h3>Resolve the moment while it still matters.</h3>
+        <p>Give guests a discreet way to signal friction during the journey, creating the opportunity to respond before the experience is over.</p>
+        <p class="card-line">The same message shows them the private way to raise a problem.</p>
+      </div>
+      <div class="feat">
+        <p class="eyebrow">Live experience feedback</p>
+        <h3>Improve events while the sailing is still underway.</h3>
+        <p>After a live event, ask three to five structured questions with prepared response blocks. Leaders see feedback immediately; the cruise line decides which aggregated ratings to publish.</p>
+      </div>
+      <div class="feat">
+        <p class="eyebrow">Ancillary revenue</p>
+        <h3>Make relevance commercial.</h3>
+        <p>When the guest is already engaged, relevant experiences and offers can appear naturally, while checkout, pricing and payment stay with the cruise line.</p>
+        <p class="card-line">Guests who want more can also buy private cards in the shop, with commission to the ship.</p>
+      </div>
+      <div class="feat">
+        <p class="eyebrow">Engagement</p>
+        <h3>The sailing keeps working after departure.</h3>
+        <p>The keepsake carries the voyage highlights home, added by the ship&rsquo;s media team, so guests have a reason to come back.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="band stone" id="calculator">
   <div class="container wrap">
     <div class="calc-head">
@@ -302,8 +363,7 @@ footer a:hover { color: var(--accent); }
       <li>Printing saved is your all-in printing cost per voyage multiplied by the share the card replaces. That covers your cruise app as well as the card.</li>
       <li>The results lead with the ship's own benefits. Card sales are optional and are shown on top, never mixed into the first two results.</li>
       <li>Card commission uses fixed defaults for the share of guests who buy, the basket and the discount, and is shown on top. Taxes are excluded.</li>
-      <li>The standard price per guest falls as more ships join. The prices are proposals for discussion.</li>
-      <li>Paper avoided is net of the card and envelope UNIKMO adds. Carbon uses our default factors, so treat it as a rough guide, not a certified figure.</li>
+            <li>Paper avoided is net of the card and envelope UNIKMO adds. Carbon uses our default factors, so treat it as a rough guide, not a certified figure.</li>
       <li>Rows marked as estimates depend on your inputs. UNIKMO has not verified any default shown here, and a pilot is how these get measured.</li>
     </ul>
   </div>
@@ -315,6 +375,54 @@ footer a:hover { color: var(--accent); }
     <pre id="code-src" tabindex="0"></pre>
   </details>
 
+  </div>
+</section>
+
+<section class="band" id="what-is">
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">What Tisonik is</p>
+      <h2>Not another app. One add-on inside the app guests already use.</h2>
+      <p class="lede">Tisonik is a white-label guest-experience interaction layer that integrates with the cruise line&rsquo;s existing app. There is no separate guest download and no replacement of the operator&rsquo;s booking or commerce stack. The cruise line retains control of its brand, app, inventory, pricing, checkout and payment. A card on each bed is how guests find it: they scan it, enter the welcome code for their trip and see a message from your cruise director, and the same card carries the voyage keepsake home.</p>
+      <ul class="chips"><li>Passenger experience</li><li>Crew recognition</li><li>Service recovery</li><li>Engagement</li><li>Ancillary revenue</li><li>Integration</li></ul>
+    </div>
+    <div class="steps">
+      <div class="step"><p class="eyebrow">Built to fit the cruise journey</p><h3>Inside the existing app</h3><p>No competing destination for the guest.</p></div>
+      <div class="step"><p class="eyebrow">&nbsp;</p><h3>Immediate operational feedback</h3><p>Structured event ratings reach leaders while they can still act.</p></div>
+      <div class="step"><p class="eyebrow">&nbsp;</p><h3>Revenue evidence without identity</h3><p>Confirmed booking value is attributed through opaque references and aggregated outcomes.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band stone" id="faq">
+  <div class="container">
+    <div class="sec-head">
+      <p class="eyebrow">FAQs</p>
+      <h2>Frequently asked questions about Tisonik.</h2>
+    </div>
+    <div class="faq-wrap">
+      <details class="faq"><summary>What is the card?</summary><p>A printed paper card, one on each bed. A QR code on the back opens a message from the cruise director. A welcome code, created for each trip and written on the card, ties it to the voyage, and it works only for cruise cards. On departure guests take the keepsake home with them.</p></details>
+      <details class="faq"><summary>Do guests need to download anything?</summary><p>No. The card opens the message, and Tisonik runs inside the cruise line’s existing app.</p></details>
+      <details class="faq"><summary>Who stores the messages and keepsake, and who owns them?</summary><p>UNIKMO stores them under its own process and keeps media for as long as possible, with no fixed limit. The cruise line owns them.</p></details>
+      <details class="faq"><summary>Who prints the cards and gets them to the ship?</summary><p>UNIKMO prints the cards and delivers them to the ship, with a lead time of two weeks at most. Ship staff place one on each bed.</p></details>
+      <details class="faq"><summary>Does the card add work for the crew?</summary><p>Ship staff place the card once per voyage. It replaces the daily programs, flyers and welcome packs the crew print and deliver today.</p></details>
+      <details class="faq"><summary>What does the card cost?</summary><p>5.00 per guest per voyage.</p></details>
+      <details class="faq"><summary>Can the ship earn from the card?</summary><p>Optionally. Guests can buy more private cards in the shop. The ship keeps a commission: 25% during the pilot, 30% after.</p></details>
+      <details class="faq"><summary>Where does Tisonik run?</summary><p>The passenger experience runs inside the cruise line’s existing app as a white-label SDK or embedded module. The card is a printed paper card that opens the cruise director’s message and the keepsake; the feature itself still runs inside the cruise line’s app. Identity resolution and source actions run on-device, ship-local or in the operator’s systems. Tisonik cloud receives only aggregate KPI reports and non-identifying service-health telemetry.</p></details>
+      <details class="faq"><summary>How do passenger privacy and data residency work?</summary><p>Passenger and crew source records remain in the operator-controlled environment and residency region. Card messages and keepsakes are stored by UNIKMO and owned by the cruise line. Tisonik receives no names, photos, biometric templates, face-match scores or person-level identifiers; cells below 20 are suppressed.</p></details>
+      <details class="faq"><summary>How much IT integration is required?</summary><p>One embedded feature connects to scoped host interfaces for launch context, operator-side identity, ship operations, booking outcomes and aggregate reporting. The pilot defines each interface before deployment.</p></details>
+      <details class="faq"><summary>What happens when ship connectivity is limited?</summary><p>The interface is cacheable and core actions can use device and ship-local services. Public internet is not required for every interaction; approved aggregate reports synchronize later.</p></details>
+      <details class="faq"><summary>How does Tisonik pass cybersecurity and vendor review?</summary><p>The production requirements include signed requests, tenant separation, role-based access, replay protection, allow-listed aggregate schemas, body-free analytics logs and independent security testing.</p></details>
+      <details class="faq"><summary>How are anonymous passenger vibes, safety and minors handled?</summary><p>Anonymous Vibes are adult-only. The operator resolves a photographed receiver inside its identity zone, returns no name, rejects same-cabin/booking-group and duplicate attempts, caps each sender at five vibes per sailing day, discards the capture after matching and delivers prepared compliments without sender identity or exact timing. A sixth attempt pauses sending until the next sailing day. Children cannot send, receive or be matched.</p></details>
+      <details class="faq"><summary>Can passengers choose to connect?</summary><p>Yes, through the separate VConnect flow, not by replying to an Anonymous Vibe. An adult may send one predefined connection request per sailing day. The recipient can accept, decline, block or report; the requester receives an update only after acceptance. Thereafter, both passengers can use prepared public-venue, activity and time options. Free text, cabins, room numbers, live location and dating-oriented prompts are excluded.</p></details>
+      <details class="faq"><summary>Does Anonymous Vibe require a second consent screen?</summary><p>No. The cruise line can include CruiseConnect recognition as a clearly stated purpose in its adult boarding imaging enrolment. Adults who accept are enrolled once for that sailing and are not interrupted again when using Anonymous Vibe; those who decline or opt out are excluded from matching.</p></details>
+      <details class="faq"><summary>Can the cruise line publish passenger rankings or identities?</summary><p>No. Top Five uses dense score positions and the result is private. Only the passenger can choose to share their own Vibe Card. Event RSVPs show a count by default; chosen name/image visibility is a separate passenger choice limited to confirmed attendees.</p></details>
+      <details class="faq"><summary>Does crew recognition become employee ranking?</summary><p>No public leaderboard or passenger-facing crew rating is created. Identity verification stays operator-side, recognition uses prepared positive reasons, and employment decisions remain solely with the cruise line.</p></details>
+      <details class="faq"><summary>Will this create additional operational workload?</summary><p>Prepared response blocks, routing rules and priority states turn activity into structured operational signals instead of another free-text inbox.</p></details>
+      <details class="faq"><summary>Can the revenue attribution be trusted?</summary><p>The operator resolves bookings locally and sends signed confirmed, cancelled, refunded and net-value totals. Tisonik does not rely on self-reported clicks or receive booking references.</p></details>
+      <details class="faq"><summary>Who controls the brand and published ratings?</summary><p>The cruise line controls the feature name, co-branding, placement and whether any aggregate event rating is published. The cruise line also owns the card, including its welcome message and keepsake.</p></details>
+      <details class="faq"><summary>Does the cruise line retain ownership and avoid lock-in?</summary><p>Yes. The operator keeps identity, commerce and all source records. Tisonik can be removed without migrating a passenger or biometric database from us.</p></details>
+    </div>
   </div>
 </section>
 
