@@ -42,6 +42,15 @@ h3 { font-size: 22px; line-height: 1.2; letter-spacing: -0.03em; }
 .accent { color: var(--accent); }
 .lede { color: var(--muted); font-size: clamp(14px, 1vw, 17px); max-width: 54ch; margin: 18px 0 0; }
 
+/* price strip */
+.price-strip { padding-block: 44px; border-bottom: 1px solid var(--line); }
+.ps-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; text-align: center; }
+@media (max-width: 700px) { .ps-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; } }
+.ps-fig { margin: 0; font-size: clamp(38px, 4.6vw, 58px); line-height: 1; letter-spacing: -0.045em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ps-fig.acc { color: var(--accent); }
+.ps-cap { margin: 10px auto 0; color: var(--muted); font-size: 14px; max-width: 28ch; }
+.ps-foot { margin: 26px 0 0; text-align: center; color: var(--muted); font-size: 12px; }
+
 /* header */
 .site-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 16px; padding-left: max(22px, env(safe-area-inset-left, 0px)); padding-right: max(22px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--line); }
 .brand { font-size: 12px; font-weight: 500; letter-spacing: 0.3em; text-decoration: none; }
@@ -198,6 +207,17 @@ footer a:hover { color: var(--accent); }
   </div>
 </section>
 
+<section class="price-strip" aria-label="The price in context">
+  <div class="container">
+    <div class="ps-grid">
+      <div><p class="ps-fig" id="s-price">5.00</p><p class="ps-cap">per guest, per voyage</p></div>
+      <div><p class="ps-fig acc" id="s-frac">4%</p><p class="ps-cap" id="s-frac-cap">of the tips guests already pay</p></div>
+      <div><p class="ps-fig" id="s-benefit">+0</p><p class="ps-cap">a year back to your ship, after the fee</p></div>
+    </div>
+    <p class="ps-foot">Illustrative figures. Set yours in the calculator below.</p>
+  </div>
+</section>
+
 <section class="band stone">
   <div class="container">
     <div class="sec-head">
@@ -247,7 +267,6 @@ footer a:hover { color: var(--accent); }
     <div class="calc-head">
       <p class="eyebrow">Savings calculator</p>
       <h2>What does it cost your ship, and what comes back?</h2>
-      <p>Enter your own figures below. Every number starts as an illustrative placeholder, and nothing you type is sent anywhere. When you are done, download the result as a PDF.</p>
     </div>
 
     <section>
@@ -260,26 +279,13 @@ footer a:hover { color: var(--accent); }
       <fieldset><legend>Your ship</legend>
         <div class="fields" id="g-ship"></div>
       </fieldset>
-      <fieldset><legend>What you print today</legend>
-        <p class="hint">Daily programs, promotions and welcome packs, all in. Use your total for one voyage, not the parts.</p>
+      <fieldset><legend>Your costs and value</legend>
         <div class="fields" id="g-print"></div>
-      </fieldset>
-      <fieldset><legend>TISONIK / UNIKMO bundle</legend>
-        <div class="fields" id="g-bundle"></div>
-      </fieldset>
-      <fieldset><legend>Sharpen the estimates (optional)</legend>
-        <p class="hint">Three figures that drive the value estimates. Everything else uses stated defaults, listed in the PDF.</p>
-        <div class="fields" id="g-value"></div>
       </fieldset>
       <div hidden id="g-fixed"></div>
     </form>
 
     <aside class="result" aria-live="polite">
-      <div class="card">
-        <p class="kicker">What we take, against what guests already pay</p>
-        <p class="big" id="r-frac">0</p>
-        <p class="sub" id="r-ctx"></p>
-      </div>
       <div class="card">
         <p class="kicker">Your benefit over one year</p>
         <p class="big" id="r-all">0</p>
@@ -362,11 +368,12 @@ footer a:hover { color: var(--accent); }
     ['ship', 'nights', 'Nights per voyage', 7, 1, ''],
     ['ship', 'voyages', 'Voyages per ship per year', 45, 1, ''],
     ['ship', 'ships', 'Ships', 1, 1, ''],
-    ['print', 'printCost', 'Printing cost per voyage, all-in', 3630, 100, 'whole ship: paper, ink, machines and the crew time to deliver it'],
+    ['print', 'printCost', 'Printing cost per voyage, all-in', 3630, 100, 'whole ship, including delivery'],
     ['print', 'removed', 'Share of printing the card replaces', 70, 5, '%'],
-    ['value', 'spendPD', 'Onboard spend per guest per day', 95, 5, ''],
-    ['value', 'bookProfit', 'Profit from one future booking', 600, 50, 'after cost of delivering it'],
-    ['value', 'crew', 'Crew on board', 1200, 10, ''],
+    ['print', 'priceIn', 'TISONIK / UNIKMO bundle, per guest per voyage', 5, 0.5, ''],
+    ['print', 'spendPD', 'Onboard spend per guest per day', 95, 5, ''],
+    ['print', 'bookProfit', 'Profit from one future booking', 600, 50, ''],
+    ['print', 'crew', 'Crew on board', 1200, 10, ''],
     ['fixed', 'tipPD', 'Daily gratuity per guest on your ship', 18, 1, 'default: average of published standard rates on major lines'],
     ['fixed', 'sheetG', 'Weight of one printed sheet', 4.5, 0.5, 'grams (A4, 80gsm)'],
     ['fixed', 'cardG', 'Weight of one UNIKMO card and envelope', 9, 1, 'grams'],
@@ -404,16 +411,11 @@ footer a:hover { color: var(--accent); }
         '<input type="number" inputmode="decimal" id="' + f[1] + '" value="' + f[3] + '" step="' + f[4] + '" min="0">'));
     });
     document.getElementById('g-ship').appendChild(field('cur', 'Currency', '', '<select id="cur"><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select>'));
-    var gb = document.getElementById('g-bundle'), gx = document.getElementById('g-fixed');
-    gb.appendChild(field('plan', 'Bundle price per guest per voyage', 'covers the card, welcome, keepsake hosting, TISONIK and guest recognition of crew. Standard falls with fleet size: 5.00 up to 4 ships, 4.00 for 5 to 14, 3.00 for 15 or more',
-      '<select id="plan"><option value="3">Pilot: 3.00</option><option value="tier" selected>Standard, by number of ships</option><option value="custom">Enter my own</option></select>'));
-    var cf = field('custom', 'Your own bundle price', '', '<input type="number" inputmode="decimal" id="custom" value="4" step="0.25" min="0">');
-    cf.hidden = true; gb.appendChild(cf);
+    var gx = document.getElementById('g-fixed');
     gx.appendChild(field('comm', 'Commission on card sales', '', '<select id="comm"><option value="25" selected>Pilot: 25%</option><option value="30">After the pilot: 30%</option></select>'));
     gx.appendChild(field('attach', 'Guests who buy a card', '% of guests', '<input type="number" id="attach" value="8" step="1" min="0" max="100">'));
     gx.appendChild(field('basket', 'Average basket at list price', '', '<input type="number" id="basket" value="40" step="1" min="0">'));
     gx.appendChild(field('disc', 'Guest discount on cards', '%', '<input type="number" id="disc" value="10" step="1" min="0" max="10">'));
-    document.getElementById('plan').addEventListener('change', function () { cf.hidden = this.value !== 'custom'; });
     document.getElementById('form').addEventListener('input', calc);
   }
   function v(id) { var n = parseFloat(document.getElementById(id).value); return isFinite(n) && n > 0 ? n : 0; }
@@ -450,9 +452,7 @@ footer a:hover { color: var(--accent); }
     var co2 = kgNet * v('co2');
 
     // bundle and card sales
-    var plan = document.getElementById('plan').value;
-    var tier = ships >= 15 ? 3 : ships >= 5 ? 4 : 5;
-    var listPrice = plan === 'custom' ? v('custom') : plan === 'tier' ? tier : parseFloat(plan);
+    var listPrice = v('priceIn');
     var annualList = listPrice * guests * voy * ships;
     var cap = 0;
     var annualFee = cap > 0 ? Math.min(annualList, cap) : annualList;
@@ -508,6 +508,7 @@ footer a:hover { color: var(--accent); }
       ['Card sales, if you want them', 'Calculated, optional', money(comm) + ' commission per voyage',
         'Guests who want more can buy private cards in your shop. You keep a commission, calculated before taxes.']
     ]; }
+    var ORDER = [4, 0, 2, 1, 6, 3, 5, 7, 8]; // most relevant first
     // On the page: text only. The figures sit in the results beside, and in the PDF.
     var SHORT = [
       ['Less printing, less labour', 'The card and your app replace the daily paper round.'],
@@ -520,7 +521,7 @@ footer a:hover { color: var(--accent); }
       ['Guests share the voyage', 'Every shared keepsake reaches people you would pay to reach.'],
       ['Card sales, if you want them', 'Optional. Guests buy more cards in your shop, you earn a commission.']
     ];
-    document.getElementById('adv').innerHTML = SHORT.map(function (a) {
+    document.getElementById('adv').innerHTML = ORDER.map(function (i) { return SHORT[i]; }).map(function (a) {
       return '<div class="a"><span class="tick"></span><div><h3>' + a[0] + '</h3><p class="why">' + a[1] + '</p></div></div>';
     }).join('');
 
@@ -548,9 +549,11 @@ footer a:hover { color: var(--accent); }
       if (surveyYear) ctx += ' Your post-cruise surveys cost about ' + money(surveyYear) + ' a year for the same ships.';
       return ctx;
     }
-    var fracEl = document.getElementById('r-frac'), tipTotal = v('tipPD') * nights;
-    fracEl.textContent = tipTotal > 0 ? (price / tipTotal * 100 < 10 ? (price / tipTotal * 100).toFixed(1) : Math.round(price / tipTotal * 100)) + '% of the tips' : '';
-    document.getElementById('r-ctx').textContent = ctxText();
+    var tipTotal = v('tipPD') * nights, fr = tipTotal > 0 ? price / tipTotal * 100 : 0;
+    document.getElementById('s-price').textContent = money(price, 2);
+    document.getElementById('s-frac').textContent = tipTotal > 0 ? (fr < 10 ? fr.toFixed(1) : Math.round(fr)) + '%' : '';
+    document.getElementById('s-frac-cap').textContent = 'of the ' + money(tipTotal) + ' guests already pay in tips (about ' + money(v('tipPD')) + ' a day)';
+    document.getElementById('s-benefit').textContent = signed(all * mult);
 
     var offset = saved + Math.max(value, 0) + comm;
     var max = Math.max(fee, offset, 1);
@@ -588,7 +591,7 @@ footer a:hover { color: var(--accent); }
       return '<tr class="' + r[0] + '"><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>';
     }).join('');
 
-    M = { adv: advList, rows: rowList, be: beText, ctx: ctxText,
+    M = { adv: function () { var a = advList(); return ORDER.map(function (i) { return a[i]; }); }, rows: rowList, be: beText, ctx: ctxText,
       guests: guests, nights: nights, voy: voy, ships: ships, mult: mult, fee: fee, price: price,
       annualFee: annualFee, saved: saved, comm: comm, value: value, hard: hard, all: all, withSales: withSales, kgNet: kgNet, co2: co2 };
   }
@@ -609,11 +612,10 @@ footer a:hover { color: var(--accent); }
 
   // Every figure you entered, with a flag for the ones you changed from our illustrative default.
   function collectInputs() {
-    var MONEY = { printCost: 1, bookProfit: 1, spendPD: 1, replCost: 1, cpm: 1, surveyPP: 1, basket: 1, custom: 1 };
-    var groups = [['ship', 'Your ship'], ['print', 'What you print today'], ['bundle', 'TISONIK / UNIKMO bundle'], ['value', 'Your own figures for the estimates'], ['fixed', 'Assumptions held at our defaults']];
+    var MONEY = { printCost: 1, priceIn: 1, bookProfit: 1, spendPD: 1, replCost: 1, cpm: 1, surveyPP: 1, basket: 1 };
+    var groups = [['ship', 'Your ship'], ['print', 'Your costs and value'], ['fixed', 'Assumptions held at our defaults']];
     var extra = {
       ship: [['cur', 'Currency', '']],
-      bundle: [['plan', 'Bundle price per guest per voyage', ''], ['custom', 'Your own bundle price', '']],
       fixed: [['comm', 'Commission on card sales', ''], ['attach', 'Guests who buy a card', '%'], ['basket', 'Average basket at list price', ''], ['disc', 'Guest discount on cards', '%']]
     };
     function read(id, unit) {
@@ -622,7 +624,6 @@ footer a:hover { color: var(--accent); }
         var d = el.querySelector('option[selected]') || el.options[0];
         changed = el.value !== d.value;
         val = clean(el.options[el.selectedIndex].text);
-        if (id === 'plan' && el.value === 'tier') val = 'Standard, ' + money(M.price, 2) + ' per guest';
       } else {
         var n = parseFloat(el.value); if (!isFinite(n)) n = 0;
         changed = n !== parseFloat(el.defaultValue);
@@ -643,7 +644,6 @@ footer a:hover { color: var(--accent); }
         var r = read(f[1], f[5]); rows.push({ label: f[2], val: r.val, changed: r.changed });
       });
       (extra[g[0]] || []).forEach(function (e) {
-        if (e[0] === 'custom' && document.getElementById('plan').value !== 'custom') return;
         var r = read(e[0], e[2]); rows.push({ label: e[1], val: r.val, changed: r.changed });
       });
       return { title: g[1], rows: rows };
