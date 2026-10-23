@@ -251,7 +251,7 @@ footer a:hover { color: var(--accent); }
     </div>
 
     <section>
-      <h2 class="sub-h">What your ship gets</h2>
+      <h2 class="sub-h">Where the value comes from</h2>
       <div class="advgrid" id="adv"></div>
     </section>
 
@@ -510,8 +510,21 @@ footer a:hover { color: var(--accent); }
         'Valued at what you would pay to reach the same number of people with ads.'],
       ['Card sales, if you want them', 'Calculated, optional', money(comm) + ' commission per voyage',
         'Guests who want more can buy private cards in your shop. You keep a commission, calculated before taxes.']
-    ]; }    document.getElementById('adv').innerHTML = advList().map(function (a) {
-      return '<div class="a"><span class="tick"></span><div><h3>' + a[0] + '<span class="tag">' + a[1] + '</span></h3><p class="fig">' + a[2] + '</p><p class="why">' + a[3] + '</p></div></div>';
+    ]; }
+    // On the page: text only. The figures sit in the results beside, and in the PDF.
+    var SHORT = [
+      ['Less printing, less labour', 'The card and your app replace the daily paper round.'],
+      ['Crew who feel seen', 'Guests thank crew in the moment. Retention starts on board.'],
+      ['Problems fixed in time', 'Guests tell you privately, before it reaches a review.'],
+      ['Feedback without the survey', 'A quick answer on board beats a long form weeks later.'],
+      ['More onboard revenue', 'Relevant offers at the right moment. Checkout stays yours.'],
+      ['A real sustainability story', 'Fewer printed pages, less ink, less to carry and dispose of.'],
+      ['A keepsake that brings guests back', 'The voyage stays in their home, with your brand on it.'],
+      ['Guests share the voyage', 'Every shared keepsake reaches people you would pay to reach.'],
+      ['Card sales, if you want them', 'Optional. Guests buy more cards in your shop, you earn a commission.']
+    ];
+    document.getElementById('adv').innerHTML = SHORT.map(function (a) {
+      return '<div class="a"><span class="tick"></span><div><h3>' + a[0] + '</h3><p class="why">' + a[1] + '</p></div></div>';
     }).join('');
 
     // results
