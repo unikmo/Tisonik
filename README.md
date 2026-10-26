@@ -50,7 +50,9 @@ USA
 
 ### Resort rating model
 
-The resort rating flow contains exactly 10 standard Tisonik questions. Participating hotels do not choose, replace or rewrite them.
+The in-app resort rating flow contains exactly 10 standard Tisonik questions. Participating hotels do not choose, replace or rewrite them.
+
+Hotels that connect a UNIKMO guest card use a separate, shorter rating: five 1–10 questions plus “Anything else to tell us?”. It is private to the hotel and is not published by Tisonik. See `docs/hotel-stays-go-live.md`.
 
 - Questions 1–8 are guest pain-point questions scored on a 1–10 scale.
 - Question 9 is **What was good?**, with up to 400 characters.

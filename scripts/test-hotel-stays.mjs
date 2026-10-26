@@ -12,6 +12,14 @@ function fakeDatabase() {
   let serial = 0
   return {
     tables,
+    rate: new Map(),
+    async rpc(name, args) {
+      const key = args.p_bucket
+      const hits = this.rate.get(key) || 0
+      if (name === 'stay_rate_limit_blocked') return { data: hits >= args.p_limit, error: null }
+      this.rate.set(key, hits + 1)
+      return { data: hits + 1 <= args.p_limit, error: null }
+    },
     from(name) {
       const rows = tables[name]
       const filters = []
@@ -215,5 +223,31 @@ assert.deepEqual(await stays.resolveStay(database, tenantUuid, made.body.code, n
 stay.status = 'voided'
 assert.deepEqual(await stays.resolveStay(database, tenant, created.code, during), { valid: false, reason: 'voided' })
 assert.equal((await stays.submitToStay(database, stay, 'thank_you', { message: 'Still here?' }, during)).status, 409)
+
+// Front desk role
+database.tables.memberships.push({ tenant_id: tenantUuid, user_id: 'desk', role: 'front_desk' })
+const deskMade = await portalAction(database, 'desk', { ...newStay, data: { ...newStay.data, bookingRef: 'BK-3003' } })
+assert.equal(deskMade.status, 201, 'front desk can create stays')
+assert.equal((await portalAction(database, 'desk', { action: 'void', tenantId: tenantUuid, data: { stayId: deskMade.body.stayId } })).status, 403, 'front desk cannot void')
+assert.equal((await portalAction(database, 'desk', { action: 'settings', tenantId: tenantUuid, data: { defaultWindowDays: 3, discoverItems: [] } })).status, 403, 'front desk cannot change settings')
+assert.equal((await portalAction(database, 'desk', { action: 'status', tenantId: tenantUuid, data: { submissionId: inboxRow.id, status: 'seen' } })).status, 200, 'front desk can work the inbox')
+
+// Rate limiting: wrong codes are counted per hotel, then lookups stop
+const limited = fakeDatabase()
+const limitedTenant = 'tenant-rl'
+const real = await stays.createStay(limited, limitedTenant, { bookingRef: 'RL-1', validFrom: '2026-11-10', validTo: '2026-11-14' })
+for (let attempt = 0; attempt < 10; attempt += 1) assert.equal((await stays.resolveStay(limited, limitedTenant, 'ZZZZZZZZ', during)).reason, 'unknown')
+const blocked = await stays.resolveStay(limited, limitedTenant, real.code, during)
+assert.equal(blocked.limited, true, 'after 10 wrong codes in a window, even the right code waits')
+const otherHotel = await stays.createStay(limited, 'tenant-other', { bookingRef: 'RL-2', validFrom: '2026-11-10', validTo: '2026-11-14' })
+assert.equal((await stays.resolveStay(limited, 'tenant-other', otherHotel.code, during)).valid, true, 'one hotel being guessed at does not block another')
+const rl = await import('../api/_lib/rate-limit.mjs')
+const guestDb = fakeDatabase()
+for (let i = 0; i < 20; i += 1) assert.equal(await rl.overLimit(guestDb, 'submit:x', 60, 20), false)
+assert.equal(await rl.overLimit(guestDb, 'submit:x', 60, 20), true, 'the 21st hit in a window is refused')
+assert.equal(rl.clientKey({ headers: { 'x-forwarded-for': '203.0.113.9, 10.0.0.1' } }).length, 32)
+assert.ok(!rl.clientKey({ headers: { 'x-real-ip': '203.0.113.9' } }).includes('203'), 'raw addresses are not stored')
+const broken = { rpc: async () => ({ data: null, error: new Error('db down') }) }
+assert.equal(await rl.overLimit(broken, 'b', 60, 1), false, 'a broken limiter never blocks guests')
 
 console.log('Hotel stay layer contract passed.')

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { allowPost, isSameSiteRequest, readJson, sendJson } from '../../_lib/http.mjs'
+import { clientKey, limits, overLimit } from '../../_lib/rate-limit.mjs'
 import { adminDatabase } from '../../_lib/supabase.mjs'
 import { guestToken, loadStay, notifyHotel, submitToStay } from '../../_lib/stays.mjs'
 
@@ -9,9 +10,10 @@ export default async function handler(request, response) {
   if (!allowPost(request, response)) return
   if (!isSameSiteRequest(request)) return sendJson(response, 403, { error: 'origin_not_allowed' })
   try {
+    const database = adminDatabase()
+    if (await overLimit(database, `submit:${clientKey(request)}`, limits.guestSubmit.window, limits.guestSubmit.max)) return sendJson(response, 429, { error: 'too_many_requests' })
     const parsed = requestSchema.safeParse(await readJson(request, 8_000))
     if (!parsed.success) return sendJson(response, 422, { error: 'invalid_request' })
-    const database = adminDatabase()
     const stay = await loadStay(database, guestToken(request, parsed.data))
     if (!stay) return sendJson(response, 401, { error: 'link_expired' })
     const result = await submitToStay(database, stay, parsed.data.kind, parsed.data.payload)

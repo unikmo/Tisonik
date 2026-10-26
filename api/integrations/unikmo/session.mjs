@@ -20,6 +20,7 @@ export default async function handler(request, response) {
     const parsed = unikmoSessionSchema.safeParse(await readJson(request, 2_000))
     if (!parsed.success) return sendJson(response, 400, { error: 'Invalid stay data' })
     const result = await resolveUnikmoSession(adminDatabase(), parsed.data)
+    if (result.limited) return sendJson(response, 429, { error: 'Too many attempts' })
     if (!result.ok) return sendJson(response, 403, { error: 'Unable to create guest session' })
     return sendJson(response, 200, { url: result.url })
   } catch (error) {

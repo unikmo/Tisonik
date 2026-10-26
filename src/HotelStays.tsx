@@ -22,7 +22,7 @@ const blankSettings: Settings = { hotel_name: '', unikmo_hotel_id: '', notify_em
 const itemsToText = (items: Settings['discover_items']) => items.map(item => `${item.title} | ${item.body}`).join('\n')
 const textToItems = (text: string) => text.split('\n').map(line => line.trim()).filter(Boolean).slice(0, 12).map(line => { const [title, ...rest] = line.split('|'); return { title: title.trim(), body: rest.join('|').trim() } }).filter(item => item.title)
 
-export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAdmin }: { tenantId: string; token: string; canWrite: boolean; isTisonikAdmin: boolean }) {
+export default function HotelStaysPanel({ tenantId, token, canWrite, canCreate, isTisonikAdmin }: { tenantId: string; token: string; canWrite: boolean; canCreate: boolean; isTisonikAdmin: boolean }) {
   const [settings, setSettings] = useState<Settings | null | undefined>(undefined)
   const [stays, setStays] = useState<Stay[]>([])
   const [subs, setSubs] = useState<Submission[]>([])
@@ -98,7 +98,7 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
       <h2>Hotel stays</h2>
       <p className="portal-empty">Stay-level data for this hotel: a booking number, an optional room and first name, and what guests write. This is separate from the aggregate reports above. Stays are deleted automatically 90 days after their after-checkout window closes.</p>
       {message && <p className="portal-status" role="status">{message}</p>}
-      {canWrite && <form className="hotel-form" onSubmit={createStay}>
+      {canCreate && <form className="hotel-form" onSubmit={createStay}>
         <label>Booking number<input required maxLength={80} value={form.bookingRef} onChange={e => setForm({ ...form, bookingRef: e.target.value })} /></label>
         <label>Arrival<input required type="date" value={form.validFrom} onChange={e => setForm({ ...form, validFrom: e.target.value })} /></label>
         <label>Departure<input required type="date" min={form.validFrom} value={form.validTo} onChange={e => setForm({ ...form, validTo: e.target.value })} /></label>

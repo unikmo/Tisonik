@@ -12,7 +12,8 @@ Tisonik is a product of TSquare Ventures LLC for guest-experience activation in 
 ### In-stay ratings and service recovery
 - The resort can invite guests to rate the stay while they are still on property or shortly before departure, when there is still time to act on poor experiences.
 - The rating flow is designed to take no more than about five minutes.
-- The rating product uses exactly 10 standard questions. Participating hotels do not choose, replace or rewrite the questions.
+- The in-app resort rating product uses exactly 10 standard questions. Participating hotels do not choose, replace or rewrite the questions.
+- Hotels that connect a UNIKMO guest card use a separate private five-question rating (five 1–10 questions plus an optional comment). It goes to the hotel team and is not published by Tisonik.
 - Questions 1–8 are fixed guest pain-point questions, each using the same 1–10 score scale.
 - Those eight scored areas cover room cleanliness and maintenance, room comfort, food quality and choice, drinks and bar service, waiting times and speed of service, staff helpfulness and welcome, pools/beach/shared areas, and ease of finding and joining activities, entertainment and included experiences.
 - Question 9 is “What was good?” and allows up to 400 characters.

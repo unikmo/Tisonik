@@ -2,7 +2,9 @@ import { z } from 'zod'
 import { createStay, createStaySchema } from './stays.mjs'
 
 const writeRoles = ['tisonik_admin', 'operator_admin']
-const inboxRoles = [...writeRoles, 'operator_analyst']
+// Front desk can create stays and work the inbox; only admins can void stays or change settings.
+const createRoles = [...writeRoles, 'front_desk']
+const inboxRoles = [...createRoles, 'operator_analyst']
 
 const envelope = z.object({
   action: z.enum(['create', 'void', 'status', 'settings']),
@@ -32,7 +34,7 @@ export async function portalAction(database, userId, rawBody) {
   if (!parsed.success) return { status: 422, body: { error: 'invalid_request' } }
   const { action, tenantId, data } = parsed.data
   const role = await roleOf(database, userId, tenantId)
-  const allowed = action === 'status' ? inboxRoles : writeRoles
+  const allowed = action === 'status' ? inboxRoles : action === 'create' ? createRoles : writeRoles
   if (!role || !allowed.includes(role)) return { status: 403, body: { error: 'not_permitted' } }
 
   if (action === 'create') {

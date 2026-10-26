@@ -1,5 +1,6 @@
 import { createHmac, randomInt, timingSafeEqual } from 'node:crypto'
 import { z } from 'zod'
+import { isBlocked, limits, overLimit } from './rate-limit.mjs'
 
 // 31 characters, no 0/O/1/I/L. Eight characters is about 850 billion combinations.
 export const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'
@@ -132,12 +133,20 @@ export const submissionLimits = { thank_you: 10, private: 5, feedback: 5, rating
 
 const stayColumns = 'id, tenant_id, booking_ref, room, guest_label, valid_from, valid_to, window_days, status'
 
+// Wrong codes are counted per hotel. Once a hotel has had too many in a minute, lookups stop until the window rolls over.
+const failBucket = tenantId => `fail:${tenantId}`
+async function refuse(database, tenantId, result) {
+  await overLimit(database, failBucket(tenantId), limits.failedCodes.window, limits.failedCodes.max)
+  return result
+}
+
 export async function resolveStay(database, tenantId, rawCode, now = new Date()) {
+  if (await isBlocked(database, failBucket(tenantId), limits.failedCodes.window, limits.failedCodes.max)) return { valid: false, reason: 'rate_limited', limited: true }
   const code = normalizeCode(rawCode)
-  if (!code) return { valid: false, reason: 'unknown' }
+  if (!code) return refuse(database, tenantId, { valid: false, reason: 'unknown' })
   const { data: stay, error } = await database.from('hotel_stays').select(stayColumns).eq('tenant_id', tenantId).eq('code_digest', codeDigest(tenantId, code)).maybeSingle()
   if (error) throw error
-  if (!stay) return { valid: false, reason: 'unknown' }
+  if (!stay) return refuse(database, tenantId, { valid: false, reason: 'unknown' })
   const phase = stayPhase(stay, now)
   if (phase === 'voided') return { valid: false, reason: 'voided' }
   return {
@@ -170,11 +179,13 @@ export async function resolveUnikmoSession(database, input, now = new Date()) {
   const { data: settings, error } = await database.from('hotel_stay_settings').select('tenant_id').eq('unikmo_hotel_id', input.hotelId).maybeSingle()
   if (error) throw error
   if (!settings) return { ok: false }
+  if (await isBlocked(database, failBucket(settings.tenant_id), limits.failedCodes.window, limits.failedCodes.max)) return { ok: false, limited: true }
+  if (await overLimit(database, `hotel:${settings.tenant_id}`, limits.hotelCalls.window, limits.hotelCalls.max)) return { ok: false, limited: true }
   const code = normalizeCode(input.cardCode)
-  if (!code) return { ok: false }
+  if (!code) return refuse(database, settings.tenant_id, { ok: false })
   const { data: stay, error: stayError } = await database.from('hotel_stays').select(stayColumns).eq('tenant_id', settings.tenant_id).eq('code_digest', codeDigest(settings.tenant_id, code)).maybeSingle()
   if (stayError) throw stayError
-  if (!stay || stay.booking_ref.trim().toLowerCase() !== input.guestReference.trim().toLowerCase()) return { ok: false }
+  if (!stay || stay.booking_ref.trim().toLowerCase() !== input.guestReference.trim().toLowerCase()) return refuse(database, settings.tenant_id, { ok: false })
   const phase = stayPhase(stay, now)
   if (phase === 'voided') return { ok: false }
   return { ok: true, url: `${publicOrigin()}/stay/#t=${signStayToken(stay.id, now.getTime())}`, phase }

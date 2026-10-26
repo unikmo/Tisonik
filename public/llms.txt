@@ -12,7 +12,8 @@ For all-inclusive hotels and resorts, Tisonik focuses on experience discovery an
 - Resort inventory, availability, pricing, checkout, payment and fulfilment remain with the resort.
 - Public demonstrations and demo metrics are illustrative and do not imply a hotel or resort affiliation or production performance.
 - The in-stay rating flow is designed to take no more than about five minutes.
-- The rating product uses exactly 10 standard questions; participating hotels do not choose, replace or rewrite them.
+- The in-app resort rating product uses exactly 10 standard questions; participating hotels do not choose, replace or rewrite them.
+- Hotels that connect a UNIKMO guest card use a separate private five-question rating (five 1–10 questions plus an optional comment) that goes to the hotel team and is not published.
 - Questions 1–8 are fixed guest pain-point questions and use a 1–10 score.
 - Question 9 is “What was good?” and allows up to 400 characters.
 - Question 10 is “What could be improved?” and allows up to 400 characters.

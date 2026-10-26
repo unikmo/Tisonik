@@ -279,7 +279,7 @@ const ResortPillar = () => (
           <h2>Ask while there is still time to make it right.</h2>
           <p>The flow is deliberately short: questions 1–8 are standard guest pain-point ratings scored from 1 to 10. Question 9 asks “What was good?” and question 10 asks “What could be improved?” Each written answer is capped at 400 characters.</p>
           <div className="resort-rating-benefits">
-            <article><strong>One standard format</strong><span>Every participating property uses the same 10-question flow: eight scored pain-point questions followed by two short written wrap-up questions.</span></article>
+            <article><strong>One standard format</strong><span>Every property using the in-app resort rating uses the same 10-question flow: eight scored pain-point questions followed by two short written wrap-up questions.</span></article>
             <article><strong>Recovery while it matters</strong><span>The resort receives the signal while the guest is still there and has a real chance to respond before checkout.</span></article>
             <article><strong>Participation means publication</strong><span>Submitted ratings go public. A participating property cannot selectively suppress or hold back poor ratings.</span></article>
           </div>
@@ -564,6 +564,7 @@ const seoPages: Record<Exclude<ResortPageKey, 'pillar' | 'demo' | 'pilot'>, {
     points: [
       { title: 'Questions 1–8: score', body: 'Eight fixed guest pain-point questions use the same 1–10 scale. Participating hotels do not choose or rewrite them.' },
       { title: 'Questions 9–10: context', body: '“What was good?” and “What could be improved?” close the rating with two separate answers of up to 400 characters each.' },
+      { title: 'Shorter for card-based hotel stays', body: 'Hotels that connect a UNIKMO guest card use a shorter private rating instead: five 1–10 questions plus “Anything else to tell us?”. It goes to the hotel team and is not published by Tisonik.' },
       { title: 'Public by participation', body: 'Submitted ratings go public. The resort can respond while the guest is still there, but participation does not include a right to suppress poor ratings.' },
     ],
   },

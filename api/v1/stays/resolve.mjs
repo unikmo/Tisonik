@@ -13,7 +13,8 @@ export default async function handler(request, response) {
     if (!auth) return sendJson(response, 401, { error: 'invalid_connector_credentials' })
     const parsed = requestSchema.safeParse(await readJson(request, 2_000))
     if (!parsed.success) return sendJson(response, 422, { error: 'invalid_request' })
-    return sendJson(response, 200, await resolveStay(auth.database, auth.connector.tenant_id, parsed.data.code))
+    const result = await resolveStay(auth.database, auth.connector.tenant_id, parsed.data.code)
+    return sendJson(response, result.limited ? 429 : 200, result)
   } catch (error) {
     if (error instanceof SyntaxError) return sendJson(response, 400, { error: 'invalid_json' })
     console.error('stay-resolve-failed', error?.message || error)
