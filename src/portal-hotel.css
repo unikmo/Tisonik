@@ -1,0 +1,9 @@
+.hotel-form{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;align-items:end}.hotel-form label{display:grid;gap:7px;font-size:11px;font-weight:700}.hotel-form input,.hotel-form textarea{border:1px solid #d4dfdb;border-radius:9px;padding:10px;font:inherit;background:#fafbf9}.hotel-form .hotel-wide{grid-column:1/-1}.hotel-form button{justify-self:start}
+.hotel-code{display:flex;flex-wrap:wrap;gap:14px;align-items:center;background:#e5f3ef;border-radius:12px;padding:16px;margin:8px 0 18px}.hotel-code span{flex:1 1 220px;font-size:12px;color:#355a5e}.hotel-code strong{font-size:34px;letter-spacing:.16em;font-family:ui-monospace,Consolas,monospace}
+.hotel-stays>div{display:grid;grid-template-columns:2fr .7fr 1.6fr .8fr .6fr;gap:12px;padding:11px 12px;border-bottom:1px solid #e7ece9;font-size:12px;align-items:center}
+.hotel-link{background:none!important;color:#338a81!important;padding:4px 8px!important;font-size:12px;text-decoration:underline;border:0}
+.hotel-filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}.hotel-filters button{background:#fff!important;color:#17363b!important;border:1px solid #d8e1dd!important}.hotel-filters button.on{background:#173f47!important;color:#fff!important}
+.hotel-averages{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}.hotel-averages article{border:1px solid #e1e7e4;border-radius:12px;padding:12px}.hotel-averages span{display:block;font-size:11px;color:#748589}.hotel-averages strong{font-size:24px}
+.hotel-actions{display:flex;gap:6px;margin-top:6px}
+@media(max-width:900px){.hotel-form{grid-template-columns:1fr 1fr}.hotel-averages{grid-template-columns:1fr 1fr 1fr}.hotel-stays>div{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.hotel-form{grid-template-columns:1fr}.hotel-averages{grid-template-columns:1fr 1fr}.hotel-code strong{font-size:28px}}

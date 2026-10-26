@@ -8,7 +8,7 @@ const stays = await import('../api/_lib/stays.mjs')
 
 // Minimal in-memory stand-in for the Supabase query builder used by the stay layer.
 function fakeDatabase() {
-  const tables = { hotel_stays: [], hotel_stay_submissions: [], hotel_stay_settings: [] }
+  const tables = { hotel_stays: [], hotel_stay_submissions: [], hotel_stay_settings: [], memberships: [] }
   let serial = 0
   return {
     tables,
@@ -16,6 +16,7 @@ function fakeDatabase() {
       const rows = tables[name]
       const filters = []
       let countOnly = false
+      let patch = null
       const run = () => rows.filter(row => filters.every(([key, value]) => row[key] === value))
       const builder = {
         select(_columns, options) { countOnly = options?.head === true; return builder },
@@ -24,14 +25,24 @@ function fakeDatabase() {
         insert(value) {
           const duplicate = name === 'hotel_stays' && rows.some(row => row.tenant_id === value.tenant_id && row.code_digest === value.code_digest)
           const duplicateRating = name === 'hotel_stay_submissions' && value.kind === 'rating' && rows.some(row => row.stay_id === value.stay_id && row.kind === 'rating')
-          const row = { id: `id-${++serial}`, status: name === 'hotel_stays' ? 'active' : 'new', ...value }
+          const row = { id: `00000000-0000-4000-8000-${String(++serial).padStart(12, '0')}`, status: name === 'hotel_stays' ? 'active' : 'new', ...value }
           return { select: () => ({ single: async () => {
             if (duplicate || duplicateRating) return { data: null, error: { code: '23505' } }
             rows.push(row)
             return { data: { id: row.id }, error: null }
           } }) }
         },
-        then(resolve) { resolve(countOnly ? { count: run().length, error: null } : { data: run(), error: null }) },
+        update(values) { patch = values; return builder },
+        async upsert(value, options) {
+          const index = rows.findIndex(row => row[options.onConflict] === value[options.onConflict])
+          if (index >= 0) rows[index] = { ...rows[index], ...value }
+          else rows.push(value)
+          return { error: null }
+        },
+        then(resolve) {
+          if (patch) { run().forEach(row => Object.assign(row, patch)); return resolve({ error: null }) }
+          resolve(countOnly ? { count: run().length, error: null } : { data: run(), error: null })
+        },
       }
       return builder
     },
@@ -105,6 +116,45 @@ assert.equal(session.hotelName, 'Hotel Test')
 assert.equal(session.tiles.rating, false, 'rating is hidden once submitted')
 assert.equal(session.questions.length, 5)
 assert.equal(session.discover.length, 1)
+
+// Portal actions (signed-in staff)
+const { portalAction } = await import('../api/_lib/stays-portal.mjs')
+const tenantUuid = '11111111-1111-4111-8111-111111111111'
+const otherUuid = '22222222-2222-4222-8222-222222222222'
+database.tables.memberships.push(
+  { tenant_id: tenantUuid, user_id: 'admin', role: 'operator_admin' },
+  { tenant_id: tenantUuid, user_id: 'analyst', role: 'operator_analyst' },
+  { tenant_id: tenantUuid, user_id: 'viewer', role: 'operator_viewer' },
+)
+const newStay = { action: 'create', tenantId: tenantUuid, data: { bookingRef: 'BK-2002', validFrom: '2026-12-01', validTo: '2026-12-03', room: '12', guestLabel: 'Alex' } }
+const made = await portalAction(database, 'admin', newStay)
+assert.equal(made.status, 201)
+assert.match(made.body.code, /^[2-9A-HJKMNP-Z]{8}$/)
+const madeRow = database.tables.hotel_stays.find(row => row.id === made.body.stayId)
+assert.equal(madeRow.tenant_id, tenantUuid, 'stay belongs to the staff member\'s hotel')
+assert.equal((await portalAction(database, 'analyst', newStay)).status, 403, 'analysts cannot create stays')
+assert.equal((await portalAction(database, 'viewer', { action: 'status', tenantId: tenantUuid, data: { submissionId: '33333333-3333-4333-8333-333333333333', status: 'seen' } })).status, 403)
+assert.equal((await portalAction(database, 'admin', { ...newStay, tenantId: otherUuid })).status, 403, 'no access to another hotel')
+assert.equal((await portalAction(database, 'admin', { ...newStay, data: { ...newStay.data, validTo: '2026-11-30' } })).status, 422, 'departure before arrival is rejected')
+assert.equal((await portalAction(database, 'stranger', newStay)).status, 403)
+
+const inboxRow = database.tables.hotel_stay_submissions[0]
+const marked = await portalAction(database, 'analyst', { action: 'status', tenantId: tenantUuid, data: { submissionId: inboxRow.id, status: 'resolved' } })
+assert.equal(marked.status, 200)
+assert.equal(database.tables.hotel_stay_submissions.find(row => row.id === inboxRow.id).status, 'new', 'ids from the stub tenant do not match this hotel, so nothing changes')
+inboxRow.tenant_id = tenantUuid
+await portalAction(database, 'analyst', { action: 'status', tenantId: tenantUuid, data: { submissionId: inboxRow.id, status: 'resolved' } })
+assert.equal(inboxRow.status, 'resolved')
+
+const settingsResult = await portalAction(database, 'admin', { action: 'settings', tenantId: tenantUuid, data: { hotelName: 'Hotel Test', notifyEmail: 'desk@hotel.example', defaultWindowDays: 10, discoverItems: [{ title: 'Spa', body: 'Level 2' }] } })
+assert.equal(settingsResult.status, 200)
+assert.equal(database.tables.hotel_stay_settings.find(row => row.tenant_id === tenantUuid).default_window_days, 10)
+assert.equal((await portalAction(database, 'admin', { action: 'settings', tenantId: tenantUuid, data: { notifyEmail: 'not-an-email', defaultWindowDays: 10, discoverItems: [] } })).status, 422)
+
+const voidResult = await portalAction(database, 'admin', { action: 'void', tenantId: tenantUuid, data: { stayId: made.body.stayId } })
+assert.equal(voidResult.status, 200)
+assert.equal(madeRow.status, 'voided')
+assert.deepEqual(await stays.resolveStay(database, tenantUuid, made.body.code, new Date('2026-12-02T12:00:00Z')), { valid: false, reason: 'voided' })
 
 // A voided stay stops working at once
 stay.status = 'voided'
