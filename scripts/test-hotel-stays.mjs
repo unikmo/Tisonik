@@ -80,7 +80,29 @@ assert.deepEqual(await stays.resolveStay(database, 'tenant-2', created.code, dur
 const token = ok.stayUrl.split('#t=')[1]
 assert.ok(stays.verifyStayToken(token, during.getTime()))
 assert.equal(stays.verifyStayToken(token + 'x', during.getTime()), null)
-assert.equal(stays.verifyStayToken(token, during.getTime() + 13 * 3600_000), null, 'expires after 12 hours')
+assert.equal(stays.verifyStayToken(token, during.getTime() + 16 * 60_000), null, 'a link expires after 15 minutes')
+assert.equal(stays.verifyStayToken(token, during.getTime(), 'session'), null, 'a link is not a session')
+
+// Link -> cookie session exchange
+const exchanged = await stays.exchangeLink(database, token, during)
+assert.ok(exchanged, 'a fresh link can be exchanged')
+assert.ok(stays.verifyStayToken(exchanged.token, during.getTime(), 'session'))
+assert.equal(stays.verifyStayToken(exchanged.token, during.getTime(), 'link'), null, 'a session cannot be exchanged again')
+assert.equal(await stays.exchangeLink(database, exchanged.token, during), null, 'only links can be exchanged')
+assert.equal(await stays.exchangeLink(database, token, new Date(during.getTime() + 16 * 60_000)), null, 'an old link cannot be exchanged')
+// Valid to 14 Nov + 14 day window + 1 day = ends 29 Nov 00:00 UTC
+assert.equal(exchanged.maxAge, Math.floor((Date.parse('2026-11-29T00:00:00Z') - during.getTime()) / 1000), 'session lasts to the end of the after-checkout window')
+assert.ok(stays.verifyStayToken(exchanged.token, Date.parse('2026-11-28T12:00:00Z')), 'still valid after checkout, inside the window')
+assert.equal(stays.verifyStayToken(exchanged.token, Date.parse('2026-11-29T01:00:00Z')), null, 'dead once the window closes')
+assert.equal(stays.signSessionToken(database.tables.hotel_stays[0], Date.parse('2026-12-30T00:00:00Z')), null, 'no session for a closed stay')
+const cookie = stays.sessionCookie(exchanged.token, exchanged.maxAge)
+assert.match(cookie, /HttpOnly; Secure; SameSite=Strict$/)
+assert.equal(stays.readCookie({ headers: { cookie: 'a=1; tsk_stay=' + exchanged.token + '; b=2' } }, 'tsk_stay'), exchanged.token)
+assert.equal(stays.guestToken({ headers: { cookie: 'tsk_stay=COOKIE' } }, { token: 'BODY' }), 'COOKIE', 'cookie wins over body token')
+assert.equal(stays.guestToken({ headers: {} }, { token: 'BODY' }), 'BODY')
+database.tables.hotel_stays[0].status = 'voided'
+assert.equal(await stays.exchangeLink(database, token, during), null, 'a voided stay cannot be exchanged')
+database.tables.hotel_stays[0].status = 'active'
 
 // UNIKMO session contract: hotelId, cardCode, guestReference, stayEndsAt
 database.tables.hotel_stay_settings[0].unikmo_hotel_id = 'HOTEL-001'

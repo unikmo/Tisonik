@@ -5,7 +5,8 @@ import { z } from 'zod'
 export const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'
 const codePattern = /^[2-9A-HJKMNP-Z]{8}$/
 
-export const TOKEN_LIFETIME_SECONDS = 12 * 3600
+export const TOKEN_LIFETIME_SECONDS = 15 * 60
+const SESSION_MAX_SECONDS = 30 * 86_400
 
 // Draft wording. Five scored questions (1-10, same scale as the resort rating) plus a free-text box.
 export const RATING_QUESTIONS = [
@@ -43,24 +44,43 @@ export function codeDigest(tenantId, code) {
 
 const b64 = value => Buffer.from(value).toString('base64url')
 
+const seal = body => createHmac('sha256', secret('STAY_LINK_SECRET')).update(body).digest('base64url')
+
+// A link is short-lived and only good for exchanging into a cookie session.
 export function signStayToken(stayId, now = Date.now()) {
-  const body = b64(JSON.stringify({ s: stayId, e: Math.floor(now / 1000) + TOKEN_LIFETIME_SECONDS }))
-  const mac = createHmac('sha256', secret('STAY_LINK_SECRET')).update(body).digest('base64url')
-  return `${body}.${mac}`
+  const body = b64(JSON.stringify({ s: stayId, p: 'link', e: Math.floor(now / 1000) + TOKEN_LIFETIME_SECONDS }))
+  return `${body}.${seal(body)}`
 }
 
-export function verifyStayToken(token, now = Date.now()) {
+// A session lasts until the stay's after-checkout window closes (plus a day), never more than 30 days.
+export function signSessionToken(stay, now = Date.now()) {
+  const windowEnd = Date.parse(`${addDays(stay.valid_to, stay.window_days + 1)}T00:00:00Z`)
+  const expires = Math.min(windowEnd, now + SESSION_MAX_SECONDS * 1000)
+  if (expires <= now) return null
+  const body = b64(JSON.stringify({ s: stay.id, p: 'session', e: Math.floor(expires / 1000) }))
+  return { token: `${body}.${seal(body)}`, maxAge: Math.floor((expires - now) / 1000) }
+}
+
+export const SESSION_COOKIE = 'tsk_stay'
+export const sessionCookie = (value, maxAge) => `${SESSION_COOKIE}=${value}; Max-Age=${maxAge}; Path=/api/v1/stays; HttpOnly; Secure; SameSite=Strict`
+
+export function readCookie(request, name) {
+  const match = String(request.headers?.cookie || '').split(';').map(part => part.trim()).find(part => part.startsWith(`${name}=`))
+  return match ? match.slice(name.length + 1) : null
+}
+
+export function verifyStayToken(token, now = Date.now(), purpose = null) {
   if (typeof token !== 'string' || token.length > 400) return null
   const [body, mac, extra] = token.split('.')
   if (!body || !mac || extra !== undefined) return null
-  const expected = createHmac('sha256', secret('STAY_LINK_SECRET')).update(body).digest('base64url')
   const a = Buffer.from(mac)
-  const b = Buffer.from(expected)
+  const b = Buffer.from(seal(body))
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null
   try {
-    const { s, e } = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'))
+    const { s, e, p } = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'))
     if (typeof s !== 'string' || typeof e !== 'number' || e * 1000 < now) return null
-    return { stayId: s }
+    if (purpose && p !== purpose) return null
+    return { stayId: s, purpose: p }
   } catch {
     return null
   }
@@ -189,12 +209,22 @@ export const createStaySchema = z.object({
   windowDays: z.number().int().min(0).max(60).optional(),
 }).strict().refine(value => value.validTo >= value.validFrom, { message: 'invalid_stay_dates' })
 
-export async function loadStay(database, token, now = new Date()) {
-  const verified = verifyStayToken(token, now.getTime())
+// The cookie session is preferred; a link token in the body is only a fallback for browsers that refuse cookies.
+export async function loadStay(database, token, now = new Date(), purpose = null) {
+  const verified = verifyStayToken(token, now.getTime(), purpose)
   if (!verified) return null
   const { data, error } = await database.from('hotel_stays').select(stayColumns).eq('id', verified.stayId).maybeSingle()
   if (error) throw error
   return data || null
+}
+
+export const guestToken = (request, body) => readCookie(request, SESSION_COOKIE) || (typeof body?.token === 'string' ? body.token : null)
+
+// Swaps a link for a cookie session. Returns null if the link is bad or the stay can no longer open.
+export async function exchangeLink(database, linkToken, now = new Date()) {
+  const stay = await loadStay(database, linkToken, now, 'link')
+  if (!stay || stayPhase(stay, now) === 'voided') return null
+  return signSessionToken(stay, now.getTime())
 }
 
 export async function guestSession(database, stay, now = new Date()) {

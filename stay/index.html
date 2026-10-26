@@ -34,6 +34,8 @@ input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
 .scale input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
 .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
 .note{font-size:13px;color:var(--muted);margin-top:28px}
+.hotel-forget{all:unset;cursor:pointer;font-size:13px;color:var(--accent);text-decoration:underline;margin-top:8px}
+.hotel-forget:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 ul.plain{list-style:none;margin:0;padding:0}
 ul.plain li{padding:10px 0;border-top:1px solid var(--line)}
 ul.plain li:first-child{border-top:0}
@@ -43,12 +45,12 @@ ul.plain li:first-child{border-top:0}
 (function(){
   var root=document.getElementById('root')
   var match=/[#&]t=([^&]+)/.exec(location.hash)
-  var token=match?match[1]:''
+  var token=match?match[1]:undefined
   var state=null
   function el(tag,attrs,kids){var n=document.createElement(tag);for(var k in (attrs||{})){if(k==='text')n.textContent=attrs[k];else n.setAttribute(k==='class'?'class':k,attrs[k])}(kids||[]).forEach(function(c){n.appendChild(c)});return n}
   function api(path,body){return fetch('/api/v1/stays/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().catch(function(){return{}}).then(function(j){return{status:r.status,body:j}})})}
   function shell(children){root.innerHTML='';root.appendChild(el('main',{id:'stay'},children))}
-  function failure(text){shell([el('p',{class:'eyebrow',text:'Tisonik'}),el('h1',{text:'This link has expired'}),el('p',{class:'lead',text:text})])}
+  function failure(text){shell([el('p',{class:'eyebrow',text:'Tisonik'}),el('h1',{text:'This page is not open'}),el('p',{class:'lead',text:text})])}
 
   function tile(title,sub,build){
     var panel=el('div',{class:'panel'});panel.hidden=true
@@ -112,6 +114,12 @@ ul.plain li:first-child{border-top:0}
     })
   }
 
+  function forget(){
+    var b=el('button',{type:'button',class:'hotel-forget',text:'Forget this device'})
+    b.addEventListener('click',function(){token=undefined;api('logout',{}).then(function(){failure('This device has been signed out. '+again)})})
+    return b
+  }
+
   function render(){
     var t=state.tiles,list=[]
     if(t.thankYou)list.push(tile('Thank someone','Tell us who made you feel special',function(p){textForm(p,'thank_you',{recipient:true,label:'Your message',min:3,max:500,done:'Thank you. We will pass it on.'})}))
@@ -120,13 +128,21 @@ ul.plain li:first-child{border-top:0}
     if(t.rating)list.push(tile('Rate your stay','Five quick questions',ratingForm))
     if(t.discover&&state.discover.length)list.push(tile('Discover','Recommended by the hotel',function(p){var u=el('ul',{class:'plain'});state.discover.slice(0,12).forEach(function(d){u.appendChild(el('li',{},[el('strong',{text:String(d.title||'')}),el('div',{class:'sub',text:String(d.body||'')})]))});p.appendChild(u)}))
     if(t.keepsake)list.push(tile('Your keepsake','Keep your card',function(p){p.appendChild(el('p',{text:'Your UNIKMO card is yours to keep. Scan it any time to come back to this page while it is open.'}))}))
-    shell([el('p',{class:'eyebrow',text:state.hotelName||'Your stay'}),el('h1',{text:state.firstName?'Welcome, '+state.firstName:'Your stay'}),el('p',{class:'lead',text:'A few ways to tell us how it is going.'}),el('div',{class:'tiles'},list),el('p',{class:'note',text:'Your messages go to the hotel team. Nothing here is posted publicly.'})])
+    shell([el('p',{class:'eyebrow',text:state.hotelName||'Your stay'}),el('h1',{text:state.firstName?'Welcome, '+state.firstName:'Your stay'}),el('p',{class:'lead',text:'A few ways to tell us how it is going.'}),el('div',{class:'tiles'},list),el('p',{class:'note',text:'Your messages go to the hotel team. Nothing here is posted publicly.'}),forget()])
   }
 
-  if(!token){failure('Scan the card in your room again to open this page.');return}
-  api('session',{token:token}).then(function(res){
-    if(res.status===200){state=res.body;render()}
-    else failure('Scan the card in your room again to open this page.')
-  }).catch(function(){failure('We could not reach the service. Please try again in a moment.')})
+  var again='Scan the card in your room again to open this page.'
+  function open(){
+    return api('session',{token:token}).then(function(res){
+      if(res.status===200){state=res.body;render()}
+      else failure(again)
+    })
+  }
+  // Swap the short-lived link in the address for a private cookie, then take it out of the address bar.
+  var start=token?api('exchange',{token:token}).then(function(res){
+    if(res.status===200){try{history.replaceState(null,'',location.pathname)}catch(e){}}
+    else if(res.status===401){token=undefined}
+  }):Promise.resolve()
+  start.then(open).catch(function(){failure('We could not reach the service. Please try again in a moment.')})
 })()
 </script></body></html>

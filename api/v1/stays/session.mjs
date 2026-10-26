@@ -1,9 +1,9 @@
 import { z } from 'zod'
 import { allowPost, isSameSiteRequest, readJson, sendJson } from '../../_lib/http.mjs'
 import { adminDatabase } from '../../_lib/supabase.mjs'
-import { guestSession, loadStay } from '../../_lib/stays.mjs'
+import { guestSession, guestToken, loadStay } from '../../_lib/stays.mjs'
 
-const requestSchema = z.object({ token: z.string().max(400) }).strict()
+const requestSchema = z.object({ token: z.string().max(400).optional() }).strict()
 
 export default async function handler(request, response) {
   if (!allowPost(request, response)) return
@@ -12,7 +12,7 @@ export default async function handler(request, response) {
     const parsed = requestSchema.safeParse(await readJson(request, 2_000))
     if (!parsed.success) return sendJson(response, 422, { error: 'invalid_request' })
     const database = adminDatabase()
-    const stay = await loadStay(database, parsed.data.token)
+    const stay = await loadStay(database, guestToken(request, parsed.data))
     if (!stay) return sendJson(response, 401, { error: 'link_expired' })
     return sendJson(response, 200, await guestSession(database, stay))
   } catch (error) {
