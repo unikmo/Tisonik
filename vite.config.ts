@@ -86,6 +86,7 @@ export default defineConfig({
         'pilot/index.html',
         'contact/index.html',
         'portal/index.html',
+        'stay/index.html',
         'sandbox/index.html',
         'imprint/index.html',
         'privacy/index.html',

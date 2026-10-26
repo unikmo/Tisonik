@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><meta name="robots" content="noindex,nofollow,noarchive"/><meta name="description" content="Private guest page for a hotel stay: thank a team member, tell the hotel privately and rate your stay."/><link rel="canonical" href="https://tisonik.com/stay/"/><meta property="og:title" content="Your stay | Tisonik"/><meta property="og:description" content="Private guest page for a hotel stay: thank a team member, tell the hotel privately and rate your stay."/><meta property="og:image" content="https://tisonik.com/og-card.png"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Your stay | Tisonik"/><meta name="twitter:description" content="Private guest page for a hotel stay: thank a team member, tell the hotel privately and rate your stay."/><meta name="twitter:image" content="https://tisonik.com/og-card.png"/><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Tisonik Hotel Stay","url":"https://tisonik.com/stay/","applicationCategory":"LifestyleApplication"}</script><title>Your stay | Tisonik</title><link rel="icon" href="/favicon.svg"/>
+<style>
+:root{--bg:#faf8f4;--card:#fff;--ink:#171715;--muted:#5f5a54;--line:#e4dfd6;--accent:#3d7580;--accent-ink:#fff;--ok:#2f6b4f;--bad:#9b3a2e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+#stay{max-width:560px;margin:0 auto;padding:32px max(16px,env(safe-area-inset-right)) 56px max(16px,env(safe-area-inset-left))}
+.eyebrow{letter-spacing:.18em;font-size:12px;color:var(--accent);text-transform:uppercase;margin:0 0 12px}
+h1{font-weight:400;font-size:clamp(28px,7vw,38px);line-height:1.1;margin:0 0 8px}
+.lead{color:var(--muted);margin:0 0 24px}
+.tiles{display:grid;gap:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0}
+.tile>button{all:unset;box-sizing:border-box;display:block;width:100%;padding:18px;cursor:pointer;border-radius:14px}
+.tile>button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tile strong{display:block;font-size:18px;font-weight:500}
+.tile span.sub,.sub{display:block;color:var(--muted);font-size:14px;margin-top:2px}
+.panel{padding:0 18px 18px}
+.panel[hidden]{display:none}
+label{display:block;font-size:14px;color:var(--muted);margin:12px 0 4px}
+input,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+textarea{min-height:110px;resize:vertical}
+input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.primary{margin-top:14px;font:inherit;font-weight:500;background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:11px 22px;cursor:pointer}
+.primary[disabled]{opacity:.6;cursor:default}
+.msg{margin:10px 0 0;font-size:14px}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.q{margin:16px 0 0}
+.q p{margin:0 0 6px}
+.scale{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.scale label{margin:0;position:relative}
+.scale input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.scale span{display:block;text-align:center;padding:9px 0;border:1px solid var(--line);border-radius:8px;font-size:14px;background:var(--bg);color:var(--ink)}
+.scale input:checked+span{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.scale input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+.note{font-size:13px;color:var(--muted);margin-top:28px}
+ul.plain{list-style:none;margin:0;padding:0}
+ul.plain li{padding:10px 0;border-top:1px solid var(--line)}
+ul.plain li:first-child{border-top:0}
+</style></head>
+<body><div id="root"></div>
+<script>
+(function(){
+  var root=document.getElementById('root')
+  var match=/[#&]t=([^&]+)/.exec(location.hash)
+  var token=match?match[1]:''
+  var state=null
+  function el(tag,attrs,kids){var n=document.createElement(tag);for(var k in (attrs||{})){if(k==='text')n.textContent=attrs[k];else n.setAttribute(k==='class'?'class':k,attrs[k])}(kids||[]).forEach(function(c){n.appendChild(c)});return n}
+  function api(path,body){return fetch('/api/v1/stays/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().catch(function(){return{}}).then(function(j){return{status:r.status,body:j}})})}
+  function shell(children){root.innerHTML='';root.appendChild(el('main',{id:'stay'},children))}
+  function failure(text){shell([el('p',{class:'eyebrow',text:'Tisonik'}),el('h1',{text:'This link has expired'}),el('p',{class:'lead',text:text})])}
+
+  function tile(title,sub,build){
+    var panel=el('div',{class:'panel'});panel.hidden=true
+    var btn=el('button',{type:'button','aria-expanded':'false'},[el('strong',{text:title}),el('span',{class:'sub',text:sub})])
+    var built=false
+    btn.addEventListener('click',function(){
+      var open=panel.hidden
+      panel.hidden=!open
+      btn.setAttribute('aria-expanded',String(open))
+      if(open&&!built){built=true;build(panel)}
+    })
+    return el('div',{class:'tile'},[btn,panel])
+  }
+
+  function textForm(panel,kind,opts){
+    var msg=el('p',{class:'msg',role:'status'})
+    var area=el('textarea',{id:kind+'-m',maxlength:String(opts.max||2000)})
+    var who=opts.recipient?el('input',{id:kind+'-r',maxlength:'80',placeholder:'A name, or "the front desk"'}):null
+    var send=el('button',{type:'button',class:'primary',text:'Send'})
+    if(who){panel.appendChild(el('label',{'for':kind+'-r',text:'Who made you feel special?'}));panel.appendChild(who)}
+    panel.appendChild(el('label',{'for':kind+'-m',text:opts.label}))
+    panel.appendChild(area);panel.appendChild(send);panel.appendChild(msg)
+    send.addEventListener('click',function(){
+      var payload={message:area.value}
+      if(who&&who.value.trim())payload.recipient=who.value
+      if(area.value.trim().length<(opts.min||5)){msg.className='msg bad';msg.textContent='Please write a little more.';return}
+      send.disabled=true;msg.className='msg';msg.textContent='Sending...'
+      api('submit',{token:token,kind:kind,payload:payload}).then(function(res){
+        if(res.status===201){msg.className='msg ok';msg.textContent=opts.done;area.disabled=true;if(who)who.disabled=true}
+        else{send.disabled=false;msg.className='msg bad';msg.textContent=res.status===429?'You have already sent the most we can accept for this stay.':res.status===409?'This is no longer open for your stay.':'That did not send. Please try again.'}
+      }).catch(function(){send.disabled=false;msg.className='msg bad';msg.textContent='That did not send. Please try again.'})
+    })
+  }
+
+  function ratingForm(panel){
+    var msg=el('p',{class:'msg',role:'status'})
+    var form=el('div')
+    state.questions.forEach(function(q){
+      var scale=el('div',{class:'scale',role:'radiogroup','aria-label':q.text})
+      for(var i=1;i<=10;i++){
+        var input=el('input',{type:'radio',name:q.id,value:String(i),'aria-label':String(i)})
+        scale.appendChild(el('label',{},[input,el('span',{text:String(i)})]))
+      }
+      form.appendChild(el('div',{class:'q'},[el('p',{text:q.text}),scale,el('div',{class:'ends'},[el('span',{text:'Poor'}),el('span',{text:'Excellent'})])]))
+    })
+    var comment=el('textarea',{id:'rating-c',maxlength:'500'})
+    form.appendChild(el('label',{'for':'rating-c',text:'Anything else to tell us?'}))
+    form.appendChild(comment)
+    var send=el('button',{type:'button',class:'primary',text:'Send my rating'})
+    form.appendChild(send);form.appendChild(msg);panel.appendChild(form)
+    send.addEventListener('click',function(){
+      var scores={},missing=false
+      state.questions.forEach(function(q){var c=form.querySelector('input[name="'+q.id+'"]:checked');if(c)scores[q.id]=Number(c.value);else missing=true})
+      if(missing){msg.className='msg bad';msg.textContent='Please answer all five questions.';return}
+      var payload={scores:scores};if(comment.value.trim())payload.comment=comment.value
+      send.disabled=true;msg.className='msg';msg.textContent='Sending...'
+      api('submit',{token:token,kind:'rating',payload:payload}).then(function(res){
+        if(res.status===201){msg.className='msg ok';msg.textContent='Thank you. Your rating has been sent.'}
+        else{send.disabled=false;msg.className='msg bad';msg.textContent=res.status===429?'You have already rated this stay.':'That did not send. Please try again.'}
+      }).catch(function(){send.disabled=false;msg.className='msg bad';msg.textContent='That did not send. Please try again.'})
+    })
+  }
+
+  function render(){
+    var t=state.tiles,list=[]
+    if(t.thankYou)list.push(tile('Thank someone','Tell us who made you feel special',function(p){textForm(p,'thank_you',{recipient:true,label:'Your message',min:3,max:500,done:'Thank you. We will pass it on.'})}))
+    if(t.private)list.push(tile('Tell us privately','Only the hotel team sees this',function(p){textForm(p,'private',{label:'What would you like us to know?',done:'Thank you. The team has your message.'})}))
+    if(t.feedback)list.push(tile('Share feedback','Send a note to guest relations',function(p){textForm(p,'feedback',{label:'Your feedback',done:'Thank you. Guest relations has your message.'})}))
+    if(t.rating)list.push(tile('Rate your stay','Five quick questions',ratingForm))
+    if(t.discover&&state.discover.length)list.push(tile('Discover','Recommended by the hotel',function(p){var u=el('ul',{class:'plain'});state.discover.slice(0,12).forEach(function(d){u.appendChild(el('li',{},[el('strong',{text:String(d.title||'')}),el('div',{class:'sub',text:String(d.body||'')})]))});p.appendChild(u)}))
+    if(t.keepsake)list.push(tile('Your keepsake','Keep your card',function(p){p.appendChild(el('p',{text:'Your UNIKMO card is yours to keep. Scan it any time to come back to this page while it is open.'}))}))
+    shell([el('p',{class:'eyebrow',text:state.hotelName||'Your stay'}),el('h1',{text:state.firstName?'Welcome, '+state.firstName:'Your stay'}),el('p',{class:'lead',text:'A few ways to tell us how it is going.'}),el('div',{class:'tiles'},list),el('p',{class:'note',text:'Your messages go to the hotel team. Nothing here is posted publicly.'})])
+  }
+
+  if(!token){failure('Scan the card in your room again to open this page.');return}
+  api('session',{token:token}).then(function(res){
+    if(res.status===200){state=res.body;render()}
+    else failure('Scan the card in your room again to open this page.')
+  }).catch(function(){failure('We could not reach the service. Please try again in a moment.')})
+})()
+</script></body></html>
