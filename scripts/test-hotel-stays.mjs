@@ -230,7 +230,7 @@ stay.status = 'voided'
 assert.deepEqual(await stays.resolveStay(database, tenant, created.code, during), { valid: false, reason: 'voided' })
 assert.equal((await stays.submitToStay(database, stay, 'thank_you', { message: 'Still here?' }, during)).status, 409)
 
-// Notifications: reception and the hotel director both get every item
+// Notifications: reception gets everything; the hotel director gets ratings only
 process.env.RESEND_API_KEY = 'test-key'
 process.env.TISONIK_ENQUIRY_FROM = 'Tisonik <notifications@example.test>'
 let sentMail = []
@@ -249,12 +249,18 @@ assert.ok(!sentMail[0].subject.includes('LOW SCORE'), 'a good rating is not flag
 for (const kind of ['private', 'feedback', 'thank_you']) {
   sentMail = []
   await stays.notifyHotel(database, mailStay, kind, { message: 'Hello there.' }, 'ref-3')
-  assert.equal(sentMail[0].to.length, 2, kind + ' goes to both')
+  assert.deepEqual(sentMail[0].to, ['reception@hotel.example'], kind + ' goes to reception only')
 }
 database.tables.hotel_stay_settings[0].manager_email = 'RECEPTION@hotel.example'
 sentMail = []
-await stays.notifyHotel(database, mailStay, 'private', { message: 'Same person.' }, 'ref-4')
+await stays.notifyHotel(database, mailStay, 'rating', { scores: { check_in: 9, room: 9, team: 9, recommend: 9 } }, 'ref-4')
 assert.equal(sentMail[0].to.length, 1, 'one person listed twice gets one email')
+database.tables.hotel_stay_settings[0].manager_email = 'director@hotel.example'
+database.tables.hotel_stay_settings[0].reception_email = null
+sentMail = []
+await stays.notifyHotel(database, mailStay, 'private', { message: 'Reception has no address.' }, 'ref-4b')
+assert.deepEqual(sentMail[0].to, ['director@hotel.example'], 'the manager covers if reception has no address')
+database.tables.hotel_stay_settings[0].reception_email = 'reception@hotel.example'
 database.tables.hotel_stay_settings[0].reception_email = null
 database.tables.hotel_stay_settings[0].manager_email = null
 sentMail = []

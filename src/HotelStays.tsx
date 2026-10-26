@@ -129,8 +129,8 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, canCreate, 
       <form className="hotel-form" onSubmit={saveSettings}>
         <label>Hotel name shown to guests<input maxLength={120} value={settingsForm.hotelName} onChange={e => setSettingsForm({ ...settingsForm, hotelName: e.target.value })} /></label>
         <label>UNIKMO hotel ID<input maxLength={64} value={settingsForm.unikmoHotelId} onChange={e => setSettingsForm({ ...settingsForm, unikmoHotelId: e.target.value })} /></label>
-        <label>Reception email (gets every message and rating)<input type="email" maxLength={254} value={settingsForm.receptionEmail} onChange={e => setSettingsForm({ ...settingsForm, receptionEmail: e.target.value })} /></label>
-        <label>Hotel director or manager email (gets every message and rating)<input type="email" maxLength={254} value={settingsForm.managerEmail} onChange={e => setSettingsForm({ ...settingsForm, managerEmail: e.target.value })} /></label>
+        <label>Reception email (gets everything)<input type="email" maxLength={254} value={settingsForm.receptionEmail} onChange={e => setSettingsForm({ ...settingsForm, receptionEmail: e.target.value })} /></label>
+        <label>Hotel director or manager email (gets ratings only)<input type="email" maxLength={254} value={settingsForm.managerEmail} onChange={e => setSettingsForm({ ...settingsForm, managerEmail: e.target.value })} /></label>
         <label>Days open after checkout<input type="number" min={0} max={60} value={settingsForm.defaultWindowDays} onChange={e => setSettingsForm({ ...settingsForm, defaultWindowDays: Number(e.target.value) })} /></label>
         <label className="hotel-wide">Discover tile, one per line as "Title | Description" (up to 12)<textarea rows={4} value={settingsForm.discover} onChange={e => setSettingsForm({ ...settingsForm, discover: e.target.value })} /></label>
         <button disabled={busy}>{busy ? 'Saving…' : 'Save hotel settings'}</button>

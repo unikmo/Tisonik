@@ -275,14 +275,16 @@ const clean = value => String(value || '').replace(/[\r\n]+/g, ' ').trim()
 
 export const LOW_SCORE = 6
 
-// Reception and the hotel director (or whoever the hotel names) both receive every message, thank-you and rating.
+// Reception receives everything: private messages, feedback, thank-yous and ratings. The hotel director (or whoever
+// the hotel names) receives ratings only. If reception has no address, the manager's covers for it so nothing is lost.
 // Best-effort: an email failure never fails the guest's request.
 export async function notifyHotel(database, stay, kind, payload, submissionId) {
   if (!['private', 'feedback', 'thank_you', 'rating'].includes(kind)) return { sent: false }
   if (!process.env.RESEND_API_KEY || !process.env.TISONIK_ENQUIRY_FROM) return { sent: false }
   try {
     const { data: settings } = await database.from('hotel_stay_settings').select('reception_email, manager_email, hotel_name').eq('tenant_id', stay.tenant_id).maybeSingle()
-    const to = [...new Set([settings?.reception_email, settings?.manager_email].filter(Boolean).map(address => address.trim().toLowerCase()))]
+    const wanted = kind === 'rating' ? [settings?.reception_email, settings?.manager_email] : [settings?.reception_email || settings?.manager_email]
+    const to = [...new Set(wanted.filter(Boolean).map(address => address.trim().toLowerCase()))]
     if (!to.length) return { sent: false }
     const scores = kind === 'rating' ? RATING_QUESTIONS.filter(question => payload.scores[question.id] !== undefined).map(question => ({ question, value: payload.scores[question.id] })) : []
     const low = scores.filter(item => item.value <= LOW_SCORE)
