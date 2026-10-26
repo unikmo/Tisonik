@@ -16,8 +16,9 @@ export const RATING_QUESTIONS = [
   { id: 'recommend', text: 'How likely are you to recommend us?' },
 ]
 
+const secretAliases = { STAY_LINK_SECRET: 'TISONIK_GUEST_SESSION_SECRET' }
 const secret = name => {
-  const value = process.env[name]
+  const value = process.env[name] || process.env[secretAliases[name]]
   if (!value || value.length < 32) throw new Error('STAY_SECRET_NOT_CONFIGURED')
   return value
 }
@@ -125,8 +126,38 @@ export async function resolveStay(database, tenantId, rawCode, now = new Date())
     validTo: stay.valid_to,
     phase,
     stayRef: stay.id,
-    stayUrl: `${process.env.STAY_BASE_URL || 'https://tisonik.com'}/stay/#t=${signStayToken(stay.id, now.getTime())}`,
+    stayUrl: `${publicOrigin()}/stay/#t=${signStayToken(stay.id, now.getTime())}`,
   }
+}
+
+export function publicOrigin() {
+  const origin = (process.env.TISONIK_PUBLIC_ORIGIN || process.env.STAY_BASE_URL || 'https://tisonik.com').replace(/\/+$/, '')
+  if (!origin.startsWith('https://')) throw new Error('PUBLIC_ORIGIN_NOT_HTTPS')
+  return origin
+}
+
+export const unikmoSessionSchema = z.object({
+  hotelId: z.string().trim().regex(/^[A-Za-z0-9_-]{2,64}$/),
+  cardCode: z.string().trim().regex(/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/),
+  guestReference: text(1, 80),
+  stayEndsAt: z.string().refine(value => Number.isFinite(Date.parse(value))),
+}).strict()
+
+// UNIKMO sends hotelId, cardCode, guestReference and stayEndsAt. Tisonik's own stay record is the authority:
+// the hotel must be mapped, the code must exist for that hotel, and the reference must match its booking.
+// stayEndsAt is not trusted to extend or shorten anything.
+export async function resolveUnikmoSession(database, input, now = new Date()) {
+  const { data: settings, error } = await database.from('hotel_stay_settings').select('tenant_id').eq('unikmo_hotel_id', input.hotelId).maybeSingle()
+  if (error) throw error
+  if (!settings) return { ok: false }
+  const code = normalizeCode(input.cardCode)
+  if (!code) return { ok: false }
+  const { data: stay, error: stayError } = await database.from('hotel_stays').select(stayColumns).eq('tenant_id', settings.tenant_id).eq('code_digest', codeDigest(settings.tenant_id, code)).maybeSingle()
+  if (stayError) throw stayError
+  if (!stay || stay.booking_ref.trim().toLowerCase() !== input.guestReference.trim().toLowerCase()) return { ok: false }
+  const phase = stayPhase(stay, now)
+  if (phase === 'voided') return { ok: false }
+  return { ok: true, url: `${publicOrigin()}/stay/#t=${signStayToken(stay.id, now.getTime())}`, phase }
 }
 
 export async function createStay(database, tenantId, input, now = new Date()) {

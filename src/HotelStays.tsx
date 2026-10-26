@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { supabase } from './supabaseClient'
 import './portal-hotel.css'
 
-type Settings = { hotel_name: string | null; notify_email: string | null; default_window_days: number; discover_items: { title: string; body: string }[] }
+type Settings = { hotel_name: string | null; unikmo_hotel_id: string | null; notify_email: string | null; default_window_days: number; discover_items: { title: string; body: string }[] }
 type Stay = { id: string; booking_ref: string; room: string | null; guest_label: string | null; valid_from: string; valid_to: string; window_days: number; status: 'active' | 'voided'; created_at: string }
 type Submission = { id: string; stay_id: string; kind: 'thank_you' | 'private' | 'feedback' | 'rating'; payload: Record<string, unknown>; status: 'new' | 'seen' | 'resolved'; created_at: string }
 type Created = { code: string; displayCode: string; bookingRef: string }
@@ -18,7 +18,7 @@ async function call(token: string, action: string, tenantId: string, data: Recor
   return { ok: response.ok, status: response.status, body }
 }
 
-const blankSettings: Settings = { hotel_name: '', notify_email: '', default_window_days: 14, discover_items: [] }
+const blankSettings: Settings = { hotel_name: '', unikmo_hotel_id: '', notify_email: '', default_window_days: 14, discover_items: [] }
 const itemsToText = (items: Settings['discover_items']) => items.map(item => `${item.title} | ${item.body}`).join('\n')
 const textToItems = (text: string) => text.split('\n').map(line => line.trim()).filter(Boolean).slice(0, 12).map(line => { const [title, ...rest] = line.split('|'); return { title: title.trim(), body: rest.join('|').trim() } }).filter(item => item.title)
 
@@ -29,17 +29,17 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
   const [filter, setFilter] = useState<Filter>('action')
   const [created, setCreated] = useState<Created | null>(null)
   const [form, setForm] = useState({ bookingRef: '', validFrom: today(), validTo: '', room: '', guestLabel: '' })
-  const [settingsForm, setSettingsForm] = useState({ hotelName: '', notifyEmail: '', defaultWindowDays: 14, discover: '' })
+  const [settingsForm, setSettingsForm] = useState({ hotelName: '', unikmoHotelId: '', notifyEmail: '', defaultWindowDays: 14, discover: '' })
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [copied, setCopied] = useState(false)
 
   const load = useCallback(async () => {
     if (!supabase) return
-    const s = await supabase.from('hotel_stay_settings').select('hotel_name,notify_email,default_window_days,discover_items').eq('tenant_id', tenantId).maybeSingle()
+    const s = await supabase.from('hotel_stay_settings').select('hotel_name,unikmo_hotel_id,notify_email,default_window_days,discover_items').eq('tenant_id', tenantId).maybeSingle()
     const row = (s.data as Settings | null) || null
     setSettings(row)
-    if (row) setSettingsForm({ hotelName: row.hotel_name || '', notifyEmail: row.notify_email || '', defaultWindowDays: row.default_window_days, discover: itemsToText(row.discover_items || []) })
+    if (row) setSettingsForm({ hotelName: row.hotel_name || '', unikmoHotelId: row.unikmo_hotel_id || '', notifyEmail: row.notify_email || '', defaultWindowDays: row.default_window_days, discover: itemsToText(row.discover_items || []) })
     const st = await supabase.from('hotel_stays').select('id,booking_ref,room,guest_label,valid_from,valid_to,window_days,status,created_at').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(50)
     setStays((st.data || []) as Stay[])
     const su = await supabase.from('hotel_stay_submissions').select('id,stay_id,kind,payload,status,created_at').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(150)
@@ -86,7 +86,7 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
   const saveSettings = async (event: FormEvent) => {
     event.preventDefault()
     setBusy(true); setMessage('')
-    const result = await call(token, 'settings', tenantId, { hotelName: settingsForm.hotelName.trim() || null, notifyEmail: settingsForm.notifyEmail.trim() || null, defaultWindowDays: Number(settingsForm.defaultWindowDays), discoverItems: textToItems(settingsForm.discover) })
+    const result = await call(token, 'settings', tenantId, { hotelName: settingsForm.hotelName.trim() || null, unikmoHotelId: settingsForm.unikmoHotelId.trim() || null, notifyEmail: settingsForm.notifyEmail.trim() || null, defaultWindowDays: Number(settingsForm.defaultWindowDays), discoverItems: textToItems(settingsForm.discover) })
     setBusy(false)
     setMessage(result.ok ? 'Hotel settings saved.' : 'Settings could not be saved. Check the email address.')
     void load()
@@ -128,6 +128,7 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
       <h2>Hotel settings</h2>
       <form className="hotel-form" onSubmit={saveSettings}>
         <label>Hotel name shown to guests<input maxLength={120} value={settingsForm.hotelName} onChange={e => setSettingsForm({ ...settingsForm, hotelName: e.target.value })} /></label>
+        <label>UNIKMO hotel ID<input maxLength={64} value={settingsForm.unikmoHotelId} onChange={e => setSettingsForm({ ...settingsForm, unikmoHotelId: e.target.value })} /></label>
         <label>Email for guest messages<input type="email" maxLength={254} value={settingsForm.notifyEmail} onChange={e => setSettingsForm({ ...settingsForm, notifyEmail: e.target.value })} /></label>
         <label>Days open after checkout<input type="number" min={0} max={60} value={settingsForm.defaultWindowDays} onChange={e => setSettingsForm({ ...settingsForm, defaultWindowDays: Number(e.target.value) })} /></label>
         <label className="hotel-wide">Discover tile, one per line as "Title | Description" (up to 12)<textarea rows={4} value={settingsForm.discover} onChange={e => setSettingsForm({ ...settingsForm, discover: e.target.value })} /></label>

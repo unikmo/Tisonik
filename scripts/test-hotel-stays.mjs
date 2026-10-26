@@ -82,6 +82,39 @@ assert.ok(stays.verifyStayToken(token, during.getTime()))
 assert.equal(stays.verifyStayToken(token + 'x', during.getTime()), null)
 assert.equal(stays.verifyStayToken(token, during.getTime() + 13 * 3600_000), null, 'expires after 12 hours')
 
+// UNIKMO session contract: hotelId, cardCode, guestReference, stayEndsAt
+database.tables.hotel_stay_settings[0].unikmo_hotel_id = 'HOTEL-001'
+const unikmoBody = { hotelId: 'HOTEL-001', cardCode: created.displayCode, guestReference: 'bk-1001', stayEndsAt: '2026-11-14T11:00:00.000Z' }
+assert.equal(stays.unikmoSessionSchema.safeParse(unikmoBody).success, true)
+assert.equal(stays.unikmoSessionSchema.safeParse({ ...unikmoBody, extra: 1 }).success, false, 'unknown fields are rejected')
+assert.equal(stays.unikmoSessionSchema.safeParse({ ...unikmoBody, cardCode: 'ABCD7K92' }).success, false, 'code must be XXXX-XXXX')
+const session1 = await stays.resolveUnikmoSession(database, unikmoBody, during)
+assert.equal(session1.ok, true)
+assert.match(session1.url, /^https:\/\/tisonik\.com\/stay\/#t=[\w-]+\.[\w-]+$/)
+assert.ok(!decodeURIComponent(session1.url).includes('BK-1001') && !Buffer.from(session1.url.split('#t=')[1].split('.')[0], 'base64url').toString().includes('1001'), 'link carries no booking number')
+assert.equal((await stays.resolveUnikmoSession(database, { ...unikmoBody, hotelId: 'HOTEL-999' }, during)).ok, false, 'unmapped hotel')
+assert.equal((await stays.resolveUnikmoSession(database, { ...unikmoBody, guestReference: 'BK-9999' }, during)).ok, false, 'reference must match the booking')
+assert.equal((await stays.resolveUnikmoSession(database, { ...unikmoBody, cardCode: 'ZZZZ-ZZZZ' }, during)).ok, false, 'unknown code')
+const afterCheckout = await stays.resolveUnikmoSession(database, unikmoBody, new Date('2026-11-20T12:00:00Z'))
+assert.equal(afterCheckout.ok, true, 'still opens inside the after-checkout window, whatever stayEndsAt says')
+assert.equal((await stays.resolveUnikmoSession(database, unikmoBody, new Date('2026-12-30T12:00:00Z'))).phase, 'closed')
+process.env.TISONIK_PUBLIC_ORIGIN = 'http://insecure.example'
+await assert.rejects(() => stays.resolveUnikmoSession(database, unikmoBody, during), /PUBLIC_ORIGIN_NOT_HTTPS/)
+delete process.env.TISONIK_PUBLIC_ORIGIN
+
+const { default: unikmoHandler } = await import('../api/integrations/unikmo/session.mjs')
+const call = async (headers, secret) => {
+  if (secret) process.env.UNIKMO_API_SECRET = secret; else delete process.env.UNIKMO_API_SECRET
+  const out = {}
+  const response = { setHeader() {}, end(body) { out.body = body }, set statusCode(value) { out.status = value } }
+  await unikmoHandler({ method: 'POST', headers, async *[Symbol.asyncIterator]() { yield Buffer.from('{}') } }, response)
+  return out.status
+}
+assert.equal(await call({}, null), 503, 'not configured')
+assert.equal(await call({}, 's'.repeat(40)), 401, 'missing token')
+assert.equal(await call({ authorization: 'Bearer ' + 'x'.repeat(40) }, 's'.repeat(40)), 401, 'wrong token')
+assert.equal(await call({ authorization: 'Bearer ' + 's'.repeat(40) }, 's'.repeat(40)), 400, 'right token, empty body')
+
 // Phases and tiles
 const stay = database.tables.hotel_stays[0]
 const tilesAt = date => stays.tilesFor(stay, new Date(date))
