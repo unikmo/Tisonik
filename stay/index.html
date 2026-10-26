@@ -32,6 +32,7 @@ input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
 .scale span{display:block;text-align:center;padding:9px 0;border:1px solid var(--line);border-radius:8px;font-size:14px;background:var(--bg);color:var(--ink)}
 .scale input:checked+span{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .scale input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.skip{display:flex;align-items:center;gap:6px;margin:8px 0 0;font-size:13px}.skip input{width:auto;padding:0}
 .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
 .note{font-size:13px;color:var(--muted);margin-top:28px}
 .hotel-forget{all:unset;cursor:pointer;font-size:13px;color:var(--accent);text-decoration:underline;margin-top:8px}
@@ -94,7 +95,13 @@ ul.plain li:first-child{border-top:0}
         var input=el('input',{type:'radio',name:q.id,value:String(i),'aria-label':String(i)})
         scale.appendChild(el('label',{},[input,el('span',{text:String(i)})]))
       }
-      form.appendChild(el('div',{class:'q'},[el('p',{text:q.text}),scale,el('div',{class:'ends'},[el('span',{text:'Poor'}),el('span',{text:'Excellent'})])]))
+      var kids=[el('p',{text:q.text}),scale,el('div',{class:'ends'},[el('span',{text:q.low||'Poor'}),el('span',{text:q.high||'Excellent'})])]
+      if(q.optional){
+        var skip=el('input',{type:'checkbox',id:'skip-'+q.id})
+        skip.addEventListener('change',function(){scale.querySelectorAll('input').forEach(function(i){i.disabled=skip.checked;if(skip.checked)i.checked=false})})
+        kids.push(el('label',{'for':'skip-'+q.id,class:'skip'},[skip,el('span',{text:' '+(q.skipLabel||'Not applicable')})]))
+      }
+      form.appendChild(el('div',{class:'q'},kids))
     })
     var comment=el('textarea',{id:'rating-c',maxlength:'500'})
     form.appendChild(el('label',{'for':'rating-c',text:'Anything else to tell us?'}))
@@ -103,8 +110,8 @@ ul.plain li:first-child{border-top:0}
     form.appendChild(send);form.appendChild(msg);panel.appendChild(form)
     send.addEventListener('click',function(){
       var scores={},missing=false
-      state.questions.forEach(function(q){var c=form.querySelector('input[name="'+q.id+'"]:checked');if(c)scores[q.id]=Number(c.value);else missing=true})
-      if(missing){msg.className='msg bad';msg.textContent='Please answer all five questions.';return}
+      state.questions.forEach(function(q){var c=form.querySelector('input[name="'+q.id+'"]:checked');var skipped=q.optional&&form.querySelector('#skip-'+q.id).checked;if(c)scores[q.id]=Number(c.value);else if(!skipped)missing=true})
+      if(missing){msg.className='msg bad';msg.textContent='Please answer every question, or tick the skip box on the fourth.';return}
       var payload={scores:scores};if(comment.value.trim())payload.comment=comment.value
       send.disabled=true;msg.className='msg';msg.textContent='Sending...'
       api('submit',{token:token,kind:'rating',payload:payload}).then(function(res){

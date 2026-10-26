@@ -59,7 +59,7 @@ function fakeDatabase() {
 
 const tenant = 'tenant-1'
 const database = fakeDatabase()
-database.tables.hotel_stay_settings.push({ tenant_id: tenant, hotel_name: 'Hotel Test', default_window_days: 14, discover_items: [{ title: 'Spa', body: 'Book at reception' }] })
+database.tables.hotel_stay_settings.push({ tenant_id: tenant, hotel_name: 'Hotel Test', reception_email: 'Reception@Hotel.example', manager_email: 'director@hotel.example', default_window_days: 14, discover_items: [{ title: 'Spa', body: 'Book at reception' }] })
 
 // Codes
 const code = stays.generateStayCode()
@@ -159,11 +159,16 @@ assert.deepEqual([closed.phase, closed.thankYou, closed.rating, closed.feedback,
 
 // Submissions
 const lastDay = new Date('2026-11-14T12:00:00Z')
-const scores = { check_in: 9, room: 8, food_drink: 7, staff: 10, recommend: 9 }
+const scores = { check_in: 9, room: 8, team: 10, recovery: 7, recommend: 9 }
 assert.equal((await stays.submitToStay(database, stay, 'private', { message: 'The air conditioning is loud.' }, lastDay)).ok, true)
 assert.equal((await stays.submitToStay(database, stay, 'feedback', { message: 'Too late for this.' }, lastDay)).status, 409, 'feedback is closed during the stay')
 assert.equal((await stays.submitToStay(database, stay, 'rating', { scores: { ...scores, room: 11 } }, lastDay)).status, 422)
-assert.equal((await stays.submitToStay(database, stay, 'rating', { scores: { check_in: 9 } }, lastDay)).status, 422, 'all five questions are required')
+assert.equal((await stays.submitToStay(database, stay, 'rating', { scores: { check_in: 9 } }, lastDay)).status, 422, 'the required questions must all be answered')
+assert.equal((await stays.submitToStay(database, stay, 'rating', { scores: { ...scores, recovery: 11 } }, lastDay)).status, 422)
+const { recovery: _skipped, ...withoutRecovery } = scores
+assert.equal(stays.submissionSchemas.rating.safeParse({ scores: withoutRecovery }).success, true, 'question 4 can be skipped')
+const { room: _room, ...withoutRoom } = scores
+assert.equal(stays.submissionSchemas.rating.safeParse({ scores: withoutRoom }).success, false, 'question 2 cannot')
 assert.equal((await stays.submitToStay(database, stay, 'rating', { scores, comment: 'Lovely stay.' }, lastDay)).ok, true)
 assert.equal((await stays.submitToStay(database, stay, 'rating', { scores }, lastDay)).status, 429, 'one rating per stay')
 assert.equal((await stays.submitToStay(database, stay, 'thank_you', { recipient: 'Maria at the front desk', message: 'Made us feel special.' }, lastDay)).ok, true)
@@ -178,6 +183,7 @@ const session = await stays.guestSession(database, stay, lastDay)
 assert.equal(session.hotelName, 'Hotel Test')
 assert.equal(session.tiles.rating, false, 'rating is hidden once submitted')
 assert.equal(session.questions.length, 5)
+assert.equal(session.questions.filter(question => question.optional).length, 1, 'only one question is skippable')
 assert.equal(session.discover.length, 1)
 
 // Portal actions (signed-in staff)
@@ -209,10 +215,10 @@ inboxRow.tenant_id = tenantUuid
 await portalAction(database, 'analyst', { action: 'status', tenantId: tenantUuid, data: { submissionId: inboxRow.id, status: 'resolved' } })
 assert.equal(inboxRow.status, 'resolved')
 
-const settingsResult = await portalAction(database, 'admin', { action: 'settings', tenantId: tenantUuid, data: { hotelName: 'Hotel Test', notifyEmail: 'desk@hotel.example', defaultWindowDays: 10, discoverItems: [{ title: 'Spa', body: 'Level 2' }] } })
+const settingsResult = await portalAction(database, 'admin', { action: 'settings', tenantId: tenantUuid, data: { hotelName: 'Hotel Test', receptionEmail: 'desk@hotel.example', managerEmail: 'boss@hotel.example', defaultWindowDays: 10, discoverItems: [{ title: 'Spa', body: 'Level 2' }] } })
 assert.equal(settingsResult.status, 200)
 assert.equal(database.tables.hotel_stay_settings.find(row => row.tenant_id === tenantUuid).default_window_days, 10)
-assert.equal((await portalAction(database, 'admin', { action: 'settings', tenantId: tenantUuid, data: { notifyEmail: 'not-an-email', defaultWindowDays: 10, discoverItems: [] } })).status, 422)
+assert.equal((await portalAction(database, 'admin', { action: 'settings', tenantId: tenantUuid, data: { receptionEmail: 'not-an-email', defaultWindowDays: 10, discoverItems: [] } })).status, 422)
 
 const voidResult = await portalAction(database, 'admin', { action: 'void', tenantId: tenantUuid, data: { stayId: made.body.stayId } })
 assert.equal(voidResult.status, 200)
@@ -223,6 +229,42 @@ assert.deepEqual(await stays.resolveStay(database, tenantUuid, made.body.code, n
 stay.status = 'voided'
 assert.deepEqual(await stays.resolveStay(database, tenant, created.code, during), { valid: false, reason: 'voided' })
 assert.equal((await stays.submitToStay(database, stay, 'thank_you', { message: 'Still here?' }, during)).status, 409)
+
+// Notifications: reception and the hotel director both get every item
+process.env.RESEND_API_KEY = 'test-key'
+process.env.TISONIK_ENQUIRY_FROM = 'Tisonik <notifications@example.test>'
+let sentMail = []
+globalThis.fetch = async (_url, options) => { sentMail.push(JSON.parse(options.body)); return { ok: true } }
+const mailStay = { tenant_id: tenant, booking_ref: 'BK-1001', room: '204', guest_label: 'Sam', valid_from: '2026-11-10', valid_to: '2026-11-14' }
+const lowRating = await stays.notifyHotel(database, mailStay, 'rating', { scores: { check_in: 9, room: 4, team: 10, recommend: 8 }, comment: 'Noisy room.' }, 'ref-1')
+assert.deepEqual([lowRating.sent, lowRating.recipients], [true, 2])
+assert.deepEqual(sentMail[0].to.sort(), ['director@hotel.example', 'reception@hotel.example'])
+assert.equal(sentMail[0].subject, 'LOW SCORE - Stay rating - booking BK-1001 - average 7.8')
+assert.ok(sentMail[0].text.includes('!! 4/10  How comfortable and clean was your room?'), 'low scores are marked')
+assert.ok(sentMail[0].text.includes('skipped  If something needed fixing'), 'a skipped question is shown as skipped')
+assert.ok(sentMail[0].text.includes('Noisy room.'))
+sentMail = []
+await stays.notifyHotel(database, mailStay, 'rating', { scores: { check_in: 9, room: 9, team: 10, recovery: 9, recommend: 10 } }, 'ref-2')
+assert.ok(!sentMail[0].subject.includes('LOW SCORE'), 'a good rating is not flagged')
+for (const kind of ['private', 'feedback', 'thank_you']) {
+  sentMail = []
+  await stays.notifyHotel(database, mailStay, kind, { message: 'Hello there.' }, 'ref-3')
+  assert.equal(sentMail[0].to.length, 2, kind + ' goes to both')
+}
+database.tables.hotel_stay_settings[0].manager_email = 'RECEPTION@hotel.example'
+sentMail = []
+await stays.notifyHotel(database, mailStay, 'private', { message: 'Same person.' }, 'ref-4')
+assert.equal(sentMail[0].to.length, 1, 'one person listed twice gets one email')
+database.tables.hotel_stay_settings[0].reception_email = null
+database.tables.hotel_stay_settings[0].manager_email = null
+sentMail = []
+assert.equal((await stays.notifyHotel(database, mailStay, 'private', { message: 'Nobody set.' }, 'ref-5')).sent, false)
+assert.equal(sentMail.length, 0, 'no recipients, no email')
+database.tables.hotel_stay_settings[0].manager_email = 'director@hotel.example'
+globalThis.fetch = async () => { throw new Error('mail provider down') }
+assert.deepEqual(await stays.notifyHotel(database, mailStay, 'private', { message: 'Provider down.' }, 'ref-6'), { sent: false }, 'a mail failure never throws')
+delete process.env.RESEND_API_KEY
+database.tables.hotel_stay_settings[0].reception_email = 'reception@hotel.example'
 
 // Front desk role
 database.tables.memberships.push({ tenant_id: tenantUuid, user_id: 'desk', role: 'front_desk' })

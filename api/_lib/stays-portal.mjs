@@ -16,7 +16,8 @@ const voidSchema = z.object({ stayId: z.string().uuid() }).strict()
 const statusSchema = z.object({ submissionId: z.string().uuid(), status: z.enum(['new', 'seen', 'resolved']) }).strict()
 const settingsSchema = z.object({
   hotelName: z.string().trim().min(2).max(120).nullable().optional(),
-  notifyEmail: z.string().trim().email().max(254).nullable().optional(),
+  receptionEmail: z.string().trim().email().max(254).nullable().optional(),
+  managerEmail: z.string().trim().email().max(254).nullable().optional(),
   unikmoHotelId: z.string().trim().regex(/^[A-Za-z0-9_-]{2,64}$/).nullable().optional(),
   defaultWindowDays: z.number().int().min(0).max(60),
   discoverItems: z.array(z.object({ title: z.string().trim().min(1).max(80), body: z.string().trim().max(300).default('') }).strict()).max(12),
@@ -61,7 +62,8 @@ export async function portalAction(database, userId, rawBody) {
   const { error } = await database.from('hotel_stay_settings').upsert({
     tenant_id: tenantId,
     hotel_name: input.data.hotelName || null,
-    notify_email: input.data.notifyEmail || null,
+    reception_email: input.data.receptionEmail || null,
+    manager_email: input.data.managerEmail || null,
     unikmo_hotel_id: input.data.unikmoHotelId || null,
     default_window_days: input.data.defaultWindowDays,
     discover_items: input.data.discoverItems,

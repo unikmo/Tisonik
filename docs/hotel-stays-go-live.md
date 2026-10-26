@@ -6,7 +6,7 @@ Everything here is done by a person with access to the production Supabase proje
 
 - [ ] Legal review of the new Privacy Policy section 13 and the stay-session cookie row on the Cookies page (both on branch `hotel-stays`). They describe stay records held by Tisonik on the hotel's behalf; the rest of the policy still describes the aggregate-only cruise design.
 - [ ] Confirm the 90-day retention (after the after-checkout window closes) and the 14-day default window.
-- [ ] Confirm the five rating questions in `api/_lib/stays.mjs` (`RATING_QUESTIONS`) are the wording you want.
+- [x] Rating questions approved 26 October (`RATING_QUESTIONS` in `api/_lib/stays.mjs`). Question 4 can be skipped.
 
 ## 2. Database (Supabase)
 
@@ -28,7 +28,7 @@ Run `node scripts/generate-stay-secrets.mjs`, then set in Vercel (Production):
 | `STAY_LINK_SECRET` | 32+ characters. (`TISONIK_GUEST_SESSION_SECRET` is accepted as an alias.) |
 | `UNIKMO_API_SECRET` | 32+ characters. Same value goes into UNIKMO as `TISONIK_API_SECRET`. |
 | `TISONIK_PUBLIC_ORIGIN` | `https://tisonik.com` (must be https). |
-| `RESEND_API_KEY`, `TISONIK_ENQUIRY_FROM` | For emailing guest messages to the hotel. Without them messages are stored and shown in the portal only. |
+| `RESEND_API_KEY`, `TISONIK_ENQUIRY_FROM` | For emailing reception and the hotel director. Without them messages and ratings are stored and shown in the portal only. |
 | `CRON_SECRET` | Already used by the enquiry cron; the new `stays-purge` cron uses the same one. |
 
 In UNIKMO: `TISONIK_SESSION_API_URL=https://tisonik.com/api/integrations/unikmo/session`, `TISONIK_API_SECRET=<same as UNIKMO_API_SECRET>`, `TISONIK_ALLOWED_ORIGIN=https://tisonik.com`.
@@ -36,7 +36,7 @@ In UNIKMO: `TISONIK_SESSION_API_URL=https://tisonik.com/api/integrations/unikmo/
 ## 4. Per hotel
 
 1. Create the hotel's tenant and invite its staff in Supabase as for any operator. Roles: `operator_admin` (everything), `front_desk` (create stays, work the inbox), `operator_analyst` (inbox status only), `operator_viewer` (read only).
-2. Sign in at `/portal/` as the hotel admin. In **Hotel settings** set: hotel name, **UNIKMO hotel ID** (must equal what UNIKMO sends as `hotelId`), the email for guest messages, days open after checkout, and the Discover items. Saving creates the hotel's settings row.
+2. Sign in at `/portal/` as the hotel admin. In **Hotel settings** set: hotel name, **UNIKMO hotel ID** (must equal what UNIKMO sends as `hotelId`), the **reception email** and the **hotel director or manager email** (both receive every message, thank-you and rating; a rating with any score of 6 or below is flagged LOW SCORE in the subject), days open after checkout, and the Discover items. Saving creates the hotel's settings row.
 3. Create a test stay for tomorrow and write the code on a card.
 
 ## 5. Smoke test (after deploying the branch)

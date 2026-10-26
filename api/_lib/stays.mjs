@@ -9,13 +9,14 @@ const codePattern = /^[2-9A-HJKMNP-Z]{8}$/
 export const TOKEN_LIFETIME_SECONDS = 15 * 60
 const SESSION_MAX_SECONDS = 30 * 86_400
 
-// Draft wording. Five scored questions (1-10, same scale as the resort rating) plus a free-text box.
+// Approved wording (26 October). Five scored questions on a 1-10 scale plus a free-text box.
+// Question 4 can be skipped when nothing went wrong.
 export const RATING_QUESTIONS = [
-  { id: 'check_in', text: 'How was your welcome and check-in?' },
-  { id: 'room', text: 'How comfortable and clean was your room?' },
-  { id: 'food_drink', text: 'How were the food and drink?' },
-  { id: 'staff', text: 'How helpful and warm was our team?' },
-  { id: 'recommend', text: 'How likely are you to recommend us?' },
+  { id: 'check_in', text: 'How was your arrival and check-in?', low: 'Poor', high: 'Excellent' },
+  { id: 'room', text: 'How comfortable and clean was your room?', low: 'Poor', high: 'Excellent' },
+  { id: 'team', text: 'How warm and helpful was our team?', low: 'Poor', high: 'Excellent' },
+  { id: 'recovery', text: 'If something needed fixing, how well did we put it right?', low: 'Poor', high: 'Excellent', optional: true, skipLabel: 'Nothing went wrong' },
+  { id: 'recommend', text: 'How likely are you to recommend us to a friend?', low: 'Not at all likely', high: 'Extremely likely' },
 ]
 
 const secretAliases = { STAY_LINK_SECRET: 'TISONIK_GUEST_SESSION_SECRET' }
@@ -124,7 +125,7 @@ export const submissionSchemas = {
   private: z.object({ message: text(5, 2000) }).strict(),
   feedback: z.object({ message: text(5, 2000) }).strict(),
   rating: z.object({
-    scores: z.object(Object.fromEntries(RATING_QUESTIONS.map(question => [question.id, z.number().int().min(1).max(10)]))).strict(),
+    scores: z.object(Object.fromEntries(RATING_QUESTIONS.map(question => [question.id, question.optional ? z.number().int().min(1).max(10).optional() : z.number().int().min(1).max(10)]))).strict(),
     comment: text(0, 500).optional(),
   }).strict(),
 }
@@ -272,14 +273,22 @@ export async function submitToStay(database, stay, kind, payload, now = new Date
 
 const clean = value => String(value || '').replace(/[\r\n]+/g, ' ').trim()
 
-// Best-effort email to the hotel for guest-relations messages. Never fails the guest's request.
+export const LOW_SCORE = 6
+
+// Reception and the hotel director (or whoever the hotel names) both receive every message, thank-you and rating.
+// Best-effort: an email failure never fails the guest's request.
 export async function notifyHotel(database, stay, kind, payload, submissionId) {
-  if (!['private', 'feedback', 'thank_you'].includes(kind)) return { sent: false }
+  if (!['private', 'feedback', 'thank_you', 'rating'].includes(kind)) return { sent: false }
   if (!process.env.RESEND_API_KEY || !process.env.TISONIK_ENQUIRY_FROM) return { sent: false }
   try {
-    const { data: settings } = await database.from('hotel_stay_settings').select('notify_email, hotel_name').eq('tenant_id', stay.tenant_id).maybeSingle()
-    if (!settings?.notify_email) return { sent: false }
-    const label = { private: 'Private message from a guest', feedback: 'Post-stay feedback', thank_you: 'A guest says thank you' }[kind]
+    const { data: settings } = await database.from('hotel_stay_settings').select('reception_email, manager_email, hotel_name').eq('tenant_id', stay.tenant_id).maybeSingle()
+    const to = [...new Set([settings?.reception_email, settings?.manager_email].filter(Boolean).map(address => address.trim().toLowerCase()))]
+    if (!to.length) return { sent: false }
+    const scores = kind === 'rating' ? RATING_QUESTIONS.filter(question => payload.scores[question.id] !== undefined).map(question => ({ question, value: payload.scores[question.id] })) : []
+    const low = scores.filter(item => item.value <= LOW_SCORE)
+    const average = scores.length ? scores.reduce((sum, item) => sum + item.value, 0) / scores.length : null
+    const label = { private: 'Private message from a guest', feedback: 'Post-stay feedback', thank_you: 'A guest says thank you', rating: 'Stay rating' }[kind]
+    const subject = clean(`${low.length ? 'LOW SCORE - ' : ''}${label} - booking ${stay.booking_ref}${average !== null ? ` - average ${average.toFixed(1)}` : ''}`)
     const lines = [
       label,
       '',
@@ -288,17 +297,18 @@ export async function notifyHotel(database, stay, kind, payload, submissionId) {
       `Guest: ${stay.guest_label || 'not recorded'}`,
       `Stay: ${stay.valid_from} to ${stay.valid_to}`,
       ...(payload.recipient ? [`About: ${payload.recipient}`] : []),
-      '',
-      payload.message,
+      ...(scores.length ? ['', ...scores.map(item => `${item.value <= LOW_SCORE ? '!! ' : '   '}${item.value}/10  ${item.question.text}`), ...RATING_QUESTIONS.filter(question => question.optional && payload.scores[question.id] === undefined).map(question => `   skipped  ${question.text}`)] : []),
+      ...(low.length ? ['', 'Scores of 6 or below are marked !! and need a call from the manager today.'] : []),
+      ...(payload.message || payload.comment ? ['', payload.message || payload.comment] : []),
       '',
       `Reference: ${submissionId}`,
     ]
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: process.env.TISONIK_ENQUIRY_FROM, to: [settings.notify_email], subject: clean(`${label} - booking ${stay.booking_ref}`), text: lines.join('\n') }),
+      body: JSON.stringify({ from: process.env.TISONIK_ENQUIRY_FROM, to, subject, text: lines.join('\n') }),
     })
-    return { sent: response.ok }
+    return { sent: response.ok, recipients: to.length }
   } catch {
     return { sent: false }
   }

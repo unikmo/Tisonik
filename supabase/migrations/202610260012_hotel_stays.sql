@@ -7,7 +7,8 @@ create table public.hotel_stay_settings (
   tenant_id uuid primary key references public.tenants(id) on delete cascade,
   hotel_name text check (hotel_name is null or char_length(hotel_name) between 2 and 120),
   unikmo_hotel_id text unique check (unikmo_hotel_id is null or unikmo_hotel_id ~ '^[A-Za-z0-9_-]{2,64}$'),
-  notify_email text check (notify_email is null or char_length(notify_email) between 5 and 254),
+  reception_email text check (reception_email is null or char_length(reception_email) between 5 and 254),
+  manager_email text check (manager_email is null or char_length(manager_email) between 5 and 254),
   default_window_days integer not null default 14 check (default_window_days between 0 and 60),
   discover_items jsonb not null default '[]'::jsonb check (jsonb_typeof(discover_items) = 'array'),
   created_at timestamptz not null default now()
