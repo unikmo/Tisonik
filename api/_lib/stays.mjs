@@ -1,10 +1,6 @@
-import { createHmac, randomInt, timingSafeEqual } from 'node:crypto'
+import { createHmac, timingSafeEqual } from 'node:crypto'
 import { z } from 'zod'
-import { isBlocked, limits, overLimit } from './rate-limit.mjs'
-
-// 31 characters, no 0/O/1/I/L. Eight characters is about 850 billion combinations.
-export const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'
-const codePattern = /^[2-9A-HJKMNP-Z]{8}$/
+import { limits, overLimit } from './rate-limit.mjs'
 
 export const TOKEN_LIFETIME_SECONDS = 15 * 60
 const SESSION_MAX_SECONDS = 30 * 86_400
@@ -19,29 +15,24 @@ export const RATING_QUESTIONS = [
   { id: 'recommend', text: 'How likely are you to recommend us to a friend?', low: 'Not at all likely', high: 'Extremely likely' },
 ]
 
+// Hotels and ships use the same five questions and ids, so scores compare. Only the nouns change on a ship.
+// The ship wording is a proposal and is not yet approved.
+export const VENUE_TYPES = ['hotel', 'ship']
+const shipWording = {
+  check_in: 'How was your embarkation?',
+  room: 'How comfortable and clean was your cabin?',
+  team: 'How warm and helpful was our crew?',
+}
+export const ratingQuestionsFor = venueType => venueType === 'ship' ? RATING_QUESTIONS.map(question => ({ ...question, text: shipWording[question.id] || question.text })) : RATING_QUESTIONS
+export const venueWords = venueType => venueType === 'ship'
+  ? { room: 'Cabin', desk: 'guest services', stay: 'Voyage', thing: 'sailing' }
+  : { room: 'Room', desk: 'reception', stay: 'Stay', thing: 'stay' }
+
 const secretAliases = { STAY_LINK_SECRET: 'TISONIK_GUEST_SESSION_SECRET' }
 const secret = name => {
   const value = process.env[name] || process.env[secretAliases[name]]
   if (!value || value.length < 32) throw new Error('STAY_SECRET_NOT_CONFIGURED')
   return value
-}
-
-export function generateStayCode() {
-  let code = ''
-  for (let index = 0; index < 8; index += 1) code += CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]
-  return code
-}
-
-export const displayCode = code => `${code.slice(0, 4)}-${code.slice(4)}`
-
-export function normalizeCode(input) {
-  const code = String(input ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '')
-  return codePattern.test(code) ? code : null
-}
-
-// Keyed hash: a leaked table cannot be brute-forced without the pepper.
-export function codeDigest(tenantId, code) {
-  return createHmac('sha256', secret('STAY_CODE_PEPPER')).update(`${tenantId}:${code}`).digest('hex')
 }
 
 const b64 = value => Buffer.from(value).toString('base64url')
@@ -132,33 +123,7 @@ export const submissionSchemas = {
 
 export const submissionLimits = { thank_you: 10, private: 5, feedback: 5, rating: 1 }
 
-const stayColumns = 'id, tenant_id, booking_ref, room, guest_label, valid_from, valid_to, window_days, status'
-
-// Wrong codes are counted per hotel. Once a hotel has had too many in a minute, lookups stop until the window rolls over.
-const failBucket = tenantId => `fail:${tenantId}`
-async function refuse(database, tenantId, result) {
-  await overLimit(database, failBucket(tenantId), limits.failedCodes.window, limits.failedCodes.max)
-  return result
-}
-
-export async function resolveStay(database, tenantId, rawCode, now = new Date()) {
-  if (await isBlocked(database, failBucket(tenantId), limits.failedCodes.window, limits.failedCodes.max)) return { valid: false, reason: 'rate_limited', limited: true }
-  const code = normalizeCode(rawCode)
-  if (!code) return refuse(database, tenantId, { valid: false, reason: 'unknown' })
-  const { data: stay, error } = await database.from('hotel_stays').select(stayColumns).eq('tenant_id', tenantId).eq('code_digest', codeDigest(tenantId, code)).maybeSingle()
-  if (error) throw error
-  if (!stay) return refuse(database, tenantId, { valid: false, reason: 'unknown' })
-  const phase = stayPhase(stay, now)
-  if (phase === 'voided') return { valid: false, reason: 'voided' }
-  return {
-    valid: true,
-    validFrom: stay.valid_from,
-    validTo: stay.valid_to,
-    phase,
-    stayRef: stay.id,
-    stayUrl: `${publicOrigin()}/stay/#t=${signStayToken(stay.id, now.getTime())}`,
-  }
-}
+const stayColumns = 'id, tenant_id, booking_ref, room, guest_label, valid_from, valid_to, window_days, status, app_sessions, card_sessions'
 
 export function publicOrigin() {
   const origin = (process.env.TISONIK_PUBLIC_ORIGIN || process.env.STAY_BASE_URL || 'https://tisonik.com').replace(/\/+$/, '')
@@ -166,60 +131,79 @@ export function publicOrigin() {
   return origin
 }
 
+const dateOf = z.string().refine(value => Number.isFinite(Date.parse(value)))
+
+// What UNIKMO sends. The card code belongs to UNIKMO: it is issued and checked there, and Tisonik never creates, stores
+// or checks one. cardCode is still accepted so the existing UNIKMO call works, and is ignored. A session started from a
+// ship's own app has no card code. guestReference must be the same stable value every time for one guest, so that guest
+// has one stay record and one rating however they arrive.
 export const unikmoSessionSchema = z.object({
   hotelId: z.string().trim().regex(/^[A-Za-z0-9_-]{2,64}$/),
-  cardCode: z.string().trim().regex(/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/),
   guestReference: text(1, 80),
-  stayEndsAt: z.string().refine(value => Number.isFinite(Date.parse(value))),
+  stayEndsAt: dateOf,
+  stayStartsAt: dateOf.optional(),
+  cardCode: z.string().trim().min(1).max(64).optional(),
+  source: z.enum(['app', 'card']).optional(),
+  room: text(1, 20).optional(),
+  firstName: text(1, 60).optional(),
 }).strict()
 
-// UNIKMO sends hotelId, cardCode, guestReference and stayEndsAt. Tisonik's own stay record is the authority:
-// the hotel must be mapped, the code must exist for that hotel, and the reference must match its booking.
-// stayEndsAt is not trusted to extend or shorten anything.
+const MAX_DAYS_AHEAD = 400
+
+// UNIKMO is trusted for the stay's dates: it is the system that knows the booking, and its server proves itself with a
+// shared secret. Tisonik creates the stay record on the first call and updates its dates on later ones. A stay the hotel
+// voided in the portal stays voided. A stay whose window has closed, or one ending implausibly far ahead, is refused.
 export async function resolveUnikmoSession(database, input, now = new Date()) {
-  const { data: settings, error } = await database.from('hotel_stay_settings').select('tenant_id').eq('unikmo_hotel_id', input.hotelId).maybeSingle()
+  const { data: settings, error } = await database.from('hotel_stay_settings').select('tenant_id, default_window_days').eq('unikmo_hotel_id', input.hotelId).maybeSingle()
   if (error) throw error
   if (!settings) return { ok: false }
-  if (await isBlocked(database, failBucket(settings.tenant_id), limits.failedCodes.window, limits.failedCodes.max)) return { ok: false, limited: true }
   if (await overLimit(database, `hotel:${settings.tenant_id}`, limits.hotelCalls.window, limits.hotelCalls.max)) return { ok: false, limited: true }
-  const code = normalizeCode(input.cardCode)
-  if (!code) return refuse(database, settings.tenant_id, { ok: false })
-  const { data: stay, error: stayError } = await database.from('hotel_stays').select(stayColumns).eq('tenant_id', settings.tenant_id).eq('code_digest', codeDigest(settings.tenant_id, code)).maybeSingle()
-  if (stayError) throw stayError
-  if (!stay || stay.booking_ref.trim().toLowerCase() !== input.guestReference.trim().toLowerCase()) return refuse(database, settings.tenant_id, { ok: false })
-  const phase = stayPhase(stay, now)
-  if (phase === 'voided') return { ok: false }
-  return { ok: true, url: `${publicOrigin()}/stay/#t=${signStayToken(stay.id, now.getTime())}`, phase }
-}
-
-export async function createStay(database, tenantId, input, now = new Date()) {
-  const { data: settings } = await database.from('hotel_stay_settings').select('default_window_days').eq('tenant_id', tenantId).maybeSingle()
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    const code = generateStayCode()
-    const { data, error } = await database.from('hotel_stays').insert({
-      tenant_id: tenantId,
-      booking_ref: input.bookingRef,
-      code_digest: codeDigest(tenantId, code),
-      room: input.room ?? null,
-      guest_label: input.guestLabel ?? null,
-      valid_from: input.validFrom,
-      valid_to: input.validTo,
-      window_days: input.windowDays ?? settings?.default_window_days ?? 14,
-    }).select('id').single()
-    if (!error) return { stayId: data.id, code, displayCode: displayCode(code) }
-    if (error.code !== '23505') throw error
+  const source = input.source || (input.cardCode ? 'card' : 'app')
+  const reference = input.guestReference.trim()
+  const validTo = day(input.stayEndsAt)
+  if (validTo > addDays(day(now), MAX_DAYS_AHEAD)) return { ok: false }
+  const find = async () => {
+    const { data, error: findError } = await database.from('hotel_stays').select(stayColumns).eq('tenant_id', settings.tenant_id).eq('booking_ref', reference).maybeSingle()
+    if (findError) throw findError
+    return data
   }
-  throw new Error('CODE_GENERATION_FAILED')
+  let stay = await find()
+  if (!stay) {
+    if (addDays(validTo, settings.default_window_days ?? 14) < day(now)) return { ok: false }
+    const validFrom = input.stayStartsAt ? day(input.stayStartsAt) : day(now)
+    const row = {
+      tenant_id: settings.tenant_id,
+      booking_ref: reference,
+      room: input.room ?? null,
+      guest_label: input.firstName ?? null,
+      valid_from: validFrom <= validTo ? validFrom : validTo,
+      valid_to: validTo,
+      window_days: settings.default_window_days ?? 14,
+      app_sessions: source === 'app' ? 1 : 0,
+      card_sessions: source === 'card' ? 1 : 0,
+    }
+    const { data, error: insertError } = await database.from('hotel_stays').insert(row).select('id').single()
+    if (insertError && insertError.code !== '23505') throw insertError
+    if (insertError) stay = await find()
+    else stay = { id: data.id, status: 'active', ...row }
+  } else if (stay.status !== 'voided') {
+    const patch = {
+      valid_to: validTo,
+      app_sessions: (stay.app_sessions || 0) + (source === 'app' ? 1 : 0),
+      card_sessions: (stay.card_sessions || 0) + (source === 'card' ? 1 : 0),
+      ...(input.stayStartsAt ? { valid_from: day(input.stayStartsAt) <= validTo ? day(input.stayStartsAt) : validTo } : {}),
+      ...(input.room ? { room: input.room } : {}),
+      ...(input.firstName ? { guest_label: input.firstName } : {}),
+    }
+    const { error: updateError } = await database.from('hotel_stays').update(patch).eq('id', stay.id)
+    if (updateError) throw updateError
+    stay = { ...stay, ...patch }
+  }
+  if (!stay) return { ok: false }
+  const phase = stayPhase(stay, now)
+  if (phase === 'voided' || phase === 'closed') return { ok: false }
+  return { ok: true, url: `${publicOrigin()}/stay/#t=${signStayToken(stay.id, now.getTime())}`, phase, source }
 }
-
-export const createStaySchema = z.object({
-  bookingRef: text(1, 80),
-  validFrom: z.string().date(),
-  validTo: z.string().date(),
-  room: text(1, 20).optional(),
-  guestLabel: text(1, 60).optional(),
-  windowDays: z.number().int().min(0).max(60).optional(),
-}).strict().refine(value => value.validTo >= value.validFrom, { message: 'invalid_stay_dates' })
 
 // The cookie session is preferred; a link token in the body is only a fallback for browsers that refuse cookies.
 export async function loadStay(database, token, now = new Date(), purpose = null) {
@@ -240,15 +224,16 @@ export async function exchangeLink(database, linkToken, now = new Date()) {
 }
 
 export async function guestSession(database, stay, now = new Date()) {
-  const { data: settings } = await database.from('hotel_stay_settings').select('hotel_name, discover_items').eq('tenant_id', stay.tenant_id).maybeSingle()
+  const { data: settings } = await database.from('hotel_stay_settings').select('hotel_name, discover_items, venue_type').eq('tenant_id', stay.tenant_id).maybeSingle()
   const tiles = tilesFor(stay, now)
   const { count } = await database.from('hotel_stay_submissions').select('id', { count: 'exact', head: true }).eq('stay_id', stay.id).eq('kind', 'rating')
   return {
     hotelName: settings?.hotel_name || null,
+    venueType: settings?.venue_type || 'hotel',
     firstName: stay.guest_label || null,
     tiles: { ...tiles, rating: tiles.rating && !count },
     discover: tiles.discover ? settings?.discover_items || [] : [],
-    questions: RATING_QUESTIONS,
+    questions: ratingQuestionsFor(settings?.venue_type),
   }
 }
 
@@ -275,18 +260,20 @@ const clean = value => String(value || '').replace(/[\r\n]+/g, ' ').trim()
 
 export const LOW_SCORE = 6
 
-// Reception receives everything: private messages, feedback, thank-yous and ratings. The hotel director (or whoever
+// Reception (guest services on a ship) receives everything: private messages, feedback, thank-yous and ratings. The hotel director (on a ship, the hotel director too; or whoever
 // the hotel names) receives ratings only. If reception has no address, the manager's covers for it so nothing is lost.
 // Best-effort: an email failure never fails the guest's request.
 export async function notifyHotel(database, stay, kind, payload, submissionId) {
   if (!['private', 'feedback', 'thank_you', 'rating'].includes(kind)) return { sent: false }
   if (!process.env.RESEND_API_KEY || !process.env.TISONIK_ENQUIRY_FROM) return { sent: false }
   try {
-    const { data: settings } = await database.from('hotel_stay_settings').select('reception_email, manager_email, hotel_name').eq('tenant_id', stay.tenant_id).maybeSingle()
+    const { data: settings } = await database.from('hotel_stay_settings').select('reception_email, manager_email, hotel_name, venue_type').eq('tenant_id', stay.tenant_id).maybeSingle()
     const wanted = kind === 'rating' ? [settings?.reception_email, settings?.manager_email] : [settings?.reception_email || settings?.manager_email]
     const to = [...new Set(wanted.filter(Boolean).map(address => address.trim().toLowerCase()))]
     if (!to.length) return { sent: false }
-    const scores = kind === 'rating' ? RATING_QUESTIONS.filter(question => payload.scores[question.id] !== undefined).map(question => ({ question, value: payload.scores[question.id] })) : []
+    const questions = ratingQuestionsFor(settings?.venue_type)
+    const words = venueWords(settings?.venue_type)
+    const scores = kind === 'rating' ? questions.filter(question => payload.scores[question.id] !== undefined).map(question => ({ question, value: payload.scores[question.id] })) : []
     const low = scores.filter(item => item.value <= LOW_SCORE)
     const average = scores.length ? scores.reduce((sum, item) => sum + item.value, 0) / scores.length : null
     const label = { private: 'Private message from a guest', feedback: 'Post-stay feedback', thank_you: 'A guest says thank you', rating: 'Stay rating' }[kind]
@@ -295,11 +282,11 @@ export async function notifyHotel(database, stay, kind, payload, submissionId) {
       label,
       '',
       `Booking: ${stay.booking_ref}`,
-      `Room: ${stay.room || 'not recorded'}`,
+      `${words.room}: ${stay.room || 'not recorded'}`,
       `Guest: ${stay.guest_label || 'not recorded'}`,
-      `Stay: ${stay.valid_from} to ${stay.valid_to}`,
+      `${words.stay}: ${stay.valid_from} to ${stay.valid_to}`,
       ...(payload.recipient ? [`About: ${payload.recipient}`] : []),
-      ...(scores.length ? ['', ...scores.map(item => `${item.value <= LOW_SCORE ? '!! ' : '   '}${item.value}/10  ${item.question.text}`), ...RATING_QUESTIONS.filter(question => question.optional && payload.scores[question.id] === undefined).map(question => `   skipped  ${question.text}`)] : []),
+      ...(scores.length ? ['', ...scores.map(item => `${item.value <= LOW_SCORE ? '!! ' : '   '}${item.value}/10  ${item.question.text}`), ...questions.filter(question => question.optional && payload.scores[question.id] === undefined).map(question => `   skipped  ${question.text}`)] : []),
       ...(low.length ? ['', 'Scores of 6 or below are marked !! and need a call from the manager today.'] : []),
       ...(payload.message || payload.comment ? ['', payload.message || payload.comment] : []),
       '',

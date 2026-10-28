@@ -11,7 +11,7 @@ const authorised = request => {
   return Boolean(configured) && configured.length >= 32 && supplied.length === expected.length && timingSafeEqual(supplied, expected)
 }
 
-// POST /api/integrations/unikmo/session - called by UNIKMO's server after a guest enters the card code.
+// POST /api/integrations/unikmo/session - called by UNIKMO's server once UNIKMO has accepted the guest (a card code it checked, or a guest the ship's app already knows).
 export default async function handler(request, response) {
   if (!allowPost(request, response)) return
   if (!process.env.UNIKMO_API_SECRET) return sendJson(response, 503, { error: 'Integration not configured' })

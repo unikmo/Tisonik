@@ -1,13 +1,12 @@
 import { z } from 'zod'
-import { createStay, createStaySchema } from './stays.mjs'
+import { VENUE_TYPES } from './stays.mjs'
 
 const writeRoles = ['tisonik_admin', 'operator_admin']
-// Front desk can create stays and work the inbox; only admins can void stays or change settings.
-const createRoles = [...writeRoles, 'front_desk']
-const inboxRoles = [...createRoles, 'operator_analyst']
+// Stays come from UNIKMO, so nobody creates them here. Front desk can work the inbox; only admins can void stays or change settings.
+const inboxRoles = [...writeRoles, 'front_desk', 'operator_analyst']
 
 const envelope = z.object({
-  action: z.enum(['create', 'void', 'status', 'settings']),
+  action: z.enum(['void', 'status', 'settings']),
   tenantId: z.string().uuid(),
   data: z.record(z.string(), z.unknown()).default({}),
 }).strict()
@@ -15,6 +14,7 @@ const envelope = z.object({
 const voidSchema = z.object({ stayId: z.string().uuid() }).strict()
 const statusSchema = z.object({ submissionId: z.string().uuid(), status: z.enum(['new', 'seen', 'resolved']) }).strict()
 const settingsSchema = z.object({
+  venueType: z.enum(VENUE_TYPES).default('hotel'),
   hotelName: z.string().trim().min(2).max(120).nullable().optional(),
   receptionEmail: z.string().trim().email().max(254).nullable().optional(),
   managerEmail: z.string().trim().email().max(254).nullable().optional(),
@@ -35,14 +35,9 @@ export async function portalAction(database, userId, rawBody) {
   if (!parsed.success) return { status: 422, body: { error: 'invalid_request' } }
   const { action, tenantId, data } = parsed.data
   const role = await roleOf(database, userId, tenantId)
-  const allowed = action === 'status' ? inboxRoles : action === 'create' ? createRoles : writeRoles
+  const allowed = action === 'status' ? inboxRoles : writeRoles
   if (!role || !allowed.includes(role)) return { status: 403, body: { error: 'not_permitted' } }
 
-  if (action === 'create') {
-    const stay = createStaySchema.safeParse(data)
-    if (!stay.success) return { status: 422, body: { error: 'invalid_stay', issues: stay.error.issues.map(({ path, message }) => ({ path, message })) } }
-    return { status: 201, body: await createStay(database, tenantId, stay.data) }
-  }
   if (action === 'void') {
     const input = voidSchema.safeParse(data)
     if (!input.success) return { status: 422, body: { error: 'invalid_request' } }
@@ -61,6 +56,7 @@ export async function portalAction(database, userId, rawBody) {
   if (!input.success) return { status: 422, body: { error: 'invalid_settings' } }
   const { error } = await database.from('hotel_stay_settings').upsert({
     tenant_id: tenantId,
+    venue_type: input.data.venueType,
     hotel_name: input.data.hotelName || null,
     reception_email: input.data.receptionEmail || null,
     manager_email: input.data.managerEmail || null,

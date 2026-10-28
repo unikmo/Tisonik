@@ -128,17 +128,17 @@ ul.plain li:first-child{border-top:0}
   }
 
   function render(){
-    var t=state.tiles,list=[]
+    var t=state.tiles,list=[],ship=state.venueType==='ship',team=ship?'the guest services team':'the hotel team'
     if(t.thankYou)list.push(tile('Thank someone','Tell us who made you feel special',function(p){textForm(p,'thank_you',{recipient:true,label:'Your message',min:3,max:500,done:'Thank you. We will pass it on.'})}))
-    if(t.private)list.push(tile('Tell us privately','Only the hotel team sees this',function(p){textForm(p,'private',{label:'What would you like us to know?',done:'Thank you. The team has your message.'})}))
-    if(t.feedback)list.push(tile('Share feedback','Send a note to guest relations',function(p){textForm(p,'feedback',{label:'Your feedback',done:'Thank you. Guest relations has your message.'})}))
-    if(t.rating)list.push(tile('Rate your stay','Five quick questions',ratingForm))
-    if(t.discover&&state.discover.length)list.push(tile('Discover','Recommended by the hotel',function(p){var u=el('ul',{class:'plain'});state.discover.slice(0,12).forEach(function(d){u.appendChild(el('li',{},[el('strong',{text:String(d.title||'')}),el('div',{class:'sub',text:String(d.body||'')})]))});p.appendChild(u)}))
+    if(t.private)list.push(tile('Tell us privately','Only '+team+' sees this',function(p){textForm(p,'private',{label:'What would you like us to know?',done:'Thank you. '+(ship?'Guest services':'The team')+' has your message.'})}))
+    if(t.feedback)list.push(tile('Share feedback','Send a note to '+(ship?'guest services':'guest relations'),function(p){textForm(p,'feedback',{label:'Your feedback',done:'Thank you. '+(ship?'Guest services':'Guest relations')+' has your message.'})}))
+    if(t.rating)list.push(tile(ship?'Rate your voyage':'Rate your stay','Five quick questions',ratingForm))
+    if(t.discover&&state.discover.length)list.push(tile('Discover',ship?'Recommended by the ship':'Recommended by the hotel',function(p){var u=el('ul',{class:'plain'});state.discover.slice(0,12).forEach(function(d){u.appendChild(el('li',{},[el('strong',{text:String(d.title||'')}),el('div',{class:'sub',text:String(d.body||'')})]))});p.appendChild(u)}))
     if(t.keepsake)list.push(tile('Your keepsake','Keep your card',function(p){p.appendChild(el('p',{text:'Your UNIKMO card is yours to keep. Scan it any time to come back to this page while it is open.'}))}))
-    shell([el('p',{class:'eyebrow',text:state.hotelName||'Your stay'}),el('h1',{text:state.firstName?'Welcome, '+state.firstName:'Your stay'}),el('p',{class:'lead',text:'A few ways to tell us how it is going.'}),el('div',{class:'tiles'},list),el('p',{class:'note',text:'Your messages go to the hotel team. Nothing here is posted publicly.'}),forget()])
+    shell([el('p',{class:'eyebrow',text:state.hotelName||(ship?'Your voyage':'Your stay')}),el('h1',{text:state.firstName?'Welcome, '+state.firstName:(ship?'Your voyage':'Your stay')}),el('p',{class:'lead',text:'A few ways to tell us how it is going.'}),el('div',{class:'tiles'},list),el('p',{class:'note',text:'Your messages go to '+team+'. Nothing here is posted publicly.'}),forget()])
   }
 
-  var again='Scan the card in your room again to open this page.'
+  var again='Scan your card again, or open this page from the app, to continue.'
   function open(){
     return api('session',{token:token}).then(function(res){
       if(res.status===200){state=res.body;render()}

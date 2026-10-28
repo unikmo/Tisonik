@@ -1,11 +1,12 @@
 -- Hotel stay layer. Separate from the aggregate-only control plane: these tables
--- hold per-stay data (a booking reference, optional room and first name, and the
--- guest's own messages). Keep them out of aggregate reporting, and purge them
+-- hold per-stay data (a guest reference from UNIKMO, optional room or cabin and first name,
+-- and the guest's own messages). Tisonik never issues or stores card codes: UNIKMO owns them. Keep them out of aggregate reporting, and purge them
 -- on the retention schedule below.
 
 create table public.hotel_stay_settings (
   tenant_id uuid primary key references public.tenants(id) on delete cascade,
   hotel_name text check (hotel_name is null or char_length(hotel_name) between 2 and 120),
+  venue_type text not null default 'hotel' check (venue_type in ('hotel', 'ship')),
   unikmo_hotel_id text unique check (unikmo_hotel_id is null or unikmo_hotel_id ~ '^[A-Za-z0-9_-]{2,64}$'),
   reception_email text check (reception_email is null or char_length(reception_email) between 5 and 254),
   manager_email text check (manager_email is null or char_length(manager_email) between 5 and 254),
@@ -18,16 +19,17 @@ create table public.hotel_stays (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid not null references public.tenants(id) on delete cascade,
   booking_ref text not null check (char_length(booking_ref) between 1 and 80),
-  code_digest text not null check (char_length(code_digest) = 64),
   room text check (room is null or char_length(room) <= 20),
   guest_label text check (guest_label is null or char_length(guest_label) <= 60),
   valid_from date not null,
   valid_to date not null,
   window_days integer not null default 14 check (window_days between 0 and 60),
   status text not null default 'active' check (status in ('active', 'voided')),
+  app_sessions integer not null default 0 check (app_sessions >= 0),
+  card_sessions integer not null default 0 check (card_sessions >= 0),
   created_at timestamptz not null default now(),
   check (valid_to >= valid_from),
-  unique (tenant_id, code_digest)
+  unique (tenant_id, booking_ref)
 );
 
 create table public.hotel_stay_submissions (
@@ -72,5 +74,5 @@ end $$;
 revoke all on function public.purge_expired_hotel_stays(integer) from public;
 grant execute on function public.purge_expired_hotel_stays(integer) to service_role;
 
-comment on table public.hotel_stays is 'Per-stay hotel data (booking reference, optional room and first name). Not part of the aggregate-only control plane. Purged by purge_expired_hotel_stays().';
+comment on table public.hotel_stays is 'Per-stay hotel or ship data (guest reference from UNIKMO, optional room or cabin and first name; no card code). Not part of the aggregate-only control plane. Purged by purge_expired_hotel_stays().';
 comment on table public.hotel_stay_submissions is 'Guest messages, thank-yous and ratings for a stay. Person-level; purged with the stay.';
