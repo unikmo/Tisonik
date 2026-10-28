@@ -16,7 +16,7 @@ export const RATING_QUESTIONS = [
 ]
 
 // Hotels and ships use the same five questions and ids, so scores compare. Only the nouns change on a ship.
-// The ship wording is a proposal and is not yet approved.
+// Ship wording approved 28 October.
 export const VENUE_TYPES = ['hotel', 'ship']
 const shipWording = {
   check_in: 'How was your embarkation?',

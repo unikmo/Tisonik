@@ -10,7 +10,7 @@ Everything here is done by a person with access to the production Supabase proje
 
 - [ ] Agree with UNIKMO: the guest reference is one stable value per guest for the whole stay (the same from the ship's app and from the card), the end date is accurate, and UNIKMO sends every code to Tisonik when it creates or replaces it, and revokes it when a card is lost.
 - [ ] Legal review of the new Privacy Policy section 13 and the stay-session cookie row on the Cookies page (both on branch `hotel-stays`). They describe stay records held by Tisonik on the hotel's behalf; the rest of the policy still describes the aggregate-only cruise design.
-- [ ] Approve the ship wording of the five rating questions (embarkation, cabin, crew). Hotels use the approved wording.
+- [x] Ship wording of the five rating questions approved 28 October (embarkation, cabin, crew). Hotels use the 26 October wording.
 - [ ] Confirm the 90-day retention (after the after-checkout window closes) and the 14-day default window.
 - [x] Rating questions approved 26 October (`RATING_QUESTIONS` in `api/_lib/stays.mjs`). Question 4 can be skipped.
 
@@ -76,5 +76,4 @@ A code UNIKMO has not registered, a code for a different guest, a revoked code, 
 - Rate limits are per minute in the database: 60 session, 20 exchange and 20 submit requests per client; 240 UNIKMO calls per hotel. Ten wrong or mismatched codes a minute per hotel pause code checks for that hotel; guests without a code are not held up.
 - UNIKMO is trusted for the stay dates and for every code it registers (its server proves itself with the shared secret). A stay is identified by hotel and guest reference exactly as sent, so UNIKMO must send the same text every time.
 - One rating per stay. If the in-app flow also collects a rating, Tisonik cannot see it, so a guest could rate in both places. The two ratings are different products (10 in-app questions, 5 here).
-- The ship wording of the rating questions is a proposal.
 - If the rate-limit functions fail, requests are allowed through (and logged) so a database hiccup never locks guests out.
