@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 
+process.env.STAY_CODE_PEPPER = 'p'.repeat(40)
 process.env.STAY_LINK_SECRET = 'l'.repeat(40)
 delete process.env.RESEND_API_KEY
 
@@ -12,9 +13,10 @@ function fakeDatabase() {
   return {
     tables,
     rate: new Map(),
-    async rpc(_name, args) {
+    async rpc(name, args) {
       const key = args.p_bucket
       const hits = this.rate.get(key) || 0
+      if (name === 'stay_rate_limit_blocked') return { data: hits >= args.p_limit, error: null }
       this.rate.set(key, hits + 1)
       return { data: hits + 1 <= args.p_limit, error: null }
     },
@@ -46,7 +48,12 @@ function fakeDatabase() {
           return { error: null }
         },
         then(resolve) {
-          if (patch) { run().forEach(row => Object.assign(row, patch)); return resolve({ error: null }) }
+          if (patch) {
+            const targets = run()
+            if (patch.code_digest && rows.some(row => !targets.includes(row) && row.tenant_id === targets[0]?.tenant_id && row.code_digest === patch.code_digest)) return resolve({ error: { code: '23505' } })
+            targets.forEach(row => Object.assign(row, patch))
+            return resolve({ error: null })
+          }
           resolve(countOnly ? { count: run().length, error: null } : { data: run(), error: null })
         },
       }
@@ -59,7 +66,8 @@ const tenant = 'tenant-1'
 const database = fakeDatabase()
 database.tables.hotel_stay_settings.push({ tenant_id: tenant, venue_type: 'hotel', unikmo_hotel_id: 'HOTEL-001', hotel_name: 'Hotel Test', reception_email: 'Reception@Hotel.example', manager_email: 'director@hotel.example', default_window_days: 14, discover_items: [{ title: 'Spa', body: 'Book at reception' }] })
 
-// UNIKMO session contract. UNIKMO owns the card code; Tisonik never issues, stores or checks one.
+// UNIKMO owns the card codes. UNIKMO creates a code and sends it to Tisonik; Tisonik keeps a keyed hash of it so it can
+// check the code later, and never creates one.
 const during = new Date('2026-11-12T10:00:00Z')
 const unikmoBody = { hotelId: 'HOTEL-001', guestReference: 'BK-1001', stayStartsAt: '2026-11-10T14:00:00.000Z', stayEndsAt: '2026-11-14T11:00:00.000Z', cardCode: 'UNIKMO-OWN-FORMAT-123', room: '204', firstName: 'Sam' }
 const parse = value => stays.unikmoSessionSchema.safeParse(value).success
@@ -70,14 +78,32 @@ assert.equal(parse({ ...unikmoBody, stayEndsAt: 'not a date' }), false)
 assert.equal(parse({ hotelId: 'HOTEL-001', guestReference: 'BK-1' }), false, 'the end date is required')
 assert.equal(parse({ ...unikmoBody, source: 'phone' }), false)
 
+assert.equal(stays.unikmoCodeSchema.safeParse(unikmoBody).success, true)
+assert.equal(stays.unikmoCodeSchema.safeParse({ ...unikmoBody, cardCode: undefined }).success, false, 'a code must be sent to register it')
+assert.equal(stays.unikmoCodeSchema.safeParse({ ...unikmoBody, status: 'lost' }).success, false)
+assert.equal(stays.normalizeCode('unikmo own-format 123'), 'UNIKMOOWNFORMAT123', 'case, spaces and hyphens are ignored')
+assert.equal(stays.normalizeCode('abc'), null, 'too short')
+assert.notEqual(stays.codeDigest('a', 'ABCD1234'), stays.codeDigest('b', 'ABCD1234'), 'digest is scoped to the hotel')
+
+assert.equal((await stays.resolveUnikmoSession(database, unikmoBody, during)).ok, false, 'a code UNIKMO has not sent is unknown')
+assert.equal(database.tables.hotel_stays.length, 0, 'an unknown code creates nothing')
+const registered = await stays.registerUnikmoCode(database, { ...unikmoBody, status: 'active' }, during)
+assert.equal(registered.ok, true)
+assert.equal(database.tables.hotel_stays.length, 1, 'registering a code creates the stay')
+assert.match(database.tables.hotel_stays[0].code_digest, /^[0-9a-f]{64}$/)
+assert.ok(!JSON.stringify(database.tables.hotel_stays[0]).includes('UNIKMOOWNFORMAT123'), 'the plain code is never stored')
+assert.deepEqual([database.tables.hotel_stays[0].app_sessions, database.tables.hotel_stays[0].card_sessions], [0, 0], 'registering is not a guest session')
+assert.equal((await stays.resolveUnikmoSession(database, { ...unikmoBody, guestReference: 'BK-9999' }, during)).ok, false, 'a code works only for its own guest reference')
+assert.equal((await stays.resolveUnikmoSession(database, { ...unikmoBody, cardCode: 'ZZZZ-9999' }, during)).ok, false, 'an unknown code is refused')
+assert.equal((await stays.resolveUnikmoSession(database, { ...unikmoBody, hotelId: 'HOTEL-999' }, during)).ok, false, 'unmapped hotel')
+
 const first = await stays.resolveUnikmoSession(database, unikmoBody, during)
 assert.equal(first.ok, true)
 assert.equal(first.source, 'card', 'a call with a card code is a card session')
 assert.match(first.url, /^https:\/\/tisonik\.com\/stay\/#t=[\w-]+\.[\w-]+$/)
-assert.equal(database.tables.hotel_stays.length, 1, 'the stay is created on the first call')
 const stay = database.tables.hotel_stays[0]
 assert.deepEqual([stay.booking_ref, stay.room, stay.guest_label, stay.valid_from, stay.valid_to, stay.window_days], ['BK-1001', '204', 'Sam', '2026-11-10', '2026-11-14', 14])
-assert.ok(!JSON.stringify(stay).includes('UNIKMO-OWN-FORMAT'), 'the card code is never stored')
+assert.equal(stay.card_sessions, 1)
 assert.ok(!Buffer.from(first.url.split('#t=')[1].split('.')[0], 'base64url').toString().includes('1001'), 'link carries no guest reference')
 
 const appCall = await stays.resolveUnikmoSession(database, { hotelId: 'HOTEL-001', guestReference: 'BK-1001', stayEndsAt: '2026-11-14T11:00:00.000Z' }, during)
@@ -91,11 +117,25 @@ assert.equal(stays.unikmoSessionSchema.parse(unikmoBody).hotelId, 'HOTEL-001')
 await stays.resolveUnikmoSession(database, { hotelId: 'HOTEL-001', guestReference: 'BK-EXT', stayEndsAt: '2026-11-14T11:00:00.000Z' }, during)
 await stays.resolveUnikmoSession(database, { hotelId: 'HOTEL-001', guestReference: 'BK-EXT', stayEndsAt: '2026-11-16T11:00:00.000Z' }, during)
 assert.equal(database.tables.hotel_stays.find(row => row.booking_ref === 'BK-EXT').valid_to, '2026-11-16', 'UNIKMO can extend a stay')
+
+// Replacing, revoking and clashing codes
+const swap = { hotelId: 'HOTEL-001', guestReference: 'BK-SWAP', stayEndsAt: '2026-11-14T11:00:00.000Z' }
+assert.equal((await stays.registerUnikmoCode(database, { ...swap, cardCode: 'CODE-AAAA' }, during)).ok, true)
+assert.equal((await stays.resolveUnikmoSession(database, { ...swap, cardCode: 'CODE-AAAA' }, during)).ok, true)
+assert.equal((await stays.registerUnikmoCode(database, { ...swap, cardCode: 'CODE-BBBB' }, during)).ok, true)
+assert.equal((await stays.resolveUnikmoSession(database, { ...swap, cardCode: 'CODE-AAAA' }, during)).ok, false, 'a new code replaces the old one')
+assert.equal((await stays.resolveUnikmoSession(database, { ...swap, cardCode: 'CODE-BBBB' }, during)).ok, true)
+assert.equal(database.tables.hotel_stays.filter(row => row.booking_ref === 'BK-SWAP').length, 1, 'still one stay')
+const clash = await stays.registerUnikmoCode(database, { ...swap, guestReference: 'BK-OTHER', cardCode: 'CODE-BBBB' }, during)
+assert.deepEqual([clash.ok, clash.conflict], [false, true], 'a code held by another guest is refused')
+assert.equal((await stays.registerUnikmoCode(database, { ...swap, cardCode: 'CODE-BBBB', status: 'revoked' }, during)).revoked, true)
+assert.equal((await stays.resolveUnikmoSession(database, { ...swap, cardCode: 'CODE-BBBB' }, during)).ok, false, 'a revoked code stops working')
+assert.equal((await stays.resolveUnikmoSession(database, swap, during)).ok, true, 'the same guest can still open from the app')
+assert.equal((await stays.registerUnikmoCode(database, { ...swap, hotelId: 'HOTEL-999', cardCode: 'CODE-CCCC' }, during)).ok, false, 'unmapped hotel')
 const count = database.tables.hotel_stays.length
 
-assert.equal((await stays.resolveUnikmoSession(database, { ...unikmoBody, hotelId: 'HOTEL-999' }, during)).ok, false, 'unmapped hotel')
-assert.equal((await stays.resolveUnikmoSession(database, { ...unikmoBody, guestReference: 'BK-FAR', stayEndsAt: '2031-01-01T00:00:00.000Z' }, during)).ok, false, 'an end date years away is refused')
-assert.equal((await stays.resolveUnikmoSession(database, { ...unikmoBody, guestReference: 'BK-OLD', stayEndsAt: '2026-01-01T00:00:00.000Z' }, during)).ok, false, 'a stay that closed long ago is refused')
+assert.equal((await stays.resolveUnikmoSession(database, { hotelId: 'HOTEL-001', guestReference: 'BK-FAR', stayEndsAt: '2031-01-01T00:00:00.000Z' }, during)).ok, false, 'an end date years away is refused')
+assert.equal((await stays.resolveUnikmoSession(database, { hotelId: 'HOTEL-001', guestReference: 'BK-OLD', stayEndsAt: '2026-01-01T00:00:00.000Z' }, during)).ok, false, 'a stay that closed long ago is refused')
 assert.equal(database.tables.hotel_stays.length, count, 'refused calls create nothing')
 assert.equal((await stays.resolveUnikmoSession(database, unikmoBody, new Date('2026-11-20T12:00:00Z'))).ok, true, 'still opens inside the after-checkout window')
 assert.equal((await stays.resolveUnikmoSession(database, unikmoBody, new Date('2026-12-30T12:00:00Z'))).ok, false, 'closed once the window has passed')
@@ -104,17 +144,20 @@ await assert.rejects(() => stays.resolveUnikmoSession(database, unikmoBody, duri
 delete process.env.TISONIK_PUBLIC_ORIGIN
 
 const { default: unikmoHandler } = await import('../api/integrations/unikmo/session.mjs')
-const call = async (headers, secret) => {
+const { default: codesHandler } = await import('../api/integrations/unikmo/codes.mjs')
+const call = async (handler, headers, secret) => {
   if (secret) process.env.UNIKMO_API_SECRET = secret; else delete process.env.UNIKMO_API_SECRET
   const out = {}
   const response = { setHeader() {}, end(body) { out.body = body }, set statusCode(value) { out.status = value } }
-  await unikmoHandler({ method: 'POST', headers, async *[Symbol.asyncIterator]() { yield Buffer.from('{}') } }, response)
+  await handler({ method: 'POST', headers, async *[Symbol.asyncIterator]() { yield Buffer.from('{}') } }, response)
   return out.status
 }
-assert.equal(await call({}, null), 503, 'not configured')
-assert.equal(await call({}, 's'.repeat(40)), 401, 'missing token')
-assert.equal(await call({ authorization: 'Bearer ' + 'x'.repeat(40) }, 's'.repeat(40)), 401, 'wrong token')
-assert.equal(await call({ authorization: 'Bearer ' + 's'.repeat(40) }, 's'.repeat(40)), 400, 'right token, empty body')
+for (const handler of [unikmoHandler, codesHandler]) {
+  assert.equal(await call(handler, {}, null), 503, 'not configured')
+  assert.equal(await call(handler, {}, 's'.repeat(40)), 401, 'missing token')
+  assert.equal(await call(handler, { authorization: 'Bearer ' + 'x'.repeat(40) }, 's'.repeat(40)), 401, 'wrong token')
+  assert.equal(await call(handler, { authorization: 'Bearer ' + 's'.repeat(40) }, 's'.repeat(40)), 400, 'right token, empty body')
+}
 
 // Tokens
 const token = first.url.split('#t=')[1]
@@ -296,7 +339,16 @@ assert.deepEqual(await stays.notifyHotel(database, mailStay, 'private', { messag
 delete process.env.RESEND_API_KEY
 database.tables.hotel_stay_settings[0].reception_email = 'reception@hotel.example'
 
-// Rate limiting: UNIKMO calls are counted per hotel; guest endpoints per client
+// Rate limiting: wrong codes are counted per hotel, UNIKMO calls per hotel, guest endpoints per client
+const guessed = fakeDatabase()
+guessed.tables.hotel_stay_settings.push({ tenant_id: 'tenant-g', unikmo_hotel_id: 'G-1', default_window_days: 14 }, { tenant_id: 'tenant-h', unikmo_hotel_id: 'G-2', default_window_days: 14 })
+const guessBody = { hotelId: 'G-1', guestReference: 'G-REF', stayEndsAt: '2026-11-14T11:00:00.000Z', cardCode: 'REAL-CODE-1' }
+assert.equal((await stays.registerUnikmoCode(guessed, guessBody, during)).ok, true)
+for (let attempt = 0; attempt < 10; attempt += 1) assert.equal((await stays.resolveUnikmoSession(guessed, { ...guessBody, cardCode: 'WRONG-' + attempt + 'AB' }, during)).limited, undefined)
+assert.equal((await stays.resolveUnikmoSession(guessed, guessBody, during)).limited, true, 'after 10 wrong codes in a minute, even the right code waits')
+assert.equal((await stays.resolveUnikmoSession(guessed, { hotelId: 'G-1', guestReference: 'G-REF', stayEndsAt: guessBody.stayEndsAt }, during)).ok, true, 'a guest with no code (the app path) is not held up')
+assert.equal((await stays.registerUnikmoCode(guessed, { ...guessBody, hotelId: 'G-2', cardCode: 'OTHER-CODE-1' }, during)).ok, true)
+assert.equal((await stays.resolveUnikmoSession(guessed, { ...guessBody, hotelId: 'G-2', cardCode: 'OTHER-CODE-1' }, during)).ok, true, 'one hotel being guessed at does not block another')
 const limited = fakeDatabase()
 limited.tables.hotel_stay_settings.push({ tenant_id: 'tenant-rl', unikmo_hotel_id: 'RL-1', default_window_days: 14 })
 const rlBody = { hotelId: 'RL-1', guestReference: 'G-1', stayEndsAt: '2026-11-14T11:00:00.000Z' }

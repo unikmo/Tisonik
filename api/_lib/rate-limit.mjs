@@ -19,10 +19,23 @@ export async function overLimit(database, bucket, windowSeconds, limit) {
   }
 }
 
+// Reads without counting: true once the bucket has already reached its limit.
+export async function isBlocked(database, bucket, windowSeconds, limit) {
+  try {
+    const { data, error } = await database.rpc('stay_rate_limit_blocked', { p_bucket: bucket, p_window_seconds: windowSeconds, p_limit: limit })
+    if (error) throw error
+    return data === true
+  } catch (error) {
+    console.error('stay-rate-limit-unavailable', error?.message || error)
+    return false
+  }
+}
+
 // Limits used by the stay endpoints (per minute unless noted).
 export const limits = {
   guestSession: { window: 60, max: 60 },
   guestExchange: { window: 60, max: 20 },
   guestSubmit: { window: 60, max: 20 },
   hotelCalls: { window: 60, max: 240 },
+  failedCodes: { window: 60, max: 10 },
 }

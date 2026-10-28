@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { z } from 'zod'
-import { limits, overLimit } from './rate-limit.mjs'
+import { isBlocked, limits, overLimit } from './rate-limit.mjs'
 
 export const TOKEN_LIFETIME_SECONDS = 15 * 60
 const SESSION_MAX_SECONDS = 30 * 86_400
@@ -131,45 +131,78 @@ export function publicOrigin() {
   return origin
 }
 
-const dateOf = z.string().refine(value => Number.isFinite(Date.parse(value)))
+// Card codes belong to UNIKMO. UNIKMO creates them and sends them to Tisonik (see registerUnikmoCode); Tisonik never
+// creates a code. It only keeps a keyed hash of each code UNIKMO sent, so it can check whether a code is still valid.
+// UNIKMO's code format is not fixed here: anything of 4 to 64 letters and digits is accepted, ignoring case, spaces and hyphens.
+export function normalizeCode(input) {
+  const code = String(input ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+  return code.length >= 4 && code.length <= 64 ? code : null
+}
 
-// What UNIKMO sends. The card code belongs to UNIKMO: it is issued and checked there, and Tisonik never creates, stores
-// or checks one. cardCode is still accepted so the existing UNIKMO call works, and is ignored. A session started from a
-// ship's own app has no card code. guestReference must be the same stable value every time for one guest, so that guest
-// has one stay record and one rating however they arrive.
-export const unikmoSessionSchema = z.object({
+// Keyed hash: a leaked table cannot be brute-forced without the pepper.
+export function codeDigest(tenantId, code) {
+  return createHmac('sha256', secret('STAY_CODE_PEPPER')).update(`${tenantId}:${code}`).digest('hex')
+}
+
+// Unknown or mismatched codes are counted per hotel. Once a hotel has had too many in a minute, code checks stop until the window rolls over.
+const failBucket = tenantId => `fail:${tenantId}`
+async function refuse(database, tenantId, result) {
+  await overLimit(database, failBucket(tenantId), limits.failedCodes.window, limits.failedCodes.max)
+  return result
+}
+
+const dateOf = z.string().refine(value => Number.isFinite(Date.parse(value)))
+const stayFields = {
   hotelId: z.string().trim().regex(/^[A-Za-z0-9_-]{2,64}$/),
   guestReference: text(1, 80),
   stayEndsAt: dateOf,
   stayStartsAt: dateOf.optional(),
-  cardCode: z.string().trim().min(1).max(64).optional(),
-  source: z.enum(['app', 'card']).optional(),
   room: text(1, 20).optional(),
   firstName: text(1, 60).optional(),
+}
+
+// UNIKMO opens a guest session. With a card code, Tisonik checks it: the code must be one UNIKMO sent, for this hotel and
+// this guest reference, and the stay must still be open. Without a card code (a guest the ship's app already knows) there
+// is nothing to check. guestReference must be the same stable value every time for one guest, so that guest has one stay
+// record and one rating however they arrive.
+export const unikmoSessionSchema = z.object({
+  ...stayFields,
+  cardCode: text(1, 64).optional(),
+  source: z.enum(['app', 'card']).optional(),
+}).strict()
+
+// UNIKMO sends a code to Tisonik when it creates or assigns it, and revokes it when the card is lost or replaced.
+// Registering a new code for a guest replaces that guest's previous one.
+export const unikmoCodeSchema = z.object({
+  ...stayFields,
+  cardCode: text(1, 64),
+  status: z.enum(['active', 'revoked']).default('active'),
 }).strict()
 
 const MAX_DAYS_AHEAD = 400
 
-// UNIKMO is trusted for the stay's dates: it is the system that knows the booking, and its server proves itself with a
-// shared secret. Tisonik creates the stay record on the first call and updates its dates on later ones. A stay the hotel
-// voided in the portal stays voided. A stay whose window has closed, or one ending implausibly far ahead, is refused.
-export async function resolveUnikmoSession(database, input, now = new Date()) {
-  const { data: settings, error } = await database.from('hotel_stay_settings').select('tenant_id, default_window_days').eq('unikmo_hotel_id', input.hotelId).maybeSingle()
+async function hotelFor(database, hotelId) {
+  const { data, error } = await database.from('hotel_stay_settings').select('tenant_id, default_window_days').eq('unikmo_hotel_id', hotelId).maybeSingle()
   if (error) throw error
-  if (!settings) return { ok: false }
-  if (await overLimit(database, `hotel:${settings.tenant_id}`, limits.hotelCalls.window, limits.hotelCalls.max)) return { ok: false, limited: true }
-  const source = input.source || (input.cardCode ? 'card' : 'app')
+  return data
+}
+
+// UNIKMO is trusted for the stay's dates: it is the system that knows the booking, and its server proves itself with a
+// shared secret. The stay record is created on first sight (hotel plus guest reference) and its dates updated afterwards.
+// A stay the hotel voided stays voided. A stay that has already closed, or ends implausibly far ahead, is not created.
+async function upsertStay(database, settings, input, { now, source = null, existing }) {
   const reference = input.guestReference.trim()
   const validTo = day(input.stayEndsAt)
-  if (validTo > addDays(day(now), MAX_DAYS_AHEAD)) return { ok: false }
-  const find = async () => {
-    const { data, error: findError } = await database.from('hotel_stays').select(stayColumns).eq('tenant_id', settings.tenant_id).eq('booking_ref', reference).maybeSingle()
-    if (findError) throw findError
-    return data
+  if (validTo > addDays(day(now), MAX_DAYS_AHEAD)) return null
+  let stay = existing
+  if (stay === undefined) {
+    const { data, error } = await database.from('hotel_stays').select(stayColumns).eq('tenant_id', settings.tenant_id).eq('booking_ref', reference).maybeSingle()
+    if (error) throw error
+    stay = data
   }
-  let stay = await find()
+  const bump = (current, name) => (current || 0) + (source === name ? 1 : 0)
   if (!stay) {
-    if (addDays(validTo, settings.default_window_days ?? 14) < day(now)) return { ok: false }
+    if (addDays(validTo, settings.default_window_days ?? 14) < day(now)) return null
     const validFrom = input.stayStartsAt ? day(input.stayStartsAt) : day(now)
     const row = {
       tenant_id: settings.tenant_id,
@@ -179,30 +212,77 @@ export async function resolveUnikmoSession(database, input, now = new Date()) {
       valid_from: validFrom <= validTo ? validFrom : validTo,
       valid_to: validTo,
       window_days: settings.default_window_days ?? 14,
-      app_sessions: source === 'app' ? 1 : 0,
-      card_sessions: source === 'card' ? 1 : 0,
+      app_sessions: bump(0, 'app'),
+      card_sessions: bump(0, 'card'),
     }
-    const { data, error: insertError } = await database.from('hotel_stays').insert(row).select('id').single()
-    if (insertError && insertError.code !== '23505') throw insertError
-    if (insertError) stay = await find()
-    else stay = { id: data.id, status: 'active', ...row }
-  } else if (stay.status !== 'voided') {
-    const patch = {
-      valid_to: validTo,
-      app_sessions: (stay.app_sessions || 0) + (source === 'app' ? 1 : 0),
-      card_sessions: (stay.card_sessions || 0) + (source === 'card' ? 1 : 0),
-      ...(input.stayStartsAt ? { valid_from: day(input.stayStartsAt) <= validTo ? day(input.stayStartsAt) : validTo } : {}),
-      ...(input.room ? { room: input.room } : {}),
-      ...(input.firstName ? { guest_label: input.firstName } : {}),
-    }
-    const { error: updateError } = await database.from('hotel_stays').update(patch).eq('id', stay.id)
-    if (updateError) throw updateError
-    stay = { ...stay, ...patch }
+    const { data, error } = await database.from('hotel_stays').insert(row).select('id').single()
+    if (!error) return { id: data.id, status: 'active', ...row }
+    if (error.code !== '23505') throw error
+    return upsertStay(database, settings, input, { now, source })
   }
+  if (stay.status === 'voided') return stay
+  const patch = {
+    valid_to: validTo,
+    app_sessions: bump(stay.app_sessions, 'app'),
+    card_sessions: bump(stay.card_sessions, 'card'),
+    ...(input.stayStartsAt ? { valid_from: day(input.stayStartsAt) <= validTo ? day(input.stayStartsAt) : validTo } : {}),
+    ...(input.room ? { room: input.room } : {}),
+    ...(input.firstName ? { guest_label: input.firstName } : {}),
+  }
+  const { error } = await database.from('hotel_stays').update(patch).eq('id', stay.id)
+  if (error) throw error
+  return { ...stay, ...patch }
+}
+
+export async function resolveUnikmoSession(database, input, now = new Date()) {
+  const settings = await hotelFor(database, input.hotelId)
+  if (!settings) return { ok: false }
+  const tenantId = settings.tenant_id
+  if (await overLimit(database, `hotel:${tenantId}`, limits.hotelCalls.window, limits.hotelCalls.max)) return { ok: false, limited: true }
+  let existing
+  if (input.cardCode !== undefined) {
+    if (await isBlocked(database, failBucket(tenantId), limits.failedCodes.window, limits.failedCodes.max)) return { ok: false, limited: true }
+    const code = normalizeCode(input.cardCode)
+    let found = null
+    if (code) {
+      const { data, error } = await database.from('hotel_stays').select(stayColumns).eq('tenant_id', tenantId).eq('code_digest', codeDigest(tenantId, code)).maybeSingle()
+      if (error) throw error
+      found = data
+    }
+    if (!found || found.booking_ref !== input.guestReference.trim()) return refuse(database, tenantId, { ok: false })
+    existing = found
+  }
+  const source = input.source || (input.cardCode !== undefined ? 'card' : 'app')
+  const stay = await upsertStay(database, settings, input, { now, source, existing })
   if (!stay) return { ok: false }
   const phase = stayPhase(stay, now)
   if (phase === 'voided' || phase === 'closed') return { ok: false }
   return { ok: true, url: `${publicOrigin()}/stay/#t=${signStayToken(stay.id, now.getTime())}`, phase, source }
+}
+
+// UNIKMO tells Tisonik about a code it created. Tisonik creates the stay record if it has not seen the guest, stores only
+// a keyed hash of the code, and from then on can check the code. A code already held by another guest is refused.
+export async function registerUnikmoCode(database, input, now = new Date()) {
+  const settings = await hotelFor(database, input.hotelId)
+  if (!settings) return { ok: false }
+  const tenantId = settings.tenant_id
+  if (await overLimit(database, `hotel:${tenantId}`, limits.hotelCalls.window, limits.hotelCalls.max)) return { ok: false, limited: true }
+  const code = normalizeCode(input.cardCode)
+  if (!code) return { ok: false }
+  const digest = codeDigest(tenantId, code)
+  if (input.status === 'revoked') {
+    const { error } = await database.from('hotel_stays').update({ code_digest: null }).eq('tenant_id', tenantId).eq('code_digest', digest)
+    if (error) throw error
+    return { ok: true, revoked: true }
+  }
+  const stay = await upsertStay(database, settings, input, { now })
+  if (!stay || stay.status === 'voided') return { ok: false }
+  const { error } = await database.from('hotel_stays').update({ code_digest: digest }).eq('id', stay.id)
+  if (error) {
+    if (error.code === '23505') return { ok: false, conflict: true }
+    throw error
+  }
+  return { ok: true, phase: stayPhase(stay, now) }
 }
 
 // The cookie session is preferred; a link token in the body is only a fallback for browsers that refuse cookies.

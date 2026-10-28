@@ -1,17 +1,9 @@
-import { timingSafeEqual } from 'node:crypto'
 import { allowPost, readJson, sendJson } from '../../_lib/http.mjs'
 import { adminDatabase } from '../../_lib/supabase.mjs'
+import { authorised } from '../../_lib/unikmo-auth.mjs'
 import { resolveUnikmoSession, unikmoSessionSchema } from '../../_lib/stays.mjs'
 
-const authorised = request => {
-  const configured = process.env.UNIKMO_API_SECRET
-  const header = String(request.headers.authorization || '')
-  const supplied = Buffer.from(header.startsWith('Bearer ') ? header.slice(7) : '')
-  const expected = Buffer.from(configured || '')
-  return Boolean(configured) && configured.length >= 32 && supplied.length === expected.length && timingSafeEqual(supplied, expected)
-}
-
-// POST /api/integrations/unikmo/session - called by UNIKMO's server once UNIKMO has accepted the guest (a card code it checked, or a guest the ship's app already knows).
+// POST /api/integrations/unikmo/session - called by UNIKMO's server to open a guest session. If a card code is sent, Tisonik checks it against the codes UNIKMO registered.
 export default async function handler(request, response) {
   if (!allowPost(request, response)) return
   if (!process.env.UNIKMO_API_SECRET) return sendJson(response, 503, { error: 'Integration not configured' })
