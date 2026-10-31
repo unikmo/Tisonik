@@ -53,9 +53,9 @@ alter table public.hotel_stay_settings enable row level security;
 alter table public.hotel_stays enable row level security;
 alter table public.hotel_stay_submissions enable row level security;
 
-create policy hotel_settings_member_read on public.hotel_stay_settings for select to authenticated using (public.is_tenant_member(tenant_id));
-create policy hotel_stays_member_read on public.hotel_stays for select to authenticated using (public.is_tenant_member(tenant_id));
-create policy hotel_submissions_member_read on public.hotel_stay_submissions for select to authenticated using (public.is_tenant_member(tenant_id));
+create policy hotel_settings_member_read on public.hotel_stay_settings for select to authenticated using (private.is_tenant_member(tenant_id));
+create policy hotel_stays_member_read on public.hotel_stays for select to authenticated using (private.is_tenant_member(tenant_id));
+create policy hotel_submissions_member_read on public.hotel_stay_submissions for select to authenticated using (private.is_tenant_member(tenant_id));
 
 grant select on public.hotel_stay_settings, public.hotel_stays, public.hotel_stay_submissions to authenticated;
 revoke all on public.hotel_stay_settings, public.hotel_stays, public.hotel_stay_submissions from anon;

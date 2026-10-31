@@ -27,11 +27,11 @@ end $$;
 -- Reads without counting. Returns true once the bucket has reached its limit.
 create or replace function public.stay_rate_limit_blocked(p_bucket text, p_window_seconds integer, p_limit integer)
 returns boolean language sql stable security definer set search_path = public
-as $
+as $$
   select coalesce((select hits from public.hotel_stay_rate_limits
     where bucket = p_bucket
       and window_start = to_timestamp(floor(extract(epoch from now()) / p_window_seconds) * p_window_seconds)), 0) >= p_limit
-$;
+$$;
 
 revoke all on function public.stay_rate_limit_hit(text, integer, integer) from public;
 revoke all on function public.stay_rate_limit_blocked(text, integer, integer) from public;
