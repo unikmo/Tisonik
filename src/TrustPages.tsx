@@ -46,7 +46,7 @@ const Cta = ({ children }: { children: ReactNode }) => <div className="trust-cta
 const howItWorksFaqs: Faq[] = [
   ['Does the guest need to download an app or create an account?', 'No. On a ship the guest uses the cruise line’s own app. In a hotel or resort the card opens a web page on their phone. There is no account, no password and no sign-up form.'],
   ['What if a card is lost or handed to someone else?', 'UNIKMO revokes the code and Tisonik refuses it from then on. A code is also tied to one guest: the right code with the wrong guest is refused too. We tested both cases before launch.'],
-  ['What does UNIKMO do, and what does Tisonik do?', 'UNIKMO is the face of your property: it produces the cards, opens each scan with your manager’s or director’s welcome of the day, creates every code, and tells Tisonik which code belongs to which guest and for which dates. Tisonik never creates a code. It checks each scan against what UNIKMO has registered, runs the guest page and delivers what the guest sends to your team.'],
+  ['What does UNIKMO do, and what does Tisonik do?', 'UNIKMO produces the cards, creates every code, and tells Tisonik which code belongs to which guest and for which dates. Tisonik never creates a code. It checks each scan against what UNIKMO has registered, runs the guest page and delivers what the guest sends to your team.'],
   ['Do you need to connect to our property-management or booking system?', 'Not for the guest page. UNIKMO supplies the guest reference and the stay dates. Your booking, property-management, commerce and payment systems are not touched. Deeper connections, for example for cruise identity or revenue attribution, are agreed in a pilot and always stay on your side.'],
   ['Who in our team receives what the guest sends?', 'Reception or guest services receive every thank-you, private message and rating by email and in the portal. The hotel director or manager receives ratings only. Any rating with a score of 6 or lower is flagged LOW SCORE in the subject line, so it is read first.'],
   ['What does the guest see on each day of the stay?', 'It changes with the stay. Before arrival and during the stay they can discover what is on offer and thank someone. During the stay they can also write to the team privately. On the last day and after checkout they can rate the stay. After checkout, for 14 days by default, they can leave final feedback. Then the page closes.'],
@@ -61,18 +61,17 @@ export function HowItWorksPage({ cruiseDetail }: { cruiseDetail: ReactNode }) {
     <section className="trust-hero">
       <p className="eyebrow">HOW IT WORKS</p>
       <h1>One card. One guest page. One inbox for your team.</h1>
-      <p className="trust-intro">UNIKMO puts your property’s face in the guest’s hand: a card that opens with a welcome from your manager or director. Tisonik turns every use of that card into thanks, honest feedback and ratings, and sends each one to the right person while the guest is still with you. Your booking, property and payment systems stay exactly as they are.</p>
+      <p className="trust-intro">UNIKMO puts a card in the guest’s hand. Tisonik turns every use of that card into thanks, honest feedback and ratings, and sends each one to the right person while the guest is still with you. Your booking, property and payment systems stay exactly as they are.</p>
       <JumpLinks links={[['#parts', 'The two parts'], ['#journey', 'Guest journey'], ['#who', 'Who sees what'], ['#where', 'Where it applies'], ['#start', 'Getting started'], ['#questions', 'Questions']]} />
     </section>
 
-    <Block id="parts" eyebrow="THE TWO PARTS" title="UNIKMO is the face guests meet. Tisonik runs the room." lead="Two companies, two clearly separated jobs. Keeping them apart is what makes the setup quick and the data question simple.">
+    <Block id="parts" eyebrow="THE TWO PARTS" title="UNIKMO opens the door. Tisonik runs the room." lead="Two companies, two clearly separated jobs. Keeping them apart is what makes the setup quick and the data question simple.">
       <div className="trust-two">
         <article>
-          <small>UNIKMO · THE FACE OF YOUR PROPERTY</small>
-          <h3>What the guest holds and scans</h3>
+          <small>UNIKMO · THE CARD</small>
+          <h3>The physical opener</h3>
           <ul>
             <li>Produces the guest card, a keepsake the guest takes home.</li>
-            <li>Opens with a personal welcome: the manager’s or director’s video of the day.</li>
             <li>Creates every card code.</li>
             <li>Sends each code to Tisonik with a guest reference and the stay dates.</li>
             <li>Revokes a code when a card is lost.</li>
@@ -103,7 +102,6 @@ export function HowItWorksPage({ cruiseDetail }: { cruiseDetail: ReactNode }) {
       <ol className="trust-steps">
         <li><b>The guest receives a card.</b><span>It is handed over as part of your normal arrival. UNIKMO has already told Tisonik which guest and which dates it belongs to.</span></li>
         <li><b>They scan it with their phone.</b><span>Tisonik checks the code. If it is unknown, revoked, for a different guest or outside the stay, nothing opens.</span></li>
-        <li><b>A person welcomes them.</b><span>The card opens with the manager’s or director’s welcome video of the day, so the first thing a guest sees is someone from your team, not a form.</span></li>
         <li><b>The guest page opens.</b><span>On a ship this happens inside the cruise line’s app. At a hotel it is a web page. Either way it carries your property’s name.</span></li>
         <li><b>They see what fits the day.</b><span>Discover what is on offer. Thank someone. Write privately to the team. On the last day and after checkout, rate the stay. After checkout, leave final feedback.</span></li>
         <li><b>The right person is told.</b><span>Reception or guest services get everything by email and in the portal. The director gets ratings, with low scores flagged.</span></li>
