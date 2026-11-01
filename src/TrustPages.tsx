@@ -46,7 +46,7 @@ const Cta = ({ children }: { children: ReactNode }) => <div className="trust-cta
 const howItWorksFaqs: Faq[] = [
   ['Does the guest need to download an app or create an account?', 'No. On a ship the guest uses the cruise line’s own app. In a hotel or resort the card opens a web page on their phone. There is no account, no password and no sign-up form.'],
   ['What if a card is lost or handed to someone else?', 'UNIKMO revokes the code and Tisonik refuses it from then on. A code is also tied to one guest: the right code with the wrong guest is refused too. We tested both cases before launch.'],
-  ['What does UNIKMO do, and what does Tisonik do?', 'UNIKMO produces the cards, creates every code, and tells Tisonik which code belongs to which guest and for which dates. Tisonik never creates a code. It checks each scan against what UNIKMO has registered, runs the guest page and delivers what the guest sends to your team.'],
+  ['What does UNIKMO do, and what does Tisonik do?', 'UNIKMO is the face of your property: it produces the cards, opens each scan with your manager’s or director’s welcome of the day, creates every code, and tells Tisonik which code belongs to which guest and for which dates. Tisonik never creates a code. It checks each scan against what UNIKMO has registered, runs the guest page and delivers what the guest sends to your team.'],
   ['Do you need to connect to our property-management or booking system?', 'Not for the guest page. UNIKMO supplies the guest reference and the stay dates. Your booking, property-management, commerce and payment systems are not touched. Deeper connections, for example for cruise identity or revenue attribution, are agreed in a pilot and always stay on your side.'],
   ['Who in our team receives what the guest sends?', 'Reception or guest services receive every thank-you, private message and rating by email and in the portal. The hotel director or manager receives ratings only. Any rating with a score of 6 or lower is flagged LOW SCORE in the subject line, so it is read first.'],
   ['What does the guest see on each day of the stay?', 'It changes with the stay. Before arrival and during the stay they can discover what is on offer and thank someone. During the stay they can also write to the team privately. On the last day and after checkout they can rate the stay. After checkout, for 14 days by default, they can leave final feedback. Then the page closes.'],
@@ -61,17 +61,18 @@ export function HowItWorksPage({ cruiseDetail }: { cruiseDetail: ReactNode }) {
     <section className="trust-hero">
       <p className="eyebrow">HOW IT WORKS</p>
       <h1>One card. One guest page. One inbox for your team.</h1>
-      <p className="trust-intro">UNIKMO puts a card in the guest’s hand. Tisonik turns every use of that card into thanks, honest feedback and ratings, and sends each one to the right person while the guest is still with you. Your booking, property and payment systems stay exactly as they are.</p>
+      <p className="trust-intro">UNIKMO puts your property’s face in the guest’s hand: a card that opens with a welcome from your manager or director. Tisonik turns every use of that card into thanks, honest feedback and ratings, and sends each one to the right person while the guest is still with you. Your booking, property and payment systems stay exactly as they are.</p>
       <JumpLinks links={[['#parts', 'The two parts'], ['#journey', 'Guest journey'], ['#who', 'Who sees what'], ['#where', 'Where it applies'], ['#start', 'Getting started'], ['#questions', 'Questions']]} />
     </section>
 
-    <Block id="parts" eyebrow="THE TWO PARTS" title="UNIKMO opens the door. Tisonik runs the room." lead="Two companies, two clearly separated jobs. Keeping them apart is what makes the setup quick and the data question simple.">
+    <Block id="parts" eyebrow="THE TWO PARTS" title="UNIKMO is the face guests meet. Tisonik runs the room." lead="Two companies, two clearly separated jobs. Keeping them apart is what makes the setup quick and the data question simple.">
       <div className="trust-two">
         <article>
-          <small>UNIKMO · THE CARD</small>
-          <h3>The physical opener</h3>
+          <small>UNIKMO · THE FACE OF YOUR PROPERTY</small>
+          <h3>What the guest holds and scans</h3>
           <ul>
             <li>Produces the guest card, a keepsake the guest takes home.</li>
+            <li>Opens with a personal welcome: the manager’s or director’s video of the day.</li>
             <li>Creates every card code.</li>
             <li>Sends each code to Tisonik with a guest reference and the stay dates.</li>
             <li>Revokes a code when a card is lost.</li>
@@ -101,7 +102,8 @@ export function HowItWorksPage({ cruiseDetail }: { cruiseDetail: ReactNode }) {
     <Block id="journey" eyebrow="THE GUEST JOURNEY" title="What a guest actually does." lead="No download, no account, no password. The page adapts to where the guest is in their stay.">
       <ol className="trust-steps">
         <li><b>The guest receives a card.</b><span>It is handed over as part of your normal arrival. UNIKMO has already told Tisonik which guest and which dates it belongs to.</span></li>
-        <li><b>They use it on their phone.</b><span>Tisonik checks the code. If it is unknown, revoked, for a different guest or outside the stay, nothing opens.</span></li>
+        <li><b>They scan it with their phone.</b><span>Tisonik checks the code. If it is unknown, revoked, for a different guest or outside the stay, nothing opens.</span></li>
+        <li><b>A person welcomes them.</b><span>The card opens with the manager’s or director’s welcome video of the day, so the first thing a guest sees is someone from your team, not a form.</span></li>
         <li><b>The guest page opens.</b><span>On a ship this happens inside the cruise line’s app. At a hotel it is a web page. Either way it carries your property’s name.</span></li>
         <li><b>They see what fits the day.</b><span>Discover what is on offer. Thank someone. Write privately to the team. On the last day and after checkout, rate the stay. After checkout, leave final feedback.</span></li>
         <li><b>The right person is told.</b><span>Reception or guest services get everything by email and in the portal. The director gets ratings, with low scores flagged.</span></li>
@@ -204,8 +206,8 @@ const securityFaqs: Faq[] = [
   ['How do you stop guessing of codes?', 'Failed code checks are rate-limited per property: ten wrong codes in a minute pause code checks for that property. Guest requests are also rate-limited per client. We key these limits on a hash of the address, never on the raw IP address.'],
   ['How do your staff and ours sign in?', 'By a one-time link sent to the work email. There are no passwords to leak. Access is by role, and the database itself restricts each person to their own property’s records.'],
   ['What happens to the data when we stop?', 'The guest page closes at the end of the after-checkout window. A scheduled job then deletes stay records and their messages once the retention period has passed (default 90 days, set in your agreement). On request we delete a property’s data sooner.'],
-  ['Have you had an independent security test?', 'Not yet. Automated code scanning and a baseline web-application scan already run in our build pipeline. An independent review is planned before the first live hotel or ship, and we will share its summary with operators who ask.'],
-  ['Do you hold any security certification?', 'Not yet. We do not claim one. We can complete your security questionnaire and describe our controls in detail, and we sign a data-processing agreement with each operator before go-live.'],
+  ['Have you had an independent security test?', 'Not yet. It is planned before the first live hotel or ship. Automated code scanning and a baseline web-application scan already run in our build pipeline. The independent test covers the guest and UNIKMO endpoints, the portal and access between properties, includes a retest after fixes, and we share its summary with operators who ask.'],
+  ['Do you hold any security certification?', 'Not yet, and we do not claim one. A certification follows the independent test, in the framework our first customers ask for. Meanwhile we complete your security questionnaire, describe our controls in detail, and sign a data-processing agreement with each operator before go-live.'],
   ['What would you do if there were an incident?', 'We would tell the affected operator without delay, say what happened and what data was involved, and help them meet their own notification duties. The operator, as controller, decides how guests are told.'],
 ]
 
@@ -331,18 +333,18 @@ export function SecurityPage() {
       </div>
     </Block>
 
-    <Block id="status" eyebrow="STATUS" title="What is done, and what is not yet." lead="We would rather you hear it from us.">
+    <Block id="status" eyebrow="STATUS AND ROADMAP" title="What is in place, and how we are closing the rest." lead="Until a formal certification is in place, you get what a reviewer actually needs: this page, a completed questionnaire, the independent test summary once it exists, the data-processing agreement and the provider list.">
       <div className="trust-table-wrap">
         <table className="trust-table">
-          <thead><tr><th scope="col">Item</th><th scope="col">Status</th></tr></thead>
+          <thead><tr><th scope="col">Item</th><th scope="col">Status</th><th scope="col">Next step</th></tr></thead>
           <tbody>
-            <tr><th scope="row">Hashed codes, signed links, scoped sessions, rate limits</th><td><span className="trust-chip trust-chip--done">Built and tested</span></td></tr>
-            <tr><th scope="row">Row-level security and role-based access</th><td><span className="trust-chip trust-chip--done">Built</span></td></tr>
-            <tr><th scope="row">Automatic deletion of expired stays</th><td><span className="trust-chip trust-chip--done">Built</span></td></tr>
-            <tr><th scope="row">Privacy policy for the guest page</th><td><span className="trust-chip trust-chip--open">Draft, in legal review</span></td></tr>
-            <tr><th scope="row">Independent security review or penetration test</th><td><span className="trust-chip trust-chip--open">Planned before the first live property</span></td></tr>
-            <tr><th scope="row">Security certification (for example ISO 27001 or SOC 2)</th><td><span className="trust-chip trust-chip--open">Not held</span></td></tr>
-            <tr><th scope="row">Data-processing agreement</th><td><span className="trust-chip trust-chip--open">Template in preparation, signed before go-live</span></td></tr>
+            <tr><th scope="row">Hashed codes, signed links, scoped sessions, rate limits</th><td><span className="trust-chip trust-chip--done">Built and tested</span></td><td>Covered by the independent test below.</td></tr>
+            <tr><th scope="row">Row-level security and role-based access</th><td><span className="trust-chip trust-chip--done">Built</span></td><td>Cross-property access is a named test case.</td></tr>
+            <tr><th scope="row">Automatic deletion of expired stays</th><td><span className="trust-chip trust-chip--done">Built</span></td><td>Retention period confirmed per operator in the agreement.</td></tr>
+            <tr><th scope="row">Privacy policy for the guest page</th><td><span className="trust-chip trust-chip--open">Draft, in legal review</span></td><td>Published in final form after review.</td></tr>
+            <tr><th scope="row">Independent penetration test</th><td><span className="trust-chip trust-chip--open">Planned before the first live property</span></td><td>An accredited tester, with the guest and UNIKMO endpoints, the portal and access between properties in scope, and a retest after fixes. We share the summary with operators on request.</td></tr>
+            <tr><th scope="row">Security certification (ISO 27001 or SOC 2)</th><td><span className="trust-chip trust-chip--open">Roadmap, not yet held</span></td><td>We pursue the framework our first customers ask for, after the independent test.</td></tr>
+            <tr><th scope="row">Data-processing agreement</th><td><span className="trust-chip trust-chip--open">Template in preparation, signed before go-live</span></td><td>Sent with the pilot proposal.</td></tr>
           </tbody>
         </table>
       </div>
