@@ -217,6 +217,9 @@ const dataRows: Row[] = [
   ['Card code', 'A keyed hash only, never the code itself', 'Checks that a card is genuine'],
   ['What the guest writes', 'Thank-yous, private messages, feedback and ratings', 'The product itself. Delivered to staff'],
   ['Session counters', 'How many times the page was opened, from card or app', 'Shows the operator whether guests use it'],
+  ['Crew recognitions and daily scores', 'Which team member a guest recognised and why (up to two preset reasons), and 1 to 10 scores for areas such as dining', 'Lets the operator thank staff and fix problems while the guest is still there'],
+  ['Opt-in profile (ships only)', 'A first name, a preset avatar and chosen interests, kept only if a guest turns on People', 'Lets guests who both opted in say hello. Hotels do not have this feature'],
+  ['Compliments and meet-up suggestions (ships only)', 'Preset compliments between two opted-in guests and a suggested public place. No free text, no chat', 'Makes a safe first hello. Operators cannot read them'],
 ]
 
 export function SecurityPage() {
@@ -235,7 +238,7 @@ export function SecurityPage() {
         <article><h3>Access enforced in the database</h3><p>Each person can read only their own property’s records, whatever the screen shows.</p></article>
         <article><h3>EU data region</h3><p>Guest data is stored in Frankfurt. Notification email is sent from the EU.</p></article>
         <article><h3>Automatic deletion</h3><p>A daily job deletes stay records and messages when their retention period ends.</p></article>
-        <article><h3>Cruise stays aggregate-only</h3><p>In the cruise app design, Tisonik receives no names, photos, biometric templates or person-level identifiers.</p></article>
+        <article><h3>The cruise app stays aggregate-only</h3><p>In the cruise app design, Tisonik receives no names, photos, biometric templates or person-level identifiers. The card page is separate: there, a guest who opts in to People chooses a first name and an avatar, and nothing else.</p></article>
       </div>
     </Block>
 
@@ -247,7 +250,7 @@ export function SecurityPage() {
           <tbody>{dataRows.map(([item, what, why]) => <tr key={item}><th scope="row">{item}</th><td>{what}</td><td>{why}</td></tr>)}</tbody>
         </table>
       </div>
-      <p className="trust-note"><b>Not collected on the guest page:</b> passwords, payment or card details, passport or ID numbers, photographs, precise location, or any account profile. The page asks the browser for no camera, microphone or location access.</p>
+      <p className="trust-note"><b>Not collected on the guest page:</b> passwords, payment or card details, passport or ID numbers, photographs, precise location, or any account. The only profile is the optional People profile on ships, which a guest creates by choice and which holds no photograph, contact detail or cabin number. The page asks the browser for no camera, microphone or location access.</p>
       <h3 className="trust-sub">Cruise in-app product (aggregate-only)</h3>
       <div className="trust-two">
         <article><small>WHAT TISONIK RECEIVES</small><ul><li>Predefined aggregate KPI reports, with any group smaller than 20 suppressed.</li><li>Service-health figures: uptime, latency, version, sync success and error counts.</li></ul></article>

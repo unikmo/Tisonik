@@ -21,6 +21,8 @@ Apply in this order, in the SQL editor or with the Supabase CLI. Take a backup f
 1. `supabase/migrations/202610260012_hotel_stays.sql` - stay tables (guest reference, dates, hashed card code, app and card session counts), venue type, retention function.
 2. `supabase/migrations/202610260013_front_desk_role.sql` - adds the `front_desk` role. Run it on its own.
 3. `supabase/migrations/202610260014_stay_rate_limits.sql` - rate-limit table and functions.
+4. `supabase/migrations/202611010015_welcome_video.sql` - welcome video columns. Apply before deploying the code that reads them.
+5. `supabase/migrations/202611010016_guest_connect.sql` - crew list, crew recognitions, daily pulse and (ships) opt-in guest profiles, compliments and meet-ups. See `docs/GUEST_CONNECT.md`. Apply before deploying.
 
 Check: `select count(*) from hotel_stays;` returns 0 and `select public.stay_rate_limit_hit('test', 60, 5);` returns `true`.
 
