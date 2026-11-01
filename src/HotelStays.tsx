@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { supabase } from './supabaseClient'
 import './portal-hotel.css'
 
-type Settings = { venue_type: 'hotel' | 'ship'; hotel_name: string | null; unikmo_hotel_id: string | null; reception_email: string | null; manager_email: string | null; default_window_days: number; discover_items: { title: string; body: string }[] }
+type Settings = { venue_type: 'hotel' | 'ship'; hotel_name: string | null; unikmo_hotel_id: string | null; reception_email: string | null; manager_email: string | null; default_window_days: number; welcome_video_url: string | null; welcome_from_name: string | null; welcome_from_role: string | null; welcome_note: string | null; discover_items: { title: string; body: string }[] }
 type Stay = { id: string; booking_ref: string; room: string | null; guest_label: string | null; valid_from: string; valid_to: string; window_days: number; status: 'active' | 'voided'; app_sessions: number; card_sessions: number; created_at: string }
 type Submission = { id: string; stay_id: string; kind: 'thank_you' | 'private' | 'feedback' | 'rating'; payload: Record<string, unknown>; status: 'new' | 'seen' | 'resolved'; created_at: string }
 type Filter = 'action' | 'thank_you' | 'rating'
@@ -16,7 +16,7 @@ async function call(token: string, action: string, tenantId: string, data: Recor
   return { ok: response.ok, status: response.status, body }
 }
 
-const blankSettings: Settings = { venue_type: 'hotel', hotel_name: '', unikmo_hotel_id: '', reception_email: '', manager_email: '', default_window_days: 14, discover_items: [] }
+const blankSettings: Settings = { venue_type: 'hotel', hotel_name: '', unikmo_hotel_id: '', reception_email: '', manager_email: '', default_window_days: 14, welcome_video_url: '', welcome_from_name: '', welcome_from_role: '', welcome_note: '', discover_items: [] }
 const itemsToText = (items: Settings['discover_items']) => items.map(item => `${item.title} | ${item.body}`).join('\n')
 const textToItems = (text: string) => text.split('\n').map(line => line.trim()).filter(Boolean).slice(0, 12).map(line => { const [title, ...rest] = line.split('|'); return { title: title.trim(), body: rest.join('|').trim() } }).filter(item => item.title)
 
@@ -25,16 +25,16 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
   const [stays, setStays] = useState<Stay[]>([])
   const [subs, setSubs] = useState<Submission[]>([])
   const [filter, setFilter] = useState<Filter>('action')
-  const [settingsForm, setSettingsForm] = useState({ venueType: 'hotel' as 'hotel' | 'ship', hotelName: '', unikmoHotelId: '', receptionEmail: '', managerEmail: '', defaultWindowDays: 14, discover: '' })
+  const [settingsForm, setSettingsForm] = useState({ venueType: 'hotel' as 'hotel' | 'ship', hotelName: '', unikmoHotelId: '', receptionEmail: '', managerEmail: '', defaultWindowDays: 14, welcomeVideoUrl: '', welcomeFromName: '', welcomeFromRole: '', welcomeNote: '', discover: '' })
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
 
   const load = useCallback(async () => {
     if (!supabase) return
-    const s = await supabase.from('hotel_stay_settings').select('venue_type,hotel_name,unikmo_hotel_id,reception_email,manager_email,default_window_days,discover_items').eq('tenant_id', tenantId).maybeSingle()
+    const s = await supabase.from('hotel_stay_settings').select('venue_type,hotel_name,unikmo_hotel_id,reception_email,manager_email,default_window_days,welcome_video_url,welcome_from_name,welcome_from_role,welcome_note,discover_items').eq('tenant_id', tenantId).maybeSingle()
     const row = (s.data as Settings | null) || null
     setSettings(row)
-    if (row) setSettingsForm({ venueType: row.venue_type || 'hotel', hotelName: row.hotel_name || '', unikmoHotelId: row.unikmo_hotel_id || '', receptionEmail: row.reception_email || '', managerEmail: row.manager_email || '', defaultWindowDays: row.default_window_days, discover: itemsToText(row.discover_items || []) })
+    if (row) setSettingsForm({ venueType: row.venue_type || 'hotel', hotelName: row.hotel_name || '', unikmoHotelId: row.unikmo_hotel_id || '', receptionEmail: row.reception_email || '', managerEmail: row.manager_email || '', defaultWindowDays: row.default_window_days, welcomeVideoUrl: row.welcome_video_url || '', welcomeFromName: row.welcome_from_name || '', welcomeFromRole: row.welcome_from_role || '', welcomeNote: row.welcome_note || '', discover: itemsToText(row.discover_items || []) })
     const st = await supabase.from('hotel_stays').select('id,booking_ref,room,guest_label,valid_from,valid_to,window_days,status,app_sessions,card_sessions,created_at').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(50)
     setStays((st.data || []) as Stay[])
     const su = await supabase.from('hotel_stay_submissions').select('id,stay_id,kind,payload,status,created_at').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(150)
@@ -70,9 +70,9 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
   const saveSettings = async (event: FormEvent) => {
     event.preventDefault()
     setBusy(true); setMessage('')
-    const result = await call(token, 'settings', tenantId, { venueType: settingsForm.venueType, hotelName: settingsForm.hotelName.trim() || null, unikmoHotelId: settingsForm.unikmoHotelId.trim() || null, receptionEmail: settingsForm.receptionEmail.trim() || null, managerEmail: settingsForm.managerEmail.trim() || null, defaultWindowDays: Number(settingsForm.defaultWindowDays), discoverItems: textToItems(settingsForm.discover) })
+    const result = await call(token, 'settings', tenantId, { venueType: settingsForm.venueType, hotelName: settingsForm.hotelName.trim() || null, unikmoHotelId: settingsForm.unikmoHotelId.trim() || null, receptionEmail: settingsForm.receptionEmail.trim() || null, managerEmail: settingsForm.managerEmail.trim() || null, defaultWindowDays: Number(settingsForm.defaultWindowDays), welcomeVideoUrl: settingsForm.welcomeVideoUrl.trim() || null, welcomeFromName: settingsForm.welcomeFromName.trim() || null, welcomeFromRole: settingsForm.welcomeFromRole.trim() || null, welcomeNote: settingsForm.welcomeNote.trim() || null, discoverItems: textToItems(settingsForm.discover) })
     setBusy(false)
-    setMessage(result.ok ? 'Settings saved.' : 'Settings could not be saved. Check the email address.')
+    setMessage(result.ok ? 'Settings saved.' : 'Settings could not be saved. Check the email addresses and that the video link is a YouTube or Vimeo address.')
     void load()
   }
   return <>
@@ -106,6 +106,10 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
         <label>{desk} email (gets everything)<input type="email" maxLength={254} value={settingsForm.receptionEmail} onChange={e => setSettingsForm({ ...settingsForm, receptionEmail: e.target.value })} /></label>
         <label>Hotel director or manager email (gets ratings only)<input type="email" maxLength={254} value={settingsForm.managerEmail} onChange={e => setSettingsForm({ ...settingsForm, managerEmail: e.target.value })} /></label>
         <label>Days open after checkout<input type="number" min={0} max={60} value={settingsForm.defaultWindowDays} onChange={e => setSettingsForm({ ...settingsForm, defaultWindowDays: Number(e.target.value) })} /></label>
+        <label className="hotel-wide">Welcome video link (YouTube or Vimeo, shown to guests during the stay)<input type="url" maxLength={300} placeholder="https://www.youtube.com/watch?v=..." value={settingsForm.welcomeVideoUrl} onChange={e => setSettingsForm({ ...settingsForm, welcomeVideoUrl: e.target.value })} /></label>
+        <label>Welcome from (name)<input maxLength={80} value={settingsForm.welcomeFromName} onChange={e => setSettingsForm({ ...settingsForm, welcomeFromName: e.target.value })} /></label>
+        <label>Welcome from (title, for example {settingsForm.venueType === 'ship' ? 'Cruise Director' : 'General Manager'})<input maxLength={60} value={settingsForm.welcomeFromRole} onChange={e => setSettingsForm({ ...settingsForm, welcomeFromRole: e.target.value })} /></label>
+        <label className="hotel-wide">Short note under the video (optional)<textarea rows={2} maxLength={300} value={settingsForm.welcomeNote} onChange={e => setSettingsForm({ ...settingsForm, welcomeNote: e.target.value })} /></label>
         <label className="hotel-wide">Discover tile, one per line as "Title | Description" (up to 12)<textarea rows={4} value={settingsForm.discover} onChange={e => setSettingsForm({ ...settingsForm, discover: e.target.value })} /></label>
         <button disabled={busy}>{busy ? 'Saving…' : 'Save settings'}</button>
       </form>

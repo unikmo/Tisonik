@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { VENUE_TYPES } from './stays.mjs'
+import { VENUE_TYPES, welcomeEmbedUrl } from './stays.mjs'
 
 const writeRoles = ['tisonik_admin', 'operator_admin']
 // Stays come from UNIKMO, so nobody creates them here. Front desk can work the inbox; only admins can void stays or change settings.
@@ -20,6 +20,10 @@ const settingsSchema = z.object({
   managerEmail: z.string().trim().email().max(254).nullable().optional(),
   unikmoHotelId: z.string().trim().regex(/^[A-Za-z0-9_-]{2,64}$/).nullable().optional(),
   defaultWindowDays: z.number().int().min(0).max(60),
+  welcomeVideoUrl: z.string().trim().max(300).refine(value => welcomeEmbedUrl(value), 'unsupported_video').nullable().optional(),
+  welcomeFromName: z.string().trim().max(80).nullable().optional(),
+  welcomeFromRole: z.string().trim().max(60).nullable().optional(),
+  welcomeNote: z.string().trim().max(300).nullable().optional(),
   discoverItems: z.array(z.object({ title: z.string().trim().min(1).max(80), body: z.string().trim().max(300).default('') }).strict()).max(12),
 }).strict()
 
@@ -62,6 +66,10 @@ export async function portalAction(database, userId, rawBody) {
     manager_email: input.data.managerEmail || null,
     unikmo_hotel_id: input.data.unikmoHotelId || null,
     default_window_days: input.data.defaultWindowDays,
+    welcome_video_url: input.data.welcomeVideoUrl || null,
+    welcome_from_name: input.data.welcomeFromName || null,
+    welcome_from_role: input.data.welcomeFromRole || null,
+    welcome_note: input.data.welcomeNote || null,
     discover_items: input.data.discoverItems,
   }, { onConflict: 'tenant_id' })
   if (error) throw error

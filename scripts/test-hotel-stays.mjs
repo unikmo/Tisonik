@@ -265,6 +265,22 @@ assert.deepEqual([shipRow.venue_type, shipRow.default_window_days, shipRow.unikm
 assert.equal((await portalAction(database, 'admin', { ...shipSettings, data: { ...shipSettings.data, venueType: 'castle' } })).status, 422, 'venue type is hotel or ship')
 assert.equal((await portalAction(database, 'admin', { action: 'settings', tenantId: tenantUuid, data: { receptionEmail: 'not-an-email', defaultWindowDays: 10, discoverItems: [] } })).status, 422)
 assert.equal((await portalAction(database, 'analyst', shipSettings)).status, 403, 'analysts cannot change settings')
+
+// Welcome video from the cruise director or hotel manager
+assert.equal(stays.welcomeEmbedUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ'), 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0')
+assert.equal(stays.welcomeEmbedUrl('https://youtu.be/dQw4w9WgXcQ?si=abc'), 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0')
+assert.equal(stays.welcomeEmbedUrl('https://vimeo.com/123456789/abcdef1234'), 'https://player.vimeo.com/video/123456789?h=abcdef1234&dnt=1')
+for (const bad of ['http://youtu.be/dQw4w9WgXcQ', 'https://evil.example/watch?v=dQw4w9WgXcQ', 'https://youtube.com.evil.example/watch?v=dQw4w9WgXcQ', 'https://youtube.com/watch?v=short', 'javascript:alert(1)', '', 'https://example.com/welcome.mp4']) assert.equal(stays.welcomeEmbedUrl(bad), null, `refused: ${bad}`)
+const withVideo = { ...shipSettings, data: { ...shipSettings.data, welcomeVideoUrl: 'https://youtu.be/dQw4w9WgXcQ', welcomeFromName: 'Alex Marsh', welcomeFromRole: 'Cruise Director', welcomeNote: 'Welcome aboard.' } }
+assert.equal((await portalAction(database, 'admin', { ...withVideo, data: { ...withVideo.data, welcomeVideoUrl: 'https://evil.example/x.mp4' } })).status, 422, 'only YouTube or Vimeo links are accepted')
+assert.equal((await portalAction(database, 'admin', withVideo)).status, 200)
+const welcomeStay = { ...stay, tenant_id: tenantUuid }
+const welcomed = await stays.guestSession(database, welcomeStay, lastDay)
+assert.equal(welcomed.welcome.embedUrl, 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0')
+assert.deepEqual([welcomed.welcome.from, welcomed.welcome.role], ['Alex Marsh', 'Cruise Director'])
+assert.equal((await stays.guestSession(database, welcomeStay, new Date('2030-01-01'))).welcome, null, 'no welcome after the stay')
+database.tables.hotel_stay_settings.find(row => row.tenant_id === tenantUuid).welcome_video_url = null
+assert.equal((await stays.guestSession(database, welcomeStay, lastDay)).welcome, null, 'no tile without a video')
 assert.equal((await portalAction(database, 'desk', shipSettings)).status, 403, 'front desk cannot change settings')
 
 // A ship: same endpoint, same stay record, ship wording

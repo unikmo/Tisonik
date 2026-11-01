@@ -93,6 +93,26 @@ export function stayPhase(stay, now = new Date()) {
   return 'closed'
 }
 
+// Turns a pasted YouTube or Vimeo link into its embed address. Anything else returns null, so the guest page never frames an unknown site.
+export function welcomeEmbedUrl(value) {
+  let url
+  try { url = new URL(String(value || '').trim()) } catch { return null }
+  if (url.protocol !== 'https:') return null
+  const host = url.hostname.replace(/^www\./, '').replace(/^m\./, '')
+  const part = url.pathname.split('/').filter(Boolean)
+  let id = null
+  if (host === 'youtu.be') id = part[0]
+  else if (host === 'youtube.com' || host === 'youtube-nocookie.com') id = url.pathname === '/watch' ? url.searchParams.get('v') : ['embed', 'shorts', 'live'].includes(part[0]) ? part[1] : null
+  if (id && /^[A-Za-z0-9_-]{11}$/.test(id)) return `https://www.youtube-nocookie.com/embed/${id}?rel=0`
+  if (host === 'vimeo.com' || host === 'player.vimeo.com') {
+    const at = part.findIndex(piece => /^\d{5,12}$/.test(piece))
+    const vid = at >= 0 ? part[at] : null
+    const hash = url.searchParams.get('h') || (/^[a-f0-9]{8,16}$/.test(part[at + 1] || '') ? part[at + 1] : null)
+    if (vid) return `https://player.vimeo.com/video/${vid}${hash ? `?h=${hash}&dnt=1` : '?dnt=1'}`
+  }
+  return null
+}
+
 export function tilesFor(stay, now = new Date()) {
   const phase = stayPhase(stay, now)
   const live = phase === 'during'
@@ -101,6 +121,7 @@ export function tilesFor(stay, now = new Date()) {
   return {
     phase,
     thankYou: live || after,
+    welcome: live,
     private: live,
     feedback: after,
     rating: lastDay || after,
@@ -304,7 +325,7 @@ export async function exchangeLink(database, linkToken, now = new Date()) {
 }
 
 export async function guestSession(database, stay, now = new Date()) {
-  const { data: settings } = await database.from('hotel_stay_settings').select('hotel_name, discover_items, venue_type').eq('tenant_id', stay.tenant_id).maybeSingle()
+  const { data: settings } = await database.from('hotel_stay_settings').select('hotel_name, discover_items, venue_type, welcome_video_url, welcome_from_name, welcome_from_role, welcome_note').eq('tenant_id', stay.tenant_id).maybeSingle()
   const tiles = tilesFor(stay, now)
   const { count } = await database.from('hotel_stay_submissions').select('id', { count: 'exact', head: true }).eq('stay_id', stay.id).eq('kind', 'rating')
   return {
@@ -313,6 +334,7 @@ export async function guestSession(database, stay, now = new Date()) {
     firstName: stay.guest_label || null,
     tiles: { ...tiles, rating: tiles.rating && !count },
     discover: tiles.discover ? settings?.discover_items || [] : [],
+    welcome: tiles.welcome && welcomeEmbedUrl(settings?.welcome_video_url) ? { embedUrl: welcomeEmbedUrl(settings.welcome_video_url), from: settings.welcome_from_name || null, role: settings.welcome_from_role || null, note: settings.welcome_note || null } : null,
     questions: ratingQuestionsFor(settings?.venue_type),
   }
 }

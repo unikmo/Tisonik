@@ -12,6 +12,7 @@ h1{font-weight:400;font-size:clamp(28px,7vw,38px);line-height:1.1;margin:0 0 8px
 .tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0}
 .tile>button{all:unset;box-sizing:border-box;display:block;width:100%;padding:18px;cursor:pointer;border-radius:14px}
 .tile>button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.frame{position:relative;aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden}.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .tile strong{display:block;font-size:18px;font-weight:500}
 .tile span.sub,.sub{display:block;color:var(--muted);font-size:14px;margin-top:2px}
 .panel{padding:0 18px 18px}
@@ -129,6 +130,13 @@ ul.plain li:first-child{border-top:0}
 
   function render(){
     var t=state.tiles,list=[],ship=state.venueType==='ship',team=ship?'the guest services team':'the hotel team'
+    if(t.welcome&&state.welcome){var w=state.welcome,who=[w.from,w.role].filter(Boolean).join(', ')
+      list.push(tile(ship?'A welcome from your Cruise Director':'A welcome from your hotel',who||'Watch a short hello',function(p){
+        if(w.note)p.appendChild(el('p',{text:w.note}))
+        var box=el('div',{class:'frame'}),go=el('button',{type:'button',class:'primary',text:'Play the welcome'}),note=el('p',{class:'sub',text:'The video loads from its host only when you press play.'})
+        go.addEventListener('click',function(){box.appendChild(el('iframe',{src:w.embedUrl,title:'Welcome video',allow:'fullscreen; picture-in-picture',referrerpolicy:'strict-origin',allowfullscreen:''}));p.insertBefore(box,go);go.remove();note.remove()})
+        p.appendChild(go);p.appendChild(note)
+      }))}
     if(t.thankYou)list.push(tile('Thank someone','Tell us who made you feel special',function(p){textForm(p,'thank_you',{recipient:true,label:'Your message',min:3,max:500,done:'Thank you. We will pass it on.'})}))
     if(t.private)list.push(tile('Tell us privately','Only '+team+' sees this',function(p){textForm(p,'private',{label:'What would you like us to know?',done:'Thank you. '+(ship?'Guest services':'The team')+' has your message.'})}))
     if(t.feedback)list.push(tile('Share feedback','Send a note to '+(ship?'guest services':'guest relations'),function(p){textForm(p,'feedback',{label:'Your feedback',done:'Thank you. '+(ship?'Guest services':'Guest relations')+' has your message.'})}))
