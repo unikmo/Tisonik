@@ -138,7 +138,7 @@ ul.plain li:first-child{border-top:0}
         p.appendChild(go);p.appendChild(note)
       }))}
     if(t.thankYou)list.push(tile('Thank someone','Tell us who made you feel special',function(p){textForm(p,'thank_you',{recipient:true,label:'Your message',min:3,max:500,done:'Thank you. We will pass it on.'})}))
-    if(t.private)list.push(tile('Tell us privately','Only '+team+' sees this',function(p){textForm(p,'private',{label:'What would you like us to know?',done:'Thank you. '+(ship?'Guest services':'The team')+' has your message.'})}))
+    if(t.private)list.push(tile('Need help? Let us fix it','Goes straight to '+team+', no one else',function(p){textForm(p,'private',{label:'What can we help with?',done:'Thank you. '+(ship?'Guest services':'The team')+' has your message.'})}))
     if(t.feedback)list.push(tile('Share feedback','Send a note to '+(ship?'guest services':'guest relations'),function(p){textForm(p,'feedback',{label:'Your feedback',done:'Thank you. '+(ship?'Guest services':'Guest relations')+' has your message.'})}))
     if(t.rating)list.push(tile(ship?'Rate your voyage':'Rate your stay','Five quick questions',ratingForm))
     if(t.discover&&state.discover.length)list.push(tile('Discover',ship?'Recommended by the ship':'Recommended by the hotel',function(p){var u=el('ul',{class:'plain'});state.discover.slice(0,12).forEach(function(d){u.appendChild(el('li',{},[el('strong',{text:String(d.title||'')}),el('div',{class:'sub',text:String(d.body||'')})]))});p.appendChild(u)}))
