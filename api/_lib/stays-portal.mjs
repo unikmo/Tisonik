@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { VENUE_TYPES, welcomeEmbedUrl } from './stays.mjs'
+import { crewItemsFromLines } from './stay-connect-config.mjs'
 
 const writeRoles = ['tisonik_admin', 'operator_admin']
 // Stays come from UNIKMO, so nobody creates them here. Front desk can work the inbox; only admins can void stays or change settings.
@@ -25,6 +26,7 @@ const settingsSchema = z.object({
   welcomeFromRole: z.string().trim().max(60).nullable().optional(),
   welcomeNote: z.string().trim().max(300).nullable().optional(),
   discoverItems: z.array(z.object({ title: z.string().trim().min(1).max(80), body: z.string().trim().max(300).default('') }).strict()).max(12),
+  crew: z.array(z.object({ name: z.string().trim().min(1).max(60), role: z.string().trim().max(60).default('') }).strict()).max(40).default([]),
 }).strict()
 
 const roleOf = async (database, userId, tenantId) => {
@@ -47,6 +49,9 @@ export async function portalAction(database, userId, rawBody) {
     if (!input.success) return { status: 422, body: { error: 'invalid_request' } }
     const { error } = await database.from('hotel_stays').update({ status: 'voided' }).eq('id', input.data.stayId).eq('tenant_id', tenantId)
     if (error) throw error
+    // A voided stay also disappears from guest-to-guest connection straight away.
+    const { error: hideError } = await database.from('stay_profiles').update({ discoverable: false }).eq('stay_id', input.data.stayId).eq('tenant_id', tenantId)
+    if (hideError) throw hideError
     return { status: 200, body: { voided: true } }
   }
   if (action === 'status') {
@@ -71,6 +76,7 @@ export async function portalAction(database, userId, rawBody) {
     welcome_from_role: input.data.welcomeFromRole || null,
     welcome_note: input.data.welcomeNote || null,
     discover_items: input.data.discoverItems,
+    crew_items: crewItemsFromLines(input.data.crew),
   }, { onConflict: 'tenant_id' })
   if (error) throw error
   return { status: 200, body: { saved: true } }

@@ -36,6 +36,7 @@ export const limits = {
   guestSession: { window: 60, max: 60 },
   guestExchange: { window: 60, max: 20 },
   guestSubmit: { window: 60, max: 20 },
+  guestConnect: { window: 60, max: 60 },
   hotelCalls: { window: 60, max: 240 },
   failedCodes: { window: 60, max: 10 },
 }

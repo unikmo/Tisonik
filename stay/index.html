@@ -1,114 +1,392 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><meta name="robots" content="noindex,nofollow,noarchive"/><meta name="description" content="Private guest page for a hotel stay: thank a team member, tell the hotel privately and rate your stay."/><link rel="canonical" href="https://tisonik.com/stay/"/><meta property="og:title" content="Your stay | Tisonik"/><meta property="og:description" content="Private guest page for a hotel stay: thank a team member, tell the hotel privately and rate your stay."/><meta property="og:image" content="https://tisonik.com/og-card.png"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Your stay | Tisonik"/><meta name="twitter:description" content="Private guest page for a hotel stay: thank a team member, tell the hotel privately and rate your stay."/><meta name="twitter:image" content="https://tisonik.com/og-card.png"/><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Tisonik Hotel Stay","url":"https://tisonik.com/stay/","applicationCategory":"LifestyleApplication"}</script><title>Your stay | Tisonik</title><link rel="icon" href="/favicon.svg"/>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/><meta name="robots" content="noindex,nofollow,noarchive"/><meta name="color-scheme" content="light dark"/><meta name="theme-color" content="#12304a"/><meta name="description" content="Private guest page for a stay or voyage: welcome, meet people, recognise your crew, tell us how it is going and ask for help."/><link rel="canonical" href="https://tisonik.com/stay/"/><meta property="og:title" content="Your stay | Tisonik"/><meta property="og:description" content="Private guest page for a stay or voyage."/><meta property="og:image" content="https://tisonik.com/og-card.png"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Your stay | Tisonik"/><meta name="twitter:description" content="Private guest page for a stay or voyage."/><meta name="twitter:image" content="https://tisonik.com/og-card.png"/><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Tisonik Guest","url":"https://tisonik.com/stay/","applicationCategory":"LifestyleApplication"}</script><title>Your stay | Tisonik</title><link rel="icon" href="/favicon.svg"/>
 <style>
-:root{--bg:#faf8f4;--card:#fff;--ink:#171715;--muted:#5f5a54;--line:#e4dfd6;--accent:#3d7580;--accent-ink:#fff;--ok:#2f6b4f;--bad:#9b3a2e}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
-#stay{max-width:560px;margin:0 auto;padding:32px max(16px,env(safe-area-inset-right)) 56px max(16px,env(safe-area-inset-left))}
-.eyebrow{letter-spacing:.18em;font-size:12px;color:var(--accent);text-transform:uppercase;margin:0 0 12px}
-h1{font-weight:400;font-size:clamp(28px,7vw,38px);line-height:1.1;margin:0 0 8px}
-.lead{color:var(--muted);margin:0 0 24px}
-.tiles{display:grid;gap:12px}
-.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0}
-.tile>button{all:unset;box-sizing:border-box;display:block;width:100%;padding:18px;cursor:pointer;border-radius:14px}
-.tile>button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.frame{position:relative;aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden}.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.tile strong{display:block;font-size:18px;font-weight:500}
-.tile span.sub,.sub{display:block;color:var(--muted);font-size:14px;margin-top:2px}
-.panel{padding:0 18px 18px}
-.panel[hidden]{display:none}
-label{display:block;font-size:14px;color:var(--muted);margin:12px 0 4px}
-input,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-textarea{min-height:110px;resize:vertical}
-input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
-.primary{margin-top:14px;font:inherit;font-weight:500;background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:11px 22px;cursor:pointer}
-.primary[disabled]{opacity:.6;cursor:default}
-.msg{margin:10px 0 0;font-size:14px}
-.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
-.q{margin:16px 0 0}
-.q p{margin:0 0 6px}
+:root{
+  --bg:#f5f2ec;--surface:#fff;--surface2:#efebe3;--ink:#14181e;--muted:#59616d;--line:rgba(20,24,30,.12);
+  --brand:#12304a;--brand2:#1d4a6e;--brand-ink:#fff;--accent:#b8893c;--accent-ink:#2a1d05;
+  --ok:#23694a;--bad:#a23b2d;--focus:#2d6cdf;--shadow:0 1px 2px rgba(20,24,30,.06),0 8px 24px rgba(20,24,30,.07);
+  --serif:ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --bar:68px;--icon:var(--brand);
+}
+:root[data-venue="hotel"]{--brand:#233d36;--brand2:#34574d;--accent:#b5694a;--accent-ink:#2b1308}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0c1116;--surface:#141b23;--surface2:#1b242e;--ink:#eef1f4;--muted:#9aa5b2;--line:rgba(238,241,244,.14);--brand:#183c5c;--brand2:#245a85;--accent:#d8a85a;--accent-ink:#241803;--ok:#5fc596;--bad:#ff8a78;--focus:#7fb0ff;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);--icon:var(--accent)}
+  :root[data-venue="hotel"]{--brand:#2b4a42;--brand2:#3f6d60;--accent:#e09a78;--accent-ink:#2b1308}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{color-scheme:light dark}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:10px}
+.app{max-width:560px;margin:0 auto;min-height:100vh;min-height:100dvh;padding:0 max(16px,env(safe-area-inset-right)) calc(var(--bar) + 28px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.top{padding:calc(22px + env(safe-area-inset-top)) 0 14px}
+.kicker{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;font-weight:600}
+h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:-.01em;margin:0}
+h1{font-size:clamp(30px,8vw,40px);line-height:1.08;text-wrap:balance}
+h2{font-size:24px;line-height:1.15;text-wrap:balance}
+h3{font-size:19px;line-height:1.25}
+.lead{color:var(--muted);margin:8px 0 0;max-width:46ch}
+main:focus{outline:none}
+.view{display:grid;gap:14px;animation:rise .28s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+.card.flat{box-shadow:none}
+.card h3+.sub,.sub{color:var(--muted);font-size:14px;margin:2px 0 0}
+.hero{position:relative;overflow:hidden;color:var(--brand-ink);background:linear-gradient(150deg,var(--brand2),var(--brand) 62%);border:0;border-radius:26px;padding:22px 20px 20px;box-shadow:0 18px 40px -18px rgba(8,24,40,.55)}
+.hero::before{content:"";position:absolute;inset:auto -30% -55% -30%;height:80%;background:radial-gradient(closest-side,rgba(255,255,255,.18),transparent);pointer-events:none}
+.hero::after{content:"";position:absolute;right:-18px;top:-18px;width:120px;height:120px;border-radius:50%;border:1px solid rgba(255,255,255,.22);box-shadow:0 0 0 18px rgba(255,255,255,.05),0 0 0 36px rgba(255,255,255,.035);pointer-events:none}
+.hero .kicker{color:rgba(255,255,255,.72)}
+.hero h2{color:#fff}
+.hero .sub{color:rgba(255,255,255,.78)}
+.frame{position:relative;aspect-ratio:16/9;background:#000;border-radius:16px;overflow:hidden;margin-top:14px}.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.journey{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:13px;color:rgba(255,255,255,.82)}
+.journey .bar{flex:1;height:5px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden}.journey .bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 22px;border:0;border-radius:99px;background:var(--brand);color:var(--brand-ink);font-weight:600;cursor:pointer;transition:transform .12s ease,opacity .2s}
+.btn:active{transform:scale(.97)}
+.btn[disabled]{opacity:.55;cursor:default}
+.btn.light{background:#fff;color:var(--brand)}
+.btn.accent{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.small{min-height:38px;padding:0 16px;font-size:14px}
+.btn.block{width:100%}
+.row{display:flex;align-items:center;gap:12px}
+.row.wrap{flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.grow>strong,.grow>.sub,.grow>.pill{display:block}
+.grow>.pill{width:fit-content;margin-bottom:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.action{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:10px;align-content:start;padding:16px;border-radius:22px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);min-height:132px;transition:transform .12s ease}
+.action:active{transform:scale(.98)}
+.action:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.action .ico{width:42px;height:42px;border-radius:14px;background:var(--surface2);display:grid;place-items:center;color:var(--icon)}
+.action strong{font-size:16px;line-height:1.2}
+.action span.sub{display:block}
+.badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--accent);color:var(--accent-ink);font-size:12px;font-weight:700;margin-left:6px}
+svg{display:block}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-top:1px solid var(--line);padding:6px max(8px,env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+.tabs ul{list-style:none;margin:0 auto;padding:0;display:flex;gap:2px;max-width:560px}
+.tabs li{flex:1}
+.tab{all:unset;box-sizing:border-box;width:100%;min-height:56px;display:grid;justify-items:center;align-content:center;gap:3px;border-radius:16px;color:var(--muted);font-size:11.5px;font-weight:600;cursor:pointer;position:relative}
+.tab[aria-current="page"]{color:var(--brand);background:var(--surface2)}
+:root[data-venue] .tab[aria-current="page"]{color:var(--ink)}
+.tab:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
+.tab .badge{position:absolute;top:2px;right:calc(50% - 26px);margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{all:unset;box-sizing:border-box;cursor:pointer;min-height:40px;padding:0 15px;display:inline-flex;align-items:center;border-radius:99px;border:1px solid var(--line);background:var(--surface);font-size:14px;font-weight:500;transition:background .15s,border-color .15s}
+.chip[aria-pressed="true"],.chip[aria-checked="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.chip[disabled]{opacity:.45;cursor:default}
+.chip:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface2);border-radius:99px;padding:4px;gap:4px}
+.seg button{all:unset;box-sizing:border-box;text-align:center;padding:9px 6px;border-radius:99px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer}
+.seg button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.seg button:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+.avatar{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--serif);font-size:21px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.25);box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
+.avatar.sm{width:38px;height:38px;font-size:17px}
+.avatar.lg{width:64px;height:64px;font-size:28px}
+.swatches{display:flex;flex-wrap:wrap;gap:10px}
+.swatch{all:unset;box-sizing:border-box;cursor:pointer;border-radius:50%;padding:3px;border:2px solid transparent}
+.swatch[aria-checked="true"]{border-color:var(--ink)}
+.swatch:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+label.field{display:block;font-size:13px;font-weight:600;color:var(--muted);margin:16px 0 6px}
+input[type=text],textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface2);border:1px solid transparent;border-radius:14px;padding:12px 14px}
+input[type=text]:focus,textarea:focus{outline:3px solid var(--focus);outline-offset:1px;background:var(--surface)}
+textarea{min-height:120px;resize:vertical}
+.check{display:flex;gap:12px;align-items:flex-start;margin-top:14px;font-size:15px;cursor:pointer}
+.check input{flex:none;width:22px;height:22px;margin:1px 0 0;accent-color:var(--brand)}
+.msg{margin:12px 0 0;font-size:14px;min-height:1.4em}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.person{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.person:first-child{border-top:0;padding-top:4px}
+.person strong{display:block;font-size:17px;line-height:1.2}
+.more{all:unset;cursor:pointer;width:40px;height:40px;display:grid;place-items:center;border-radius:50%;color:var(--muted)}
+.more:focus-visible{outline:3px solid var(--focus)}
+.pill{display:inline-block;white-space:nowrap;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--surface2);color:var(--muted)}
+.pill.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.rules{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px;font-size:14.5px}
+.rules li{display:flex;gap:10px;align-items:flex-start}.rules svg{flex:none;color:var(--ok);margin-top:2px}
+.scale5{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px}
+.scale5 button{all:unset;box-sizing:border-box;text-align:center;padding:10px 2px;min-height:48px;border-radius:14px;background:var(--surface2);font-size:12.5px;font-weight:600;cursor:pointer;display:grid;gap:2px;align-content:center;transition:background .15s,transform .1s}
+.scale5 button b{font-size:16px;font-family:var(--serif)}
+.scale5 button:active{transform:scale(.96)}
+.scale5 button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.scale5 button[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+.scale5[data-done="true"] button:not([aria-pressed="true"]){opacity:.4}
 .scale{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
-.scale label{margin:0;position:relative}
-.scale input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
-.scale span{display:block;text-align:center;padding:9px 0;border:1px solid var(--line);border-radius:8px;font-size:14px;background:var(--bg);color:var(--ink)}
-.scale input:checked+span{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.scale input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
-.skip{display:flex;align-items:center;gap:6px;margin:8px 0 0;font-size:13px}.skip input{width:auto;padding:0}
+.scale label{margin:0;position:relative;display:block}
+.scale input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.scale span{display:block;text-align:center;padding:10px 0;border-radius:10px;font-size:14px;background:var(--surface2)}
+.scale input:checked+span{background:var(--brand);color:var(--brand-ink)}
+.scale input:focus-visible+span{outline:3px solid var(--focus);outline-offset:1px}
 .ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
-.note{font-size:13px;color:var(--muted);margin-top:28px}
-.hotel-forget{all:unset;cursor:pointer;font-size:13px;color:var(--accent);text-decoration:underline;margin-top:8px}
-.hotel-forget:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-ul.plain{list-style:none;margin:0;padding:0}
-ul.plain li{padding:10px 0;border-top:1px solid var(--line)}
-ul.plain li:first-child{border-top:0}
+.q{margin:20px 0 0}.q p{margin:0 0 8px;font-weight:600}
+.skip{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-size:14px;color:var(--muted)}.skip input{width:20px;height:20px;accent-color:var(--brand)}
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(6,12,20,.5);display:flex;align-items:flex-end;justify-content:center;animation:fade .2s ease both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet{width:100%;max-width:560px;max-height:88dvh;overflow:auto;background:var(--surface);border-radius:28px 28px 0 0;padding:10px max(20px,env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));animation:slide .28s cubic-bezier(.2,.8,.2,1) both}
+@keyframes slide{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+.grab{width:42px;height:5px;border-radius:99px;background:var(--line);margin:0 auto 14px}
+.sheet h2{margin-bottom:4px}
+.sheet:focus{outline:none}
+.toast{position:fixed;left:50%;bottom:calc(var(--bar) + 20px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:99px;font-size:14px;font-weight:600;max-width:calc(100vw - 32px);box-shadow:var(--shadow);animation:rise .25s ease both}
+.empty{text-align:center;padding:26px 8px;color:var(--muted)}
+.empty b{display:block;font-family:var(--serif);font-size:19px;color:var(--ink);font-weight:500;margin-bottom:4px}
+.note{font-size:13px;color:var(--muted);margin:6px 2px 0}
+.forget{all:unset;cursor:pointer;font-size:13px;color:var(--muted);text-decoration:underline;margin:6px 2px 0}
+.forget:focus-visible{outline:3px solid var(--focus)}
+.list-item{padding:14px 0;border-top:1px solid var(--line)}.list-item:first-child{border-top:0;padding-top:0}
+.list-item strong{display:block;font-size:16px}
+.thread{padding:14px 0;border-top:1px solid var(--line);display:grid;gap:10px}.thread:first-child{border-top:0;padding-top:4px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style></head>
 <body><div id="root"></div>
 <script>
 (function(){
+  'use strict'
   var root=document.getElementById('root')
   var match=/[#&]t=([^&]+)/.exec(location.hash)
   var token=match?match[1]:undefined
-  var state=null
-  function el(tag,attrs,kids){var n=document.createElement(tag);for(var k in (attrs||{})){if(k==='text')n.textContent=attrs[k];else n.setAttribute(k==='class'?'class':k,attrs[k])}(kids||[]).forEach(function(c){n.appendChild(c)});return n}
-  function api(path,body){return fetch('/api/v1/stays/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().catch(function(){return{}}).then(function(j){return{status:r.status,body:j}})})}
-  function shell(children){root.innerHTML='';root.appendChild(el('main',{id:'stay'},children))}
-  function failure(text){shell([el('p',{class:'eyebrow',text:'Tisonik'}),el('h1',{text:'This page is not open'}),el('p',{class:'lead',text:text})])}
+  var state=null,tab='today',cache={inbox:null,people:null,pending:0},today={pulses:{},recognised:{}}
+  var again='Scan your card again, or open this page from the app, to continue.'
 
-  function tile(title,sub,build){
-    var panel=el('div',{class:'panel'});panel.hidden=true
-    var btn=el('button',{type:'button','aria-expanded':'false'},[el('strong',{text:title}),el('span',{class:'sub',text:sub})])
-    var built=false
-    btn.addEventListener('click',function(){
-      var open=panel.hidden
-      panel.hidden=!open
-      btn.setAttribute('aria-expanded',String(open))
-      if(open&&!built){built=true;build(panel)}
-    })
-    return el('div',{class:'tile'},[btn,panel])
+  function el(tag,attrs,kids){var n=document.createElement(tag);for(var k in (attrs||{})){if(k==='text')n.textContent=attrs[k];else if(attrs[k]!==false&&attrs[k]!=null)n.setAttribute(k,attrs[k])}(kids||[]).forEach(function(c){if(c==null||c===false)return;n.appendChild(typeof c==='string'?document.createTextNode(c):c)});return n}
+  function api(path,body){return fetch('/api/v1/stays/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().catch(function(){return{}}).then(function(j){return{status:r.status,body:j}})})}
+  function connect(action,data){return api('connect',{token:token,action:action,data:data||{}})}
+
+  // Static icon markup only. Nothing a guest or a venue writes ever goes through innerHTML.
+  var P={
+    today:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/>',
+    people:'<circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><circle cx="17.2" cy="9" r="2.4"/><path d="M17 14c2.3.2 3.7 1.6 4.2 4.2"/>',
+    crew:'<path d="m12 3 2.6 5.4 5.9.8-4.3 4.2 1 5.9L12 16.4 6.8 19.3l1-5.9L3.5 9.2l5.9-.8z"/>',
+    rate:'<path d="M4 19V9m6 10V5m6 14v-7m4 7H3"/>',
+    help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.8"/><path d="M12 17.2h.01"/>',
+    check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+    play:'<path d="M8 5.5v13l11-6.5z" fill="currentColor"/>',
+    more:'<circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/>',
+    key:'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h5"/>',
+    compass:'<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/>',
+    heart:'<path d="M12 20s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 7.6 4.3 4.3 0 0 1 19.500 10c0 5.600-7.500 10-7.500 10z"/>'
+  }
+  function icon(name,size){var s=document.createElement('span');s.setAttribute('aria-hidden','true');s.innerHTML='<svg width="'+(size||24)+'" height="'+(size||24)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(P[name]||'')+'</svg>';return s}
+
+  var AV={coral:['#ff8a73','#e2533f'],amber:['#ffc15a','#e08a1e'],sand:['#d9bf8e','#a8803f'],sage:['#a0c996','#5a9566'],teal:['#5fc9c0','#1f7f7b'],sky:['#86c2ff','#3577cf'],indigo:['#939bff','#4650c4'],plum:['#cc84df','#85389f'],rose:['#ff96b3','#cf416a'],slate:['#9eabba','#56657a'],olive:['#bfca70','#74842a'],ink:['#5a6980','#1a2333']}
+  function avatar(key,name,size){var c=AV[key]||AV.slate;var a=el('span',{class:'avatar'+(size?' '+size:''),'aria-hidden':'true',text:String(name||'?').trim().charAt(0).toUpperCase()});a.style.background='linear-gradient(145deg,'+c[0]+','+c[1]+')';return a}
+
+  var toastTimer
+  function toast(text){var old=document.querySelector('.toast');if(old)old.remove();var t=el('div',{class:'toast',role:'status',text:text});document.body.appendChild(t);clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.remove()},3200)}
+
+  // Bottom sheet with a focus trap, Escape to close and focus returned to the button that opened it.
+  function sheet(title,build){
+    var opener=document.activeElement,old=document.querySelector('.toast');if(old)old.remove()
+    var scrim=el('div',{class:'scrim'})
+    var box=el('div',{class:'sheet',role:'dialog','aria-modal':'true','aria-label':title,tabindex:'-1'})
+    var body=el('div')
+    box.appendChild(el('div',{class:'grab'}));box.appendChild(el('h2',{text:title}));box.appendChild(body);scrim.appendChild(box)
+    function close(){document.removeEventListener('keydown',keys);scrim.remove();document.body.style.overflow='';if(opener&&opener.focus&&document.contains(opener))opener.focus()}
+    function keys(e){
+      if(e.key==='Escape'){close();return}
+      if(e.key!=='Tab')return
+      var f=box.querySelectorAll('button:not([disabled]),input:not([disabled]),textarea:not([disabled]),[tabindex="0"]')
+      if(!f.length)return
+      var first=f[0],last=f[f.length-1]
+      if(e.shiftKey&&(document.activeElement===first||document.activeElement===box)){e.preventDefault();last.focus()}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+    }
+    scrim.addEventListener('click',function(e){if(e.target===scrim)close()})
+    document.addEventListener('keydown',keys)
+    document.body.style.overflow='hidden';document.body.appendChild(scrim)
+    build(body,close)
+    box.focus()
+    return close
   }
 
-  function textForm(panel,kind,opts){
+  function tabsFor(){
+    var t=state.tiles,f=state.features,list=[{id:'today',label:'Today',icon:'today'}]
+    if(f.people)list.push({id:'people',label:'People',icon:'people'})
+    if(f.recognition||t.thankYou)list.push({id:'crew',label:state.venueType==='ship'?'Crew':'Team',icon:'crew'})
+    if(f.pulse||t.rating)list.push({id:'rate',label:'Rate',icon:'rate'})
+    if(t.private||t.feedback)list.push({id:'help',label:'Help',icon:'help'})
+    return list
+  }
+
+  function shell(view,heading,sub){
+    root.innerHTML=''
+    var ship=state.venueType==='ship'
+    var tabs=tabsFor()
+    var nav=el('nav',{class:'tabs','aria-label':'Sections'},[el('ul',{},tabs.map(function(x){
+      var b=el('button',{type:'button',class:'tab','aria-current':x.id===tab?'page':false},[icon(x.icon,24),el('span',{text:x.label})])
+      if(x.id==='people'&&cache.pending>0)b.appendChild(el('span',{class:'badge',text:String(cache.pending),'aria-label':cache.pending+' waiting'}))
+      b.addEventListener('click',function(){go(x.id)})
+      return el('li',{},[b])
+    }))])
+    var top=el('header',{class:'top'},[el('p',{class:'kicker',text:state.hotelName||(ship?'Your voyage':'Your stay')}),el('h1',{text:heading}),sub?el('p',{class:'lead',text:sub}):null])
+    var main=el('main',{id:'main',tabindex:'-1'},[view])
+    root.appendChild(el('div',{class:'app'},[top,main]));root.appendChild(nav)
+    return main
+  }
+
+  function go(id){tab=id;render();window.scrollTo(0,0);var m=document.getElementById('main');if(m)m.focus({preventScroll:true})}
+
+  /* ---------- Today ---------- */
+  function welcomeCard(){
+    var w=state.welcome,ship=state.venueType==='ship',j=state.journey
+    var who=[w.from,w.role].filter(Boolean).join(', ')
+    var card=el('section',{class:'card hero','aria-label':'Welcome'},[
+      el('p',{class:'kicker',text:ship?'A welcome from your Cruise Director':'A welcome from your hotel'}),
+      el('h2',{text:who||'Watch a short hello'}),
+      w.note?el('p',{class:'sub',text:w.note}):null])
+    var box=el('div',{class:'frame'}),go=el('button',{type:'button',class:'btn light',style:'margin-top:16px'},[icon('play',18),el('span',{text:'Play the welcome'})])
+    var note=el('p',{class:'sub',style:'font-size:12.5px;margin-top:10px',text:'The video loads from its host only when you press play.'})
+    go.addEventListener('click',function(){box.appendChild(el('iframe',{src:w.embedUrl,title:'Welcome video',allow:'fullscreen; picture-in-picture',referrerpolicy:'strict-origin',allowfullscreen:''}));card.insertBefore(box,go);go.remove();note.remove()})
+    card.appendChild(go);card.appendChild(note)
+    if(j)card.appendChild(journeyBar(j))
+    return card
+  }
+  function journeyBar(j){return el('div',{class:'journey'},[el('span',{text:(state.venueType==='ship'?'Day ':'Day ')+j.day+' of '+j.total}),el('div',{class:'bar','aria-hidden':'true'},[el('i',{style:'width:'+Math.round(j.day/j.total*100)+'%'})])])}
+
+  function viewToday(){
+    var t=state.tiles,f=state.features,ship=state.venueType==='ship',v=el('div',{class:'view'})
+    if(t.welcome&&state.welcome)v.appendChild(welcomeCard())
+    else if(state.journey&&state.tiles.phase==='during'){var c=el('section',{class:'card hero'},[el('p',{class:'kicker',text:ship?'Your voyage':'Your stay'}),el('h2',{text:ship?'Make it a good one':'Make yourself at home'}),journeyBar(state.journey)]);v.appendChild(c)}
+    var grid=el('div',{class:'grid2'}),n=0
+    function action(id,ic,title,sub,badge){n++;var b=el('button',{type:'button',class:'action'},[el('span',{class:'ico'},[icon(ic,22)]),el('strong',{},[title,badge?el('span',{class:'badge',text:String(badge)}):null]),el('span',{class:'sub',text:sub})]);b.addEventListener('click',function(){go(id)});grid.appendChild(b)}
+    if(f.people)action('people','people','Meet people','Opt in to say hello to guests who share your interests',cache.pending||0)
+    if(f.recognition)action('crew','crew',ship?'Recognise crew':'Recognise the team','Make someone’s day with a word of thanks')
+    if(f.pulse)action('rate','rate','How is today?','Two taps per area. Low scores reach the team at once')
+    if(t.private)action('help','help','Need help?','Let us fix it. Goes straight to '+(ship?'guest services':'reception'))
+    if(n)v.appendChild(grid)
+    if(t.discover&&state.discover.length){
+      var d=el('section',{class:'card'},[el('p',{class:'kicker',text:ship?'Recommended by the ship':'Recommended by the hotel'}),el('h3',{text:'Discover'})])
+      state.discover.slice(0,12).forEach(function(x){d.appendChild(el('div',{class:'list-item',style:'margin-top:12px'},[el('strong',{text:String(x.title||'')}),el('div',{class:'sub',text:String(x.body||'')})]))})
+      v.appendChild(d)
+    }
+    if(t.keepsake)v.appendChild(el('section',{class:'card flat'},[el('div',{class:'row'},[el('span',{style:'color:var(--icon)'},[icon('key',26)]),el('div',{class:'grow'},[el('h3',{text:'Your keepsake'}),el('p',{class:'sub',text:'Your UNIKMO card is yours to keep. Scan it any time to come back here while your '+(ship?'voyage':'stay')+' is open.'})])])]))
+    v.appendChild(el('p',{class:'note',text:'Your messages go to '+(ship?'the guest services team':'the hotel team')+'. Nothing here is posted publicly.'}))
+    v.appendChild(forgetButton())
+    return v
+  }
+  function forgetButton(){var b=el('button',{type:'button',class:'forget',text:'Forget this device'});b.addEventListener('click',function(){token=undefined;api('logout',{}).then(function(){failure('This device has been signed out. '+again)})});return b}
+
+  /* ---------- Forms shared by Crew and Help ---------- */
+  function textForm(host,kind,opts){
     var msg=el('p',{class:'msg',role:'status'})
     var area=el('textarea',{id:kind+'-m',maxlength:String(opts.max||2000)})
-    var who=opts.recipient?el('input',{id:kind+'-r',maxlength:'80',placeholder:'A name, or "the front desk"'}):null
-    var send=el('button',{type:'button',class:'primary',text:'Send'})
-    if(who){panel.appendChild(el('label',{'for':kind+'-r',text:'Who made you feel special?'}));panel.appendChild(who)}
-    panel.appendChild(el('label',{'for':kind+'-m',text:opts.label}))
-    panel.appendChild(area);panel.appendChild(send);panel.appendChild(msg)
+    var who=opts.recipient?el('input',{type:'text',id:kind+'-r',maxlength:'80',placeholder:'A name, or "the front desk"'}):null
+    var send=el('button',{type:'button',class:'btn block',style:'margin-top:16px',text:opts.button||'Send'})
+    if(who){host.appendChild(el('label',{class:'field','for':kind+'-r',text:'Who made you feel special?'}));host.appendChild(who)}
+    host.appendChild(el('label',{class:'field','for':kind+'-m',text:opts.label}));host.appendChild(area);host.appendChild(send);host.appendChild(msg)
     send.addEventListener('click',function(){
       var payload={message:area.value}
       if(who&&who.value.trim())payload.recipient=who.value
       if(area.value.trim().length<(opts.min||5)){msg.className='msg bad';msg.textContent='Please write a little more.';return}
       send.disabled=true;msg.className='msg';msg.textContent='Sending...'
       api('submit',{token:token,kind:kind,payload:payload}).then(function(res){
-        if(res.status===201){msg.className='msg ok';msg.textContent=opts.done;area.disabled=true;if(who)who.disabled=true}
-        else{send.disabled=false;msg.className='msg bad';msg.textContent=res.status===429?'You have already sent the most we can accept for this stay.':res.status===409?'This is no longer open for your stay.':'That did not send. Please try again.'}
+        if(res.status===201){msg.className='msg ok';msg.textContent=opts.done;area.disabled=true;if(who)who.disabled=true;if(opts.after)opts.after()}
+        else{send.disabled=false;msg.className='msg bad';msg.textContent=res.status===429?'You have already sent the most we can accept for this '+(state.venueType==='ship'?'voyage':'stay')+'.':res.status===409?'This is no longer open for you.':'That did not send. Please try again.'}
       }).catch(function(){send.disabled=false;msg.className='msg bad';msg.textContent='That did not send. Please try again.'})
     })
   }
 
-  function ratingForm(panel){
-    var msg=el('p',{class:'msg',role:'status'})
-    var form=el('div')
+  /* ---------- Crew ---------- */
+  function viewCrew(){
+    var ship=state.venueType==='ship',v=el('div',{class:'view'}),crew=state.connect.crew
+    if(state.features.recognition&&crew.length){
+      var card=el('section',{class:'card'},[el('h3',{text:ship?'Who looked after you?':'Who looked after you?'}),el('p',{class:'sub',text:'Choose a person and up to two reasons. You can recognise each person once a day.'})])
+      crew.forEach(function(c){
+        var done=today.recognised[c.id]
+        var b=el('button',{type:'button',class:'btn small '+(done?'ghost':''),disabled:done?'':false,text:done?'Recognised today':'Recognise'})
+        if(!done)b.addEventListener('click',function(){recogniseSheet(c)})
+        card.appendChild(el('div',{class:'person'},[avatar('ink',c.name),el('div',{class:'grow'},[el('strong',{text:c.name}),c.role?el('span',{class:'sub',text:c.role}):null]),b]))
+      })
+      v.appendChild(card)
+    }
+    if(state.tiles.thankYou){
+      var other=el('section',{class:'card flat'},[el('h3',{text:crew.length?'Someone not on the list?':'Thank someone'}),el('p',{class:'sub',text:'Tell us who made you feel special and we will pass it on.'})])
+      var b2=el('button',{type:'button',class:'btn small ghost',style:'margin-top:12px',text:'Write a thank-you'})
+      b2.addEventListener('click',function(){sheet('Thank someone',function(body){textForm(body,'thank_you',{recipient:true,label:'Your message',min:3,max:500,done:'Thank you. We will pass it on.',button:'Send thanks'})})})
+      other.appendChild(b2);v.appendChild(other)
+    }
+    if(!v.firstChild)v.appendChild(el('div',{class:'empty'},[el('b',{text:'Nothing to show yet'}),el('span',{text:'Recognition opens when your '+(ship?'voyage':'stay')+' begins.'})]))
+    return v
+  }
+  function recogniseSheet(c){
+    sheet('Recognise '+c.name,function(body,close){
+      var chosen=[],msg=el('p',{class:'msg',role:'status'})
+      body.appendChild(el('p',{class:'sub',text:(c.role?c.role+'. ':'')+'Pick one or two reasons.'}))
+      var chips=el('div',{class:'chips',style:'margin-top:14px',role:'group','aria-label':'Reasons'})
+      state.connect.reasons.forEach(function(r){
+        var b=el('button',{type:'button',class:'chip','aria-pressed':'false',text:r.label})
+        b.addEventListener('click',function(){
+          var i=chosen.indexOf(r.id)
+          if(i>=0){chosen.splice(i,1)}else{if(chosen.length>=2){msg.className='msg';msg.textContent='Two reasons at most.';return}chosen.push(r.id)}
+          b.setAttribute('aria-pressed',String(chosen.indexOf(r.id)>=0));msg.textContent=''
+        })
+        chips.appendChild(b)
+      })
+      var send=el('button',{type:'button',class:'btn block',style:'margin-top:18px',text:'Send recognition'})
+      body.appendChild(chips);body.appendChild(send);body.appendChild(msg)
+      send.addEventListener('click',function(){
+        if(!chosen.length){msg.className='msg bad';msg.textContent='Choose at least one reason.';return}
+        send.disabled=true
+        connect('crew.recognise',{crewId:c.id,reasons:chosen}).then(function(res){
+          if(res.status===200){today.recognised[c.id]=true;close();toast('Sent. '+c.name+' will hear about it.');render()}
+          else if(res.status===429){today.recognised[c.id]=true;close();toast('You have already recognised '+c.name+' today.');render()}
+          else{send.disabled=false;msg.className='msg bad';msg.textContent='That did not send. Please try again.'}
+        }).catch(function(){send.disabled=false;msg.className='msg bad';msg.textContent='That did not send. Please try again.'})
+      })
+    })
+  }
+
+  /* ---------- Rate ---------- */
+  var LEVELS=[['Poor',2],['Fair',4],['Okay',6],['Great',8],['Superb',10]]
+  function viewRate(){
+    var ship=state.venueType==='ship',v=el('div',{class:'view'}),t=state.tiles
+    if(state.features.pulse){
+      var card=el('section',{class:'card'},[el('h3',{text:'How is today going?'}),el('p',{class:'sub',text:'Only rate what you used. If something is not right, we hear about it today and can put it right while you are still here.'})])
+      state.connect.departments.forEach(function(d){
+        var done=today.pulses[d.id]
+        var row=el('div',{class:'list-item',style:'margin-top:14px'},[el('strong',{text:d.label})])
+        var scale=el('div',{class:'scale5',role:'group','aria-label':d.label,'data-done':done?'true':'false'})
+        var note=el('p',{class:'msg',role:'status'})
+        LEVELS.forEach(function(l){
+          var b=el('button',{type:'button','aria-pressed':done===l[1]?'true':'false'},[el('b',{text:String(l[1])}),el('span',{text:l[0]})])
+          b.addEventListener('click',function(){
+            if(today.pulses[d.id])return
+            scale.querySelectorAll('button').forEach(function(x){x.disabled=true})
+            connect('pulse.submit',{department:d.id,score:l[1]}).then(function(res){
+              if(res.status===200){today.pulses[d.id]=l[1];b.setAttribute('aria-pressed','true');scale.setAttribute('data-done','true');note.className='msg ok';note.textContent=res.body.low?'Thank you. We have told the team so they can put it right today.':res.body.askRecognition?'Wonderful. Is there someone you would like to recognise?':'Thank you.';if(res.body.askRecognition&&state.features.recognition){var r=el('button',{type:'button',class:'btn small ghost',style:'margin-top:8px',text:'Recognise someone'});r.addEventListener('click',function(){go('crew')});row.appendChild(r)}}
+              else if(res.status===429){today.pulses[d.id]=true;scale.setAttribute('data-done','true');note.textContent='You have already scored this today. Come back tomorrow.'}
+              else{scale.querySelectorAll('button').forEach(function(x){x.disabled=false});note.className='msg bad';note.textContent='That did not send. Please try again.'}
+            }).catch(function(){scale.querySelectorAll('button').forEach(function(x){x.disabled=false});note.className='msg bad';note.textContent='That did not send. Please try again.'})
+          })
+          scale.appendChild(b)
+        })
+        row.appendChild(scale);row.appendChild(note);card.appendChild(row)
+      })
+      v.appendChild(card)
+    }
+    if(t.rating){
+      var r=el('section',{class:'card hero'},[el('p',{class:'kicker',text:ship?'Before you disembark':'Before you leave'}),el('h2',{text:ship?'Rate your voyage':'Rate your stay'}),el('p',{class:'sub',text:'Five quick questions. It goes to the '+(ship?'hotel director':'manager')+' and helps the whole team.'})])
+      var open=el('button',{type:'button',class:'btn light',style:'margin-top:16px',text:'Start'})
+      open.addEventListener('click',function(){sheet(ship?'Rate your voyage':'Rate your stay',ratingForm)})
+      r.appendChild(open);v.appendChild(r)
+    }
+    if(!v.firstChild)v.appendChild(el('div',{class:'empty'},[el('b',{text:'Nothing to rate yet'}),el('span',{text:'This opens when your '+(ship?'voyage':'stay')+' begins.'})]))
+    return v
+  }
+  function ratingForm(host,close){
+    var msg=el('p',{class:'msg',role:'status'}),form=el('div')
     state.questions.forEach(function(q){
       var scale=el('div',{class:'scale',role:'radiogroup','aria-label':q.text})
-      for(var i=1;i<=10;i++){
-        var input=el('input',{type:'radio',name:q.id,value:String(i),'aria-label':String(i)})
-        scale.appendChild(el('label',{},[input,el('span',{text:String(i)})]))
-      }
+      for(var i=1;i<=10;i++){scale.appendChild(el('label',{},[el('input',{type:'radio',name:q.id,value:String(i),'aria-label':String(i)}),el('span',{text:String(i)})]))}
       var kids=[el('p',{text:q.text}),scale,el('div',{class:'ends'},[el('span',{text:q.low||'Poor'}),el('span',{text:q.high||'Excellent'})])]
-      if(q.optional){
-        var skip=el('input',{type:'checkbox',id:'skip-'+q.id})
-        skip.addEventListener('change',function(){scale.querySelectorAll('input').forEach(function(i){i.disabled=skip.checked;if(skip.checked)i.checked=false})})
-        kids.push(el('label',{'for':'skip-'+q.id,class:'skip'},[skip,el('span',{text:' '+(q.skipLabel||'Not applicable')})]))
-      }
+      if(q.optional){var skip=el('input',{type:'checkbox',id:'skip-'+q.id});skip.addEventListener('change',function(){scale.querySelectorAll('input').forEach(function(x){x.disabled=skip.checked;if(skip.checked)x.checked=false})});kids.push(el('label',{'for':'skip-'+q.id,class:'skip'},[skip,el('span',{text:q.skipLabel||'Not applicable'})]))}
       form.appendChild(el('div',{class:'q'},kids))
     })
     var comment=el('textarea',{id:'rating-c',maxlength:'500'})
-    form.appendChild(el('label',{'for':'rating-c',text:'Anything else to tell us?'}))
-    form.appendChild(comment)
-    var send=el('button',{type:'button',class:'primary',text:'Send my rating'})
-    form.appendChild(send);form.appendChild(msg);panel.appendChild(form)
+    form.appendChild(el('label',{class:'field','for':'rating-c',text:'Anything else to tell us?'}));form.appendChild(comment)
+    var send=el('button',{type:'button',class:'btn block',style:'margin-top:16px',text:'Send my rating'})
+    form.appendChild(send);form.appendChild(msg);host.appendChild(form)
     send.addEventListener('click',function(){
       var scores={},missing=false
       state.questions.forEach(function(q){var c=form.querySelector('input[name="'+q.id+'"]:checked');var skipped=q.optional&&form.querySelector('#skip-'+q.id).checked;if(c)scores[q.id]=Number(c.value);else if(!skipped)missing=true})
@@ -116,40 +394,207 @@ ul.plain li:first-child{border-top:0}
       var payload={scores:scores};if(comment.value.trim())payload.comment=comment.value
       send.disabled=true;msg.className='msg';msg.textContent='Sending...'
       api('submit',{token:token,kind:'rating',payload:payload}).then(function(res){
-        if(res.status===201){msg.className='msg ok';msg.textContent='Thank you. Your rating has been sent.'}
-        else{send.disabled=false;msg.className='msg bad';msg.textContent=res.status===429?'You have already rated this stay.':'That did not send. Please try again.'}
+        if(res.status===201){state.tiles.rating=false;close();toast('Thank you. Your rating has been sent.');render()}
+        else{send.disabled=false;msg.className='msg bad';msg.textContent=res.status===429?'You have already rated this '+(state.venueType==='ship'?'voyage':'stay')+'.':'That did not send. Please try again.'}
       }).catch(function(){send.disabled=false;msg.className='msg bad';msg.textContent='That did not send. Please try again.'})
     })
   }
 
-  function forget(){
-    var b=el('button',{type:'button',class:'hotel-forget',text:'Forget this device'})
-    b.addEventListener('click',function(){token=undefined;api('logout',{}).then(function(){failure('This device has been signed out. '+again)})})
-    return b
+  /* ---------- Help ---------- */
+  function viewHelp(){
+    var ship=state.venueType==='ship',v=el('div',{class:'view'}),team=ship?'guest services':'reception'
+    if(state.tiles.private){
+      var c=el('section',{class:'card'},[el('h3',{text:'Need help? Let us fix it'}),el('p',{class:'sub',text:'Goes straight to '+team+', no one else. Tell us what is wrong and where, and we will sort it out.'})])
+      textForm(c,'private',{label:'What can we help with?',done:'Thank you. '+(ship?'Guest services':'The team')+' has your message.',button:'Send to '+team})
+      v.appendChild(c)
+    }
+    if(state.tiles.feedback){
+      var f=el('section',{class:'card'},[el('h3',{text:'Share feedback'}),el('p',{class:'sub',text:'Your '+(ship?'voyage':'stay')+' has ended, so we cannot fix anything now. We read every note and it goes to '+(ship?'guest services':'guest relations')+'.'})])
+      textForm(f,'feedback',{label:'Your feedback',done:'Thank you. '+(ship?'Guest services':'Guest relations')+' has your message.'})
+      v.appendChild(f)
+    }
+    return v
   }
 
+  /* ---------- People ---------- */
+  function viewPeople(){
+    var v=el('div',{class:'view'}),p=state.profile
+    if(!p||!p.discoverable){v.appendChild(profileCard(p));return v}
+    var mode=viewPeople.mode||'discover'
+    var seg=el('div',{class:'seg',role:'tablist'},[segBtn('discover','Discover',mode),segBtn('inbox','Compliments'+(cache.pending?' ('+cache.pending+')':''),mode)])
+    function segBtn(id,label,cur){var b=el('button',{type:'button',role:'tab','aria-selected':String(cur===id),text:label});b.addEventListener('click',function(){viewPeople.mode=id;render()});return b}
+    v.appendChild(seg)
+    var head=el('div',{class:'row'},[avatar(p.avatar,p.name,'sm'),el('div',{class:'grow'},[el('strong',{text:p.name}),el('span',{class:'sub',text:'You are visible to other guests'})])])
+    var edit=el('button',{type:'button',class:'btn small ghost',text:'Edit'});edit.addEventListener('click',function(){profileSheet(p)})
+    head.appendChild(edit);v.appendChild(el('section',{class:'card flat'},[head]))
+    var box=el('section',{class:'card'});v.appendChild(box)
+    if(mode==='discover')loadPeople(box);else loadInbox(box)
+    return v
+  }
+  function profileCard(p){
+    var c=el('section',{class:'card'},[el('p',{class:'kicker',text:'Optional'}),el('h2',{text:'Meet people on board'}),el('p',{class:'lead',text:'Say hello to guests who share your interests. You choose a first name and an avatar. Nothing else about you is shown.'})])
+    c.appendChild(el('ul',{class:'rules'},[
+      el('li',{},[icon('check',18),el('span',{text:'Preset compliments only. There is no chat and no dating.'})]),
+      el('li',{},[icon('check',18),el('span',{text:'Meet-ups are suggested for public places only. Never a cabin.'})]),
+      el('li',{},[icon('check',18),el('span',{text:'Only guests who opted in on this sailing can see you. Block or report anyone, any time.'})])]))
+    var b=el('button',{type:'button',class:'btn block',style:'margin-top:18px',text:p?'Turn visibility back on':'Set up my profile'});b.addEventListener('click',function(){profileSheet(p)});c.appendChild(b)
+    return c
+  }
+  function profileSheet(existing){
+    sheet(existing?'Your profile':'Set up your profile',function(body,close){
+      var name=el('input',{type:'text',id:'pf-name',maxlength:'24',autocomplete:'off',placeholder:'First name',value:existing?existing.name:''})
+      var avKey=existing?existing.avatar:'coral',interests=(existing?existing.interests:[]).slice()
+      body.appendChild(el('label',{class:'field','for':'pf-name',text:'First name (shown to other guests)'}));body.appendChild(name)
+      body.appendChild(el('p',{class:'field',style:'margin-bottom:8px',text:'Avatar'}))
+      var sw=el('div',{class:'swatches',role:'radiogroup','aria-label':'Avatar'})
+      state.connect.avatars.forEach(function(k){var b=el('button',{type:'button',class:'swatch',role:'radio','aria-checked':String(k===avKey),'aria-label':k},[avatar(k,name.value||'A','sm')]);b.addEventListener('click',function(){avKey=k;sw.querySelectorAll('.swatch').forEach(function(s){s.setAttribute('aria-checked',String(s===b))})});sw.appendChild(b)})
+      name.addEventListener('input',function(){sw.querySelectorAll('.avatar').forEach(function(a){a.textContent=(name.value.trim().charAt(0)||'A').toUpperCase()})})
+      body.appendChild(sw)
+      body.appendChild(el('p',{class:'field',style:'margin-bottom:8px',text:'Interests you are happy to share'}))
+      var chips=el('div',{class:'chips',role:'group','aria-label':'Interests'})
+      state.connect.interests.forEach(function(i){var b=el('button',{type:'button',class:'chip','aria-pressed':String(interests.indexOf(i.id)>=0),text:i.label});b.addEventListener('click',function(){var at=interests.indexOf(i.id);if(at>=0)interests.splice(at,1);else interests.push(i.id);b.setAttribute('aria-pressed',String(interests.indexOf(i.id)>=0))});chips.appendChild(b)})
+      body.appendChild(chips)
+      var adult=el('input',{type:'checkbox',id:'pf-adult'});if(existing)adult.checked=true
+      var show=el('input',{type:'checkbox',id:'pf-show'});show.checked=existing?existing.discoverable:true
+      body.appendChild(el('label',{class:'check','for':'pf-adult'},[adult,el('span',{text:'I am 18 or over.'})]))
+      body.appendChild(el('label',{class:'check','for':'pf-show'},[show,el('span',{text:'Show me to other guests on this sailing.'})]))
+      var msg=el('p',{class:'msg',role:'status'}),save=el('button',{type:'button',class:'btn block',style:'margin-top:16px',text:existing?'Save':'Join'})
+      body.appendChild(save);body.appendChild(msg)
+      save.addEventListener('click',function(){
+        if(!name.value.trim()){msg.className='msg bad';msg.textContent='Please add a first name.';return}
+        if(!adult.checked){msg.className='msg bad';msg.textContent='This is for guests aged 18 or over.';return}
+        save.disabled=true
+        connect('profile.save',{displayName:name.value.trim(),avatar:avKey,interests:interests,adult:true,discoverable:show.checked}).then(function(res){
+          if(res.status===200){state.profile=res.body.profile;cache.people=null;cache.inbox=null;close();toast(show.checked?'You are on the list.':'You are hidden.');render();refreshPending()}
+          else{save.disabled=false;msg.className='msg bad';msg.textContent=res.status===422?'Names can not include numbers, links or contact details.':'That did not save. Please try again.'}
+        }).catch(function(){save.disabled=false;msg.className='msg bad';msg.textContent='That did not save. Please try again.'})
+      })
+    })
+  }
+  var filter=null
+  function loadPeople(box){
+    box.appendChild(el('p',{class:'sub',text:'Loading guests...'}))
+    connect('people.list',filter?{interest:filter}:{}).then(function(res){
+      box.innerHTML=''
+      if(res.status!==200){box.appendChild(el('div',{class:'empty'},[el('b',{text:'We could not load guests'}),el('span',{text:'Please try again in a moment.'})]));return}
+      var chips=el('div',{class:'chips',style:'margin-bottom:12px',role:'group','aria-label':'Filter by interest'})
+      var all=el('button',{type:'button',class:'chip','aria-pressed':String(!filter),text:'Everyone'});all.addEventListener('click',function(){filter=null;render()});chips.appendChild(all)
+      state.connect.interests.forEach(function(i){var b=el('button',{type:'button',class:'chip','aria-pressed':String(filter===i.id),text:i.label});b.addEventListener('click',function(){filter=i.id;render()});chips.appendChild(b)})
+      box.appendChild(chips)
+      var people=res.body.people
+      if(!people.length){box.appendChild(el('div',{class:'empty'},[el('b',{text:filter?'No one with that interest yet':'No one else is visible yet'}),el('span',{text:'More guests join each day. Check back soon.'})]));return}
+      var labelOf={};state.connect.interests.forEach(function(i){labelOf[i.id]=i.label})
+      people.forEach(function(x){
+        var list=(x.shared.length?x.shared:x.interests).map(function(s){return labelOf[s]||s}).join(' · ')
+        var common=x.shared.length?el('span',{class:'pill ok',text:x.shared.length+' in common'}):null
+        var send=el('button',{type:'button',class:'btn small',disabled:x.sentToday?'':false,text:x.sentToday?'Sent today':'Compliment'})
+        if(!x.sentToday)send.addEventListener('click',function(){complimentSheet(x)})
+        var more=el('button',{type:'button',class:'more','aria-label':'More options for '+x.name},[icon('more',22)]);more.addEventListener('click',function(){safetySheet(x)})
+        box.appendChild(el('div',{class:'person'},[avatar(x.avatar,x.name),el('div',{class:'grow'},[el('strong',{text:x.name}),common,list?el('span',{class:'sub',text:list}):null]),send,more]))
+      })
+    }).catch(function(){box.innerHTML='';box.appendChild(el('div',{class:'empty'},[el('b',{text:'We could not load guests'}),el('span',{text:'Please try again in a moment.'})]))})
+  }
+  function complimentSheet(x){
+    sheet('Compliment '+x.name,function(body,close){
+      var label=null,msg=el('p',{class:'msg',role:'status'})
+      body.appendChild(el('p',{class:'sub',text:'Pick one. '+x.name+' can say thanks or pass. Nothing else is shared.'}))
+      var chips=el('div',{class:'chips',style:'margin-top:14px',role:'radiogroup','aria-label':'Compliment'})
+      state.connect.affirmations.forEach(function(a){var b=el('button',{type:'button',class:'chip',role:'radio','aria-checked':'false',text:a.label});b.addEventListener('click',function(){label=a.id;chips.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-checked',String(c===b))})});chips.appendChild(b)})
+      var send=el('button',{type:'button',class:'btn block',style:'margin-top:18px',text:'Send'})
+      body.appendChild(chips);body.appendChild(send);body.appendChild(msg)
+      send.addEventListener('click',function(){
+        if(!label){msg.className='msg bad';msg.textContent='Choose a compliment first.';return}
+        send.disabled=true
+        connect('affirm.send',{to:x.id,label:label}).then(function(res){
+          if(res.status===200){close();toast('Sent to '+x.name+'.');cache.inbox=null;render()}
+          else{send.disabled=false;msg.className='msg bad';msg.textContent=res.body.error==='already_sent_today'?'You have already sent '+x.name+' one today.':res.body.error==='daily_limit'?'That is the most you can send in one day.':res.status===404?x.name+' is no longer available.':'That did not send. Please try again.'}
+        }).catch(function(){send.disabled=false;msg.className='msg bad';msg.textContent='That did not send. Please try again.'})
+      })
+    })
+  }
+  function safetySheet(x){
+    sheet(x.name,function(body,close){
+      body.appendChild(el('p',{class:'sub',text:'You can hide '+x.name+' from you, or report them to the team. They are never told.'}))
+      var block=el('button',{type:'button',class:'btn block ghost',style:'margin-top:16px',text:'Block '+x.name})
+      block.addEventListener('click',function(){block.disabled=true;connect('block',{profile:x.id}).then(function(){close();toast(x.name+' is blocked.');cache.inbox=null;render();refreshPending()})})
+      body.appendChild(block)
+      body.appendChild(el('p',{class:'field',style:'margin-bottom:8px',text:'Report'}))
+      var chips=el('div',{class:'chips'})
+      ;[['uncomfortable','Made me uncomfortable'],['behaviour','Behaviour felt wrong'],['fake','Looks like a fake profile'],['other','Something else']].forEach(function(r){var b=el('button',{type:'button',class:'chip',text:r[1]});b.addEventListener('click',function(){chips.querySelectorAll('button').forEach(function(c){c.disabled=true});connect('report',{profile:x.id,reason:r[0]}).then(function(){close();toast('Thank you. The team has been told.');cache.inbox=null;render()})});chips.appendChild(b)})
+      body.appendChild(chips)
+    })
+  }
+  function refreshPending(){
+    if(!state.features.people||!state.profile||!state.profile.discoverable){cache.pending=0;return Promise.resolve()}
+    return connect('inbox').then(function(res){
+      if(res.status!==200)return
+      cache.inbox=res.body.items
+      var n=res.body.items.filter(function(i){return (i.direction==='in'&&i.status==='sent')||(i.meetup&&i.meetup.status==='proposed'&&!i.meetup.byMe)}).length
+      if(n!==cache.pending){cache.pending=n;render()}
+    }).catch(function(){})
+  }
+  function loadInbox(box){
+    box.appendChild(el('p',{class:'sub',text:'Loading...'}))
+    connect('inbox').then(function(res){
+      box.innerHTML=''
+      if(res.status!==200){box.appendChild(el('div',{class:'empty'},[el('b',{text:'We could not load this'}),el('span',{text:'Please try again in a moment.'})]));return}
+      var items=res.body.items;cache.inbox=items
+      if(!items.length){box.appendChild(el('div',{class:'empty'},[el('b',{text:'No compliments yet'}),el('span',{text:'When someone sends you one, it will appear here. You can send one from Discover.'})]));return}
+      items.forEach(function(i){box.appendChild(thread(i))})
+    }).catch(function(){})
+  }
+  function thread(i){
+    var inn=i.direction==='in',kids=[]
+    var line=inn?i.other.name+' says “'+i.label+'”':'You sent '+i.other.name+' “'+i.label+'”'
+    kids.push(el('div',{class:'row'},[avatar(i.other.avatar,i.other.name,'sm'),el('div',{class:'grow'},[el('strong',{text:line}),el('span',{class:'sub',text:inn?(i.status==='sent'?'New':'You said thanks'):(i.status==='acknowledged'?i.other.name+' said thanks':'Waiting for a reply')})])]))
+    function act(label,cls,fn){var b=el('button',{type:'button',class:'btn small '+(cls||''),text:label});b.addEventListener('click',function(){b.disabled=true;fn().then(function(){cache.inbox=null;render();refreshPending()})});return b}
+    var actions=el('div',{class:'row wrap'})
+    if(inn&&i.status==='sent'){actions.appendChild(act('Say thanks','',function(){return connect('affirm.respond',{id:i.id,response:'acknowledge'})}));actions.appendChild(act('Not now','ghost',function(){return connect('affirm.respond',{id:i.id,response:'ignore'})}))}
+    if(i.status==='acknowledged'){
+      if(!i.meetup||i.meetup.status==='declined'){var m=el('button',{type:'button',class:'btn small accent',text:'Suggest meeting up'});m.addEventListener('click',function(){placeSheet(i)});actions.appendChild(m)}
+      else if(i.meetup.status==='proposed'&&!i.meetup.byMe){kids.push(el('p',{class:'sub',style:'margin:0',text:i.other.name+' suggests: '+i.meetup.place}));actions.appendChild(act('Sounds good','',function(){return connect('meet.respond',{id:i.meetup.id,response:'accept'})}));actions.appendChild(act('Not this time','ghost',function(){return connect('meet.respond',{id:i.meetup.id,response:'decline'})}))}
+      else if(i.meetup.status==='proposed'){kids.push(el('p',{class:'sub',style:'margin:0',text:'You suggested: '+i.meetup.place+'. Waiting for '+i.other.name+'.'}))}
+      else if(i.meetup.status==='accepted'){kids.push(el('p',{class:'sub',style:'margin:0;color:var(--ok);font-weight:600',text:'It is on: '+i.meetup.place+'. Look out for '+i.other.name+'.'}))}
+    }
+    if(actions.firstChild)kids.push(actions)
+    return el('div',{class:'thread'},kids)
+  }
+  function placeSheet(i){
+    sheet('Suggest a place',function(body,close){
+      var place=null,msg=el('p',{class:'msg',role:'status'})
+      body.appendChild(el('p',{class:'sub',text:'Public places and activities only. '+i.other.name+' can accept or decline.'}))
+      var chips=el('div',{class:'chips',style:'margin-top:14px',role:'radiogroup','aria-label':'Place'})
+      state.connect.places.forEach(function(p){var b=el('button',{type:'button',class:'chip',role:'radio','aria-checked':'false',text:p.label});b.addEventListener('click',function(){place=p.id;chips.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-checked',String(c===b))})});chips.appendChild(b)})
+      var send=el('button',{type:'button',class:'btn block',style:'margin-top:18px',text:'Send suggestion'})
+      body.appendChild(chips);body.appendChild(send);body.appendChild(msg)
+      send.addEventListener('click',function(){
+        if(!place){msg.className='msg bad';msg.textContent='Choose a place first.';return}
+        send.disabled=true
+        connect('meet.propose',{affirmationId:i.id,place:place}).then(function(res){
+          if(res.status===200){close();toast('Suggestion sent.');cache.inbox=null;render()}
+          else{send.disabled=false;msg.className='msg bad';msg.textContent=res.body.error==='proposal_open'?'There is already a suggestion waiting.':'That did not send. Please try again.'}
+        }).catch(function(){send.disabled=false;msg.className='msg bad';msg.textContent='That did not send. Please try again.'})
+      })
+    })
+  }
+
+  /* ---------- App ---------- */
   function render(){
-    var t=state.tiles,list=[],ship=state.venueType==='ship',team=ship?'the guest services team':'the hotel team'
-    if(t.welcome&&state.welcome){var w=state.welcome,who=[w.from,w.role].filter(Boolean).join(', ')
-      list.push(tile(ship?'A welcome from your Cruise Director':'A welcome from your hotel',who||'Watch a short hello',function(p){
-        if(w.note)p.appendChild(el('p',{text:w.note}))
-        var box=el('div',{class:'frame'}),go=el('button',{type:'button',class:'primary',text:'Play the welcome'}),note=el('p',{class:'sub',text:'The video loads from its host only when you press play.'})
-        go.addEventListener('click',function(){box.appendChild(el('iframe',{src:w.embedUrl,title:'Welcome video',allow:'fullscreen; picture-in-picture',referrerpolicy:'strict-origin',allowfullscreen:''}));p.insertBefore(box,go);go.remove();note.remove()})
-        p.appendChild(go);p.appendChild(note)
-      }))}
-    if(t.thankYou)list.push(tile('Thank someone','Tell us who made you feel special',function(p){textForm(p,'thank_you',{recipient:true,label:'Your message',min:3,max:500,done:'Thank you. We will pass it on.'})}))
-    if(t.private)list.push(tile('Need help? Let us fix it','Goes straight to '+team+', no one else',function(p){textForm(p,'private',{label:'What can we help with?',done:'Thank you. '+(ship?'Guest services':'The team')+' has your message.'})}))
-    if(t.feedback)list.push(tile('Share feedback','Send a note to '+(ship?'guest services':'guest relations'),function(p){textForm(p,'feedback',{label:'Your feedback',done:'Thank you. '+(ship?'Guest services':'Guest relations')+' has your message.'})}))
-    if(t.rating)list.push(tile(ship?'Rate your voyage':'Rate your stay','Five quick questions',ratingForm))
-    if(t.discover&&state.discover.length)list.push(tile('Discover',ship?'Recommended by the ship':'Recommended by the hotel',function(p){var u=el('ul',{class:'plain'});state.discover.slice(0,12).forEach(function(d){u.appendChild(el('li',{},[el('strong',{text:String(d.title||'')}),el('div',{class:'sub',text:String(d.body||'')})]))});p.appendChild(u)}))
-    if(t.keepsake)list.push(tile('Your keepsake','Keep your card',function(p){p.appendChild(el('p',{text:'Your UNIKMO card is yours to keep. Scan it any time to come back to this page while it is open.'}))}))
-    shell([el('p',{class:'eyebrow',text:state.hotelName||(ship?'Your voyage':'Your stay')}),el('h1',{text:state.firstName?'Welcome, '+state.firstName:(ship?'Your voyage':'Your stay')}),el('p',{class:'lead',text:'A few ways to tell us how it is going.'}),el('div',{class:'tiles'},list),el('p',{class:'note',text:'Your messages go to '+team+'. Nothing here is posted publicly.'}),forget()])
+    var ship=state.venueType==='ship',name=state.firstName
+    var ids=tabsFor().map(function(x){return x.id});if(ids.indexOf(tab)<0)tab='today'
+    var heading,sub
+    if(tab==='today'){heading=name?'Welcome, '+name:(ship?'Welcome aboard':'Welcome');sub=ship?'Everything for your voyage, in one place.':'Everything for your stay, in one place.'}
+    else if(tab==='people'){heading='People';sub=null}
+    else if(tab==='crew'){heading=ship?'Your crew':'Your team';sub='A word of thanks goes a long way.'}
+    else if(tab==='rate'){heading='How are we doing?';sub=null}
+    else{heading='Help';sub=null}
+    var view=tab==='people'?viewPeople():tab==='crew'?viewCrew():tab==='rate'?viewRate():tab==='help'?viewHelp():viewToday()
+    shell(view,heading,sub)
   }
-
-  var again='Scan your card again, or open this page from the app, to continue.'
+  function failure(text){root.innerHTML='';root.appendChild(el('main',{class:'app'},[el('div',{class:'top'},[el('p',{class:'kicker',text:'Tisonik'}),el('h1',{text:'This page is not open'}),el('p',{class:'lead',text:text})])]))}
   function open(){
     return api('session',{token:token}).then(function(res){
-      if(res.status===200){state=res.body;render()}
+      if(res.status===200){state=res.body;document.documentElement.setAttribute('data-venue',state.venueType==='ship'?'ship':'hotel');(state.today||{}).pulses&&(today.pulses=state.today.pulses);(state.today||{}).recognised&&(today.recognised=state.today.recognised);render();refreshPending()}
       else failure(again)
     })
   }

@@ -8,7 +8,7 @@ const stays = await import('../api/_lib/stays.mjs')
 
 // Minimal in-memory stand-in for the Supabase query builder used by the stay layer.
 function fakeDatabase() {
-  const tables = { hotel_stays: [], hotel_stay_submissions: [], hotel_stay_settings: [], memberships: [] }
+  const tables = { hotel_stays: [], hotel_stay_submissions: [], hotel_stay_settings: [], memberships: [], stay_profiles: [], stay_pulses: [], crew_recognitions: [] }
   let serial = 0
   return {
     tables,

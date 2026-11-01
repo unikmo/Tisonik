@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { z } from 'zod'
 import { isBlocked, limits, overLimit } from './rate-limit.mjs'
+import { AFFIRMATIONS, AVATARS, INTERESTS, PLACES, REASONS, departmentsFor, featuresFor } from './stay-connect-config.mjs'
 
 export const TOKEN_LIFETIME_SECONDS = 15 * 60
 const SESSION_MAX_SECONDS = 30 * 86_400
@@ -325,12 +326,35 @@ export async function exchangeLink(database, linkToken, now = new Date()) {
 }
 
 export async function guestSession(database, stay, now = new Date()) {
-  const { data: settings } = await database.from('hotel_stay_settings').select('hotel_name, discover_items, venue_type, welcome_video_url, welcome_from_name, welcome_from_role, welcome_note').eq('tenant_id', stay.tenant_id).maybeSingle()
+  const { data: settings } = await database.from('hotel_stay_settings').select('hotel_name, discover_items, venue_type, welcome_video_url, welcome_from_name, welcome_from_role, welcome_note, crew_items').eq('tenant_id', stay.tenant_id).maybeSingle()
   const tiles = tilesFor(stay, now)
   const { count } = await database.from('hotel_stay_submissions').select('id', { count: 'exact', head: true }).eq('stay_id', stay.id).eq('kind', 'rating')
+  const venueType = settings?.venue_type || 'hotel'
+  const features = featuresFor(venueType)
+  let profile = null
+  if (features.people && tiles.phase === 'during') {
+    const { data } = await database.from('stay_profiles').select('id, display_name, avatar, interests, discoverable').eq('stay_id', stay.id).maybeSingle()
+    if (data) profile = { id: data.id, name: data.display_name, avatar: data.avatar, interests: data.interests || [], discoverable: !!data.discoverable }
+  }
+  // What this guest has already done today, so the page shows it done after a reload.
+  const serviceDate = day(now)
+  const [pulses, recognitions] = await Promise.all([
+    database.from('stay_pulses').select('department, score').eq('stay_id', stay.id).eq('service_date', serviceDate),
+    database.from('crew_recognitions').select('crew_id').eq('stay_id', stay.id).eq('service_date', serviceDate),
+  ])
+  const span = (from, to) => Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000)
+  const total = span(stay.valid_from, stay.valid_to) + 1
   return {
     hotelName: settings?.hotel_name || null,
-    venueType: settings?.venue_type || 'hotel',
+    journey: tiles.phase === 'during' ? { day: Math.min(total, Math.max(1, span(stay.valid_from, serviceDate) + 1)), total } : null,
+    today: {
+      pulses: Object.fromEntries((pulses.data || []).map(row => [row.department, row.score])),
+      recognised: Object.fromEntries((recognitions.data || []).map(row => [row.crew_id, true])),
+    },
+    venueType,
+    features: { people: features.people && tiles.phase === 'during', recognition: features.recognition && (tiles.phase === 'during' || tiles.phase === 'after_checkout'), pulse: features.pulse && tiles.phase === 'during' },
+    connect: { interests: INTERESTS, affirmations: AFFIRMATIONS, places: PLACES, reasons: REASONS, avatars: AVATARS, departments: departmentsFor(venueType), crew: (settings?.crew_items || []).map(({ id, name, role }) => ({ id, name, role })) },
+    profile,
     firstName: stay.guest_label || null,
     tiles: { ...tiles, rating: tiles.rating && !count },
     discover: tiles.discover ? settings?.discover_items || [] : [],
@@ -366,7 +390,7 @@ export const LOW_SCORE = 6
 // the hotel names) receives ratings only. If reception has no address, the manager's covers for it so nothing is lost.
 // Best-effort: an email failure never fails the guest's request.
 export async function notifyHotel(database, stay, kind, payload, submissionId) {
-  if (!['private', 'feedback', 'thank_you', 'rating'].includes(kind)) return { sent: false }
+  if (!['private', 'feedback', 'thank_you', 'rating', 'report', 'recognition', 'pulse'].includes(kind)) return { sent: false }
   if (!process.env.RESEND_API_KEY || !process.env.TISONIK_ENQUIRY_FROM) return { sent: false }
   try {
     const { data: settings } = await database.from('hotel_stay_settings').select('reception_email, manager_email, hotel_name, venue_type').eq('tenant_id', stay.tenant_id).maybeSingle()
@@ -378,8 +402,10 @@ export async function notifyHotel(database, stay, kind, payload, submissionId) {
     const scores = kind === 'rating' ? questions.filter(question => payload.scores[question.id] !== undefined).map(question => ({ question, value: payload.scores[question.id] })) : []
     const low = scores.filter(item => item.value <= LOW_SCORE)
     const average = scores.length ? scores.reduce((sum, item) => sum + item.value, 0) / scores.length : null
-    const label = { private: 'Private message from a guest', feedback: 'Post-stay feedback', thank_you: 'A guest says thank you', rating: 'Stay rating' }[kind]
-    const subject = clean(`${low.length ? 'LOW SCORE - ' : ''}${label} - booking ${stay.booking_ref}${average !== null ? ` - average ${average.toFixed(1)}` : ''}`)
+    const label = { private: 'Private message from a guest', feedback: 'Post-stay feedback', thank_you: 'A guest says thank you', rating: 'Stay rating', report: 'A guest reported another guest', recognition: 'A guest recognised a crew member', pulse: 'Low daily score' }[kind]
+    const pulseLow = kind === 'pulse' && payload.score <= LOW_SCORE
+    if (kind === 'pulse' && !pulseLow) return { sent: false }
+    const subject = clean(`${low.length || pulseLow ? 'LOW SCORE - ' : ''}${label} - booking ${stay.booking_ref}${average !== null ? ` - average ${average.toFixed(1)}` : ''}${kind === 'pulse' ? ` - ${payload.department} ${payload.score}/10` : ''}`)
     const lines = [
       label,
       '',
@@ -388,6 +414,9 @@ export async function notifyHotel(database, stay, kind, payload, submissionId) {
       `Guest: ${stay.guest_label || 'not recorded'}`,
       `${words.stay}: ${stay.valid_from} to ${stay.valid_to}`,
       ...(payload.recipient ? [`About: ${payload.recipient}`] : []),
+      ...(payload.about ? [`About guest: ${payload.about}`] : []),
+      ...(payload.crewName ? [`Crew member: ${payload.crewName}${payload.crewRole ? ` (${payload.crewRole})` : ''}`, `Reasons: ${payload.reasons.join('; ')}`] : []),
+      ...(payload.department ? [`Department: ${payload.department}`, `Score: ${payload.score}/10`, '', 'Please follow up with this guest today, while they are still here.'] : []),
       ...(scores.length ? ['', ...scores.map(item => `${item.value <= LOW_SCORE ? '!! ' : '   '}${item.value}/10  ${item.question.text}`), ...questions.filter(question => question.optional && payload.scores[question.id] === undefined).map(question => `   skipped  ${question.text}`)] : []),
       ...(low.length ? ['', 'Scores of 6 or below are marked !! and need a call from the manager today.'] : []),
       ...(payload.message || payload.comment ? ['', payload.message || payload.comment] : []),
