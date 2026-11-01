@@ -214,3 +214,62 @@ img { display: block; width: 100%; }
   .contact-form-row { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+
+/* How it works and Security pages */
+.trust-hero { padding: clamp(52px,7vw,96px) clamp(22px,5vw,72px) clamp(36px,5vw,64px); text-align: center; }
+.trust-hero h1 { max-width: 880px; margin: 0 auto 20px; font-size: clamp(38px,4.4vw,64px); line-height: 1.05; letter-spacing: -.048em; font-weight: 400; text-wrap: balance; }
+.trust-intro { max-width: 740px; margin: 0 auto; color: var(--muted); font-size: clamp(16px,1.15vw,19px); line-height: 1.7; }
+.trust-jump { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 10px; margin: 34px auto 0; max-width: 860px; }
+.trust-jump a { padding: 9px 15px; border: 1px solid var(--line); border-radius: 999px; font-size: 12px; letter-spacing: .04em; color: var(--ink); text-decoration: none; transition: border-color .2s ease, background .2s ease; }
+.trust-jump a:hover { border-color: var(--accent); background: rgba(128,83,49,.06); }
+.trust-block { width: min(1120px,100%); margin: 0 auto; padding: clamp(52px,6vw,88px) 22px; border-top: 1px solid var(--line); scroll-margin-top: 24px; }
+.trust-block > h2, .trust-cruise > h2 { max-width: 780px; margin: 0 0 14px; font-size: clamp(28px,3vw,42px); line-height: 1.1; letter-spacing: -.04em; font-weight: 400; text-wrap: balance; }
+.trust-lead { max-width: 740px; margin: 0 0 34px; color: var(--muted); font-size: 16px; line-height: 1.7; }
+.trust-sub { margin: 36px 0 14px; font-size: 20px; font-weight: 400; letter-spacing: -.02em; }
+.trust-two, .trust-three { display: grid; gap: 18px; margin-top: 8px; }
+.trust-two { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.trust-three { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.trust-two article, .trust-three article { min-width: 0; padding: 26px clamp(18px,2.4vw,30px); border: 1px solid var(--line); border-radius: 16px; background: rgba(255,255,255,.55); }
+.trust-two small, .trust-three small { display: block; margin-bottom: 12px; color: var(--accent); font-size: 10px; letter-spacing: .18em; font-weight: 600; }
+.trust-two h3, .trust-three h3 { margin: 0 0 10px; font-size: 21px; line-height: 1.2; font-weight: 400; letter-spacing: -.025em; }
+.trust-two p, .trust-three p, .trust-two li, .trust-three li { color: var(--muted); font-size: 14.5px; line-height: 1.65; }
+.trust-two p, .trust-three p { margin: 0; }
+.trust-two ul, .trust-three ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+.trust-three a { display: inline-block; margin-top: 16px; font-size: 12px; letter-spacing: .08em; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); }
+.trust-three a:hover { border-color: var(--accent); }
+.trust-glance article { background: transparent; }
+.trust-note { max-width: 820px; margin: 26px 0 0; color: var(--muted); font-size: 14px; line-height: 1.65; }
+.trust-note b { color: var(--ink); font-weight: 600; }
+.trust-flow { display: flex; flex-wrap: wrap; align-items: stretch; justify-content: center; gap: 10px; margin-top: 30px; }
+.trust-flow > div { flex: 1 1 170px; max-width: 240px; padding: 18px 16px; border: 1px solid var(--line); border-radius: 14px; background: #fff; display: grid; gap: 6px; text-align: center; }
+.trust-flow b { font-size: 15px; font-weight: 600; }
+.trust-flow span { color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+.trust-flow i { align-self: center; color: var(--accent); font-style: normal; font-size: 20px; }
+.trust-steps { list-style: none; counter-reset: step; margin: 0 0 8px; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.trust-steps li { counter-increment: step; display: grid; grid-template-columns: 44px minmax(0,1fr); column-gap: 14px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.trust-steps li::before { content: counter(step, decimal-leading-zero); grid-row: span 2; color: var(--accent); font-size: 11px; letter-spacing: .16em; padding-top: 4px; }
+.trust-steps b { font-size: 17px; font-weight: 500; letter-spacing: -.01em; }
+.trust-steps span { color: var(--muted); font-size: 15px; line-height: 1.65; }
+.trust-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.55); }
+.trust-table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: 14.5px; line-height: 1.55; }
+.trust-table th, .trust-table td { padding: 14px 18px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.trust-table thead th { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.trust-table tbody th { font-weight: 500; color: var(--ink); }
+.trust-table td { color: var(--muted); }
+.trust-table tbody tr:last-child th, .trust-table tbody tr:last-child td { border-bottom: 0; }
+.trust-chip { display: inline-block; padding: 4px 11px; border-radius: 999px; font-size: 12px; line-height: 1.4; }
+.trust-chip--done { background: rgba(47,107,79,.12); color: #2f6b4f; }
+.trust-chip--open { background: rgba(128,83,49,.12); color: #805331; }
+.trust-cta { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 12px; }
+.trust-cruise { padding: clamp(52px,6vw,88px) 0 0; background: #f4f0e9; border-top: 1px solid var(--line); }
+.trust-cruise > .eyebrow, .trust-cruise > h2, .trust-cruise > .trust-lead { width: min(1120px,100%); max-width: none; margin-left: auto; margin-right: auto; padding: 0 22px; box-sizing: border-box; }
+.trust-cruise > h2 { padding-right: max(22px, 32%); }
+.trust-cruise > .trust-lead { margin-bottom: 0; padding-right: max(22px, 32%); }
+.trust-closing { text-align: left; }
+@media (max-width: 1030px) { .trust-three { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+@media (max-width: 720px) {
+  .trust-two, .trust-three { grid-template-columns: 1fr; }
+  .trust-steps li { grid-template-columns: 34px minmax(0,1fr); }
+  .trust-flow i { transform: rotate(90deg); flex-basis: 100%; text-align: center; }
+  .trust-flow > div { max-width: none; flex-basis: 100%; }
+}

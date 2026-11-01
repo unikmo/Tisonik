@@ -65,6 +65,8 @@ const Footer = () => (
       <a href="/hotel-ancillary-revenue-software/">Ancillary revenue</a>
       <a href="/resort-pilot/">Pilot</a>
       <a href="/contact/">Contact</a>
+      <a href="/integration/">How it works</a>
+      <a href="/security/">Security</a>
       <a href="/privacy/">Privacy</a>
       <a href="/imprint/">Imprint</a>
     </nav>

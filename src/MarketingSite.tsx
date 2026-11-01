@@ -1,4 +1,5 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
+import { HowItWorksPage, SecurityPage } from './TrustPages'
 
 const Arrow = () => <span aria-hidden="true">→</span>
 const contactHref = '/contact/#contact'
@@ -6,7 +7,7 @@ const pilotContactHref = '/pilot/#contact'
 const demoHref = '/product-app/'
 
 type StoryCrop = 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue'
-type PageKey = 'home' | 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue' | 'dashboard' | 'integration' | 'pilot' | 'contact'
+type PageKey = 'home' | 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue' | 'dashboard' | 'integration' | 'security' | 'pilot' | 'contact'
 
 type Detail = {
   eyebrow: string
@@ -18,7 +19,7 @@ type Detail = {
   note?: string
 }
 
-const details: Record<Exclude<PageKey, 'home' | 'contact'>, Detail> = {
+const details: Record<Exclude<PageKey, 'home' | 'contact' | 'security'>, Detail> = {
   passenger: {
     eyebrow: 'PASSENGER EXPERIENCE',
     title: 'Turn a good passenger moment into an anonymous vibe.',
@@ -133,6 +134,7 @@ const pageFromPath = (path: string): PageKey => {
   if (normalized === '/ancillary-revenue' || normalized === '/social-commerce') return 'revenue'
   if (normalized === '/cruise-dashboard') return 'dashboard'
   if (normalized === '/integration') return 'integration'
+  if (normalized === '/security') return 'security'
   if (normalized === '/pilot') return 'pilot'
   if (normalized === '/contact') return 'contact'
   return 'home'
@@ -148,7 +150,7 @@ const Header = ({ page }: { page: PageKey }) => (
       <a href="/crew-recognition/">Recognition</a>
       <a href="/ancillary-revenue/">Ancillary Revenue</a>
     </nav>
-    <div className="header-actions"><a className="header-cta" href={page === 'pilot' ? pilotContactHref : page === 'contact' ? contactHref : demoHref}>{page === 'pilot' ? 'Request a pilot' : page === 'contact' ? 'Contact' : 'View product demo'} <Arrow /></a><a className="menu-link" href="/integration/">How it integrates <span className="menu-lines" aria-hidden="true"><i/><i/><i/></span></a></div>
+    <div className="header-actions"><a className="header-cta" href={page === 'pilot' ? pilotContactHref : page === 'contact' ? contactHref : demoHref}>{page === 'pilot' ? 'Request a pilot' : page === 'contact' ? 'Contact' : 'View product demo'} <Arrow /></a><a className="menu-link" href="/integration/">How it works <span className="menu-lines" aria-hidden="true"><i/><i/><i/></span></a></div>
   </header>
 )
 
@@ -156,7 +158,7 @@ const Footer = () => (
   <footer className="site-footer">
     <div><strong>TISONIK</strong><span>A product of TSquare Ventures LLC</span></div>
     <p>Guest experience activation for cruise lines and all-inclusive hotels &amp; resorts: service recovery, recognition, engagement, discovery and ancillary revenue.</p>
-    <nav className="footer-links" aria-label="Footer navigation"><a href={contactHref}>Contact</a><a href="/imprint/">Imprint</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/cookies/">Cookies</a></nav>
+    <nav className="footer-links" aria-label="Footer navigation"><a href={contactHref}>Contact</a><a href="/imprint/">Imprint</a><a href="/security/">Security</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/cookies/">Cookies</a></nav>
   </footer>
 )
 
@@ -173,7 +175,7 @@ const EntityDefinition = () => (
     <h2 id="what-is-tisonik">Not another app. One experience layer inside the guest journey you already own.</h2>
     <p>Tisonik is a white-label guest-experience interaction layer for cruise lines and all-inclusive hotels and resorts. It fits into the operator’s existing app or digital guest journey without replacing the booking, property-management or commerce stack. The operator retains control of its brand, inventory, pricing, checkout and payment.</p>
     <div className="entity-links" aria-label="Tisonik product areas">
-      <a href="/">Cruise lines</a><a href="/all-inclusive-resorts/">Hotels &amp; resorts</a><a href="/service-recovery/">Service recovery</a><a href="/crew-recognition/">Recognition</a><a href="/ancillary-revenue/">Ancillary revenue</a><a href="/integration/">Cruise integration</a>
+      <a href="/">Cruise lines</a><a href="/all-inclusive-resorts/">Hotels &amp; resorts</a><a href="/service-recovery/">Service recovery</a><a href="/crew-recognition/">Recognition</a><a href="/ancillary-revenue/">Ancillary revenue</a><a href="/integration/">How it works</a><a href="/security/">Security</a>
     </div>
   </section>
 )
@@ -201,7 +203,7 @@ const faqStructuredData = JSON.stringify({
   mainEntity: buyerFaqs.map(([question, answer]) => ({ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } })),
 })
 
-const BuyerReadiness = () => <section className="buyer-readiness" aria-labelledby="buyer-readiness-title"><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqStructuredData }}/><p className="eyebrow">FAQs</p><h2 id="buyer-readiness-title">Frequently asked questions about CruiseConnect.</h2><div className="buyer-readiness-grid">{buyerFaqs.map(([question,answer],index)=><details key={question} open={index===0}><summary><span>{String(index+1).padStart(2,'0')}</span><h3>{question}</h3><i aria-hidden="true">+</i></summary><p>{answer}</p></details>)}</div></section>
+const BuyerReadiness = ({ schema = true }: { schema?: boolean }) => <section className="buyer-readiness" aria-labelledby="buyer-readiness-title">{schema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqStructuredData }}/>}<p className="eyebrow">FAQs</p><h2 id="buyer-readiness-title">Frequently asked questions about CruiseConnect.</h2><div className="buyer-readiness-grid">{buyerFaqs.map(([question,answer],index)=><details key={question} open={index===0}><summary><span>{String(index+1).padStart(2,'0')}</span><h3>{question}</h3><i aria-hidden="true">+</i></summary><p>{answer}</p></details>)}</div></section>
 
 const Home = () => (
   <>
@@ -297,6 +299,11 @@ const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) =>
 }
 
 const DetailPage = ({ page }: { page: Exclude<PageKey, 'home'> }) => {
+  if (page === 'security') return <><SecurityPage /><section className="detail-next"><p className="eyebrow">THE CONNECTED PRODUCT</p><h2>See how this fits into the complete Tisonik experience.</h2><a className="pilot-button" href={demoHref}>View product demo <Arrow /></a></section></>
+  if (page === 'integration') {
+    const cruise = details.integration
+    return <><HowItWorksPage cruiseDetail={<><section className="detail-facts" id="details">{cruise.facts.map((fact,index)=><article key={fact.title}><span>0{index+1}</span><h3>{fact.title}</h3><p>{fact.body}</p></article>)}</section>{cruise.note && <p className="architecture-note">{cruise.note}</p>}<BuyerReadiness schema={false} /></>} /><section className="detail-next"><p className="eyebrow">THE CONNECTED PRODUCT</p><h2>See how this fits into the complete Tisonik experience.</h2><a className="pilot-button" href={demoHref}>View product demo <Arrow /></a></section></>
+  }
   if (page === 'pilot') return <PilotContactForm mode="pilot" />
   if (page === 'contact') return <PilotContactForm mode="contact" />
   const detail = details[page]
@@ -305,7 +312,6 @@ const DetailPage = ({ page }: { page: Exclude<PageKey, 'home'> }) => {
     <section className="detail-facts" id="details">{detail.facts.map((fact,index)=><article key={fact.title}><span>0{index+1}</span><h2>{fact.title}</h2><p>{fact.body}</p></article>)}</section>
     {detail.note && <p className="architecture-note">{detail.note}</p>}
     <EntityDefinition />
-    {page === 'integration' && <BuyerReadiness />}
     <section className="detail-next"><p className="eyebrow">THE CONNECTED PRODUCT</p><h2>See how this fits into the complete Tisonik experience.</h2><a className="pilot-button" href={demoHref}>View product demo <Arrow /></a></section>
   </>
 }

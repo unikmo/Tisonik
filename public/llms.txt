@@ -47,7 +47,8 @@ For all-inclusive hotels and resorts, Tisonik focuses on experience discovery an
 - https://tisonik.com/service-recovery/ — private service recovery
 - https://tisonik.com/engagement/ — passenger engagement
 - https://tisonik.com/ancillary-revenue/ — contextual ancillary-revenue discovery
-- https://tisonik.com/integration/ — integration and offline-first architecture
+- https://tisonik.com/integration/ — how Tisonik and UNIKMO work: guest journey, who sees what, hotels, resorts, cruise lines and other venues, cruise integration detail
+- https://tisonik.com/security/ — data security and privacy: what is held, card-code hashing, access control, hosting providers, retention and status
 - https://tisonik.com/pilot/ — cruise pilot framework
 
 ## Brand
