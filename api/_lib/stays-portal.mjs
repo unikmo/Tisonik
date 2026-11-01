@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { VENUE_TYPES, welcomeEmbedUrl } from './stays.mjs'
-import { crewItemsFromLines } from './stay-connect-config.mjs'
+import { activityItemsFromLines, crewItemsFromLines } from './stay-connect-config.mjs'
 
 const writeRoles = ['tisonik_admin', 'operator_admin']
 // Stays come from UNIKMO, so nobody creates them here. Front desk can work the inbox; only admins can void stays or change settings.
@@ -26,6 +26,7 @@ const settingsSchema = z.object({
   welcomeFromRole: z.string().trim().max(60).nullable().optional(),
   welcomeNote: z.string().trim().max(300).nullable().optional(),
   discoverItems: z.array(z.object({ title: z.string().trim().min(1).max(80), body: z.string().trim().max(300).default('') }).strict()).max(12),
+  activities: z.array(z.object({ title: z.string().trim().min(1).max(60), when: z.string().trim().max(60).default('') }).strict()).max(20).default([]),
   crew: z.array(z.object({ name: z.string().trim().min(1).max(60), role: z.string().trim().max(60).default('') }).strict()).max(40).default([]),
 }).strict()
 
@@ -77,6 +78,7 @@ export async function portalAction(database, userId, rawBody) {
     welcome_note: input.data.welcomeNote || null,
     discover_items: input.data.discoverItems,
     crew_items: crewItemsFromLines(input.data.crew),
+    activity_items: activityItemsFromLines(input.data.activities),
   }, { onConflict: 'tenant_id' })
   if (error) throw error
   return { status: 200, body: { saved: true } }

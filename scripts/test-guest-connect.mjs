@@ -6,7 +6,8 @@ delete process.env.RESEND_API_KEY
 
 const stays = await import('../api/_lib/stays.mjs')
 const { connectAction } = await import('../api/_lib/stay-connect.mjs')
-const { featuresFor, crewItemsFromLines, nameIsSafe } = await import('../api/_lib/stay-connect-config.mjs')
+const { featuresFor, crewItemsFromLines, activityItemsFromLines, nameIsSafe } = await import('../api/_lib/stay-connect-config.mjs')
+const { registerNearby, nearbySchema } = await import('../api/_lib/stay-nearby.mjs')
 
 // In-memory stand-in for the Supabase query builder, with the unique rules of the guest-connect tables.
 const unique = {
@@ -15,12 +16,14 @@ const unique = {
   stay_blocks: [['blocker_profile', 'blocked_profile']],
   crew_recognitions: [['stay_id', 'crew_id', 'service_date']],
   stay_pulses: [['stay_id', 'department', 'service_date']],
+  stay_activity_joins: [['stay_id', 'activity_id', 'service_date']],
 }
 function fakeDatabase() {
-  const tables = { hotel_stay_settings: [], hotel_stay_submissions: [], stay_profiles: [], stay_affirmations: [], stay_meetups: [], stay_blocks: [], crew_recognitions: [], stay_pulses: [] }
+  const tables = { hotel_stay_settings: [], hotel_stay_submissions: [], stay_profiles: [], stay_affirmations: [], stay_meetups: [], stay_blocks: [], crew_recognitions: [], stay_pulses: [], stay_activity_joins: [], hotel_stays: [] }
   let serial = 0
   return {
     tables,
+    async rpc() { return { data: true, error: null } },
     from(name) {
       const rows = tables[name]
       const filters = []
@@ -231,5 +234,93 @@ assert.match(mails.at(-1).text, /Crew member: Ken Ito \(Cabin steward\)/)
 await stays.notifyHotel(database, ann, 'report', { about: 'Ann', message: 'Behaviour felt wrong' }, 'r4')
 assert.match(mails.at(-1).subject, /reported another guest/)
 assert.ok(!mails.at(-1).text.includes('undefined'))
+
+// ---- Part two: shared activity, nearby, did-we-fix-it, and the voyage summary ----
+const dan = mkStay('dan'), eve = mkStay('eve')
+for (const stay of [ann, dan, eve, bo]) database.tables.hotel_stays.push(stay)
+database.tables.hotel_stay_settings[0].unikmo_hotel_id = 'SHIP-T'
+database.tables.hotel_stay_settings[0].activity_items = activityItemsFromLines([{ title: 'Trivia night', when: '19:00' }, { title: 'Trivia night' }])
+assert.deepEqual(database.tables.hotel_stay_settings[0].activity_items.map(item => item.id), ['trivia-night', 'trivia-night-2'])
+ok(await connectAction(database, ann, 'profile.save', profile('Ann', { nearby: true }), day))
+ok(await connectAction(database, dan, 'profile.save', profile('Dan', { nearby: true }), day))
+ok(await connectAction(database, eve, 'profile.save', profile('Eve'), day))
+assert.equal(database.tables.stay_profiles.find(row => row.stay_id === 'eve').nearby_on, false)
+assert.equal(database.tables.stay_profiles.find(row => row.stay_id === 'ann').nearby_on, true)
+assert.equal((await stays.guestSession(database, ann, day)).connect.activities[0].title, 'Trivia night')
+
+// Shared activity: you must have joined it yourself, and only joins from the last two days count.
+no(await connectAction(database, ann, 'activity.join', { activityId: 'karaoke' }, day), 404, 'not_found')
+no(await connectAction(database, ann, 'people.list', { activity: 'karaoke' }, day), 422)
+assert.equal(ok(await connectAction(database, ann, 'people.list', { activity: 'trivia-night' }, day)).body.joined, false)
+ok(await connectAction(database, ann, 'activity.join', { activityId: 'trivia-night' }, day))
+ok(await connectAction(database, ann, 'activity.join', { activityId: 'trivia-night' }, day))
+assert.equal(database.tables.stay_activity_joins.length, 1, 'joining twice is one join')
+ok(await connectAction(database, dan, 'activity.join', { activityId: 'trivia-night' }, day))
+database.tables.stay_activity_joins.push({ stay_id: 'eve', tenant_id: tenant, activity_id: 'trivia-night', service_date: '2026-11-05' })
+assert.deepEqual(ok(await connectAction(database, ann, 'people.list', { activity: 'trivia-night' }, day)).body.people.map(person => person.name), ['Dan'])
+
+// Nearby: only guests who opted in and whose phones can hear each other, with a signal under ten minutes old.
+assert.equal(nearbySchema.safeParse({ hotelId: 'SHIP-T', guestReference: 'ann', token: 'short', seen: [] }).success, false)
+assert.equal(nearbySchema.safeParse({ hotelId: 'SHIP-T', guestReference: 'ann', token: 'ANNTOKEN1', seen: ['DANTOKEN1'], extra: 1 }).success, false)
+assert.equal(ok(await connectAction(database, ann, 'people.list', { mode: 'nearby' }, day)).body.nearbyReady, false, 'no signal yet')
+assert.equal((await registerNearby(database, { hotelId: 'SHIP-T', guestReference: 'eve', token: 'EVETOKEN1', seen: ['ANNTOKEN1'] }, day)).ok, false, 'a guest who did not opt in is ignored')
+assert.equal((await registerNearby(database, { hotelId: 'NOPE', guestReference: 'ann', token: 'ANNTOKEN1', seen: [] }, day)).ok, false)
+assert.equal((await registerNearby(database, { hotelId: 'SHIP-T', guestReference: 'ann', token: 'ANNTOKEN1', seen: ['DANTOKEN1', 'EVETOKEN1', 'ANNTOKEN1'] }, day)).ok, true)
+assert.equal((await registerNearby(database, { hotelId: 'SHIP-T', guestReference: 'dan', token: 'DANTOKEN1', seen: ['ANNTOKEN1'] }, day)).ok, true)
+assert.ok(!database.tables.stay_profiles.find(row => row.stay_id === 'ann').nearby_tokens.includes('ANNTOKEN1'), 'own token is dropped from the heard list')
+const heard = ok(await connectAction(database, ann, 'people.list', { mode: 'nearby' }, day)).body
+assert.equal(heard.nearbyReady, true)
+assert.deepEqual(heard.people.map(person => person.name), ['Dan'], 'Eve did not opt in so is not shown')
+const later = new Date(day.getTime() + 11 * 60 * 1000)
+assert.equal(ok(await connectAction(database, ann, 'people.list', { mode: 'nearby' }, later)).body.nearbyReady, false, 'a signal older than ten minutes is ignored')
+assert.equal((await stays.guestSession(database, ann, day)).profile.nearbyLive, true)
+ok(await connectAction(database, dan, 'profile.save', profile('Dan', { nearby: false }), day))
+assert.deepEqual(ok(await connectAction(database, ann, 'people.list', { mode: 'nearby' }, day)).body.people, [], 'turning Nearby off hides the guest')
+
+// Did we fix it? Only the guest's own resolved private message, once. Not fixed reopens it and tells the desk.
+const sentMsg = await stays.submitToStay(database, ann, 'private', { message: 'The shower in my cabin is broken.' }, day)
+assert.equal(sentMsg.ok, true)
+assert.deepEqual((await stays.guestSession(database, ann, day)).recovery, [], 'nothing to check while it is still open')
+no(await connectAction(database, ann, 'recovery.answer', { submissionId: sentMsg.submissionId, answer: 'fixed' }, day), 404, 'not_found')
+const message = database.tables.hotel_stay_submissions.find(row => row.id === sentMsg.submissionId)
+message.status = 'resolved'
+const prompts = (await stays.guestSession(database, ann, day)).recovery
+assert.equal(prompts.length, 1)
+assert.match(prompts[0].about, /shower/)
+no(await connectAction(database, dan, 'recovery.answer', { submissionId: sentMsg.submissionId, answer: 'fixed' }, day), 404, 'not_found')
+const reopened = ok(await connectAction(database, ann, 'recovery.answer', { submissionId: sentMsg.submissionId, answer: 'not_fixed' }, day))
+assert.equal(reopened.body.reopened, true)
+assert.equal(reopened.notify.kind, 'recheck')
+assert.equal(message.status, 'new')
+assert.equal(message.recheck, 'not_fixed')
+no(await connectAction(database, ann, 'recovery.answer', { submissionId: sentMsg.submissionId, answer: 'fixed' }, day), 404, 'not_found')
+message.status = 'resolved'
+message.recheck = null
+ok(await connectAction(database, ann, 'recovery.answer', { submissionId: sentMsg.submissionId, answer: 'fixed' }, day))
+assert.equal(message.recheck, 'fixed')
+assert.equal(message.status, 'resolved')
+no(await connectAction(database, ann, 'recovery.answer', { submissionId: sentMsg.submissionId, answer: 'fixed' }, day), 409, 'already_answered')
+assert.deepEqual((await stays.guestSession(database, ann, day)).recovery, [])
+no(await connectAction(database, ann, 'recovery.answer', { submissionId: sentMsg.submissionId, answer: 'fixed' }, new Date('2026-11-20T10:00:00Z')), 409, 'not_open_for_this_stay')
+
+// The summary appears only near the end and after checkout, counts only the guest's own activity, and names no one.
+assert.equal((await stays.guestSession(database, ann, day)).summary, null)
+const ending = (await stays.guestSession(database, ann, new Date('2026-11-17T10:00:00Z'))).summary
+assert.equal(ending.days, 9)
+assert.equal(ending.crewRecognised, 3)
+assert.equal(ending.complimentsSent, 3)
+assert.equal(ending.complimentsReceived, 0)
+assert.equal(ending.topCompliment, null)
+assert.ok(ending.scoresGiven >= 3)
+const boEnding = (await stays.guestSession(database, bo, new Date('2026-11-20T10:00:00Z'))).summary
+assert.ok(boEnding.complimentsReceived >= 2)
+assert.equal(boEnding.topCompliment, 'You made us laugh')
+assert.ok(!JSON.stringify(boEnding).includes('Ann'), 'the summary names no one')
+const hotelEnding = (await stays.guestSession(database, hotelStay, new Date('2026-11-17T10:00:00Z'))).summary
+assert.equal(hotelEnding.complimentsSent, 0)
+assert.equal(hotelEnding.crewRecognised, 1)
+await stays.notifyHotel(database, ann, 'recheck', { message: 'The shower in my cabin is broken.' }, 'r5')
+assert.match(mails.at(-1).subject, /NOT FIXED/)
+assert.match(mails.at(-1).text, /shower/)
 
 console.log('guest connect checks passed')

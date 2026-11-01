@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { stayPhase } from './stays.mjs'
-import { AFFIRMATIONS, AVATARS, INTERESTS, LIMITS, PLACES, REASONS, departmentsFor, featuresFor, nameIsSafe } from './stay-connect-config.mjs'
+import { AFFIRMATIONS, AVATARS, INTERESTS, LIMITS, PLACES, REASONS, departmentsFor, featuresFor, nameIsSafe, nearbyFresh } from './stay-connect-config.mjs'
 
 const ids = list => list.map(item => item.id)
 const labelOf = (list, id) => list.find(item => item.id === id)?.label || id
@@ -16,8 +16,11 @@ const schemas = {
     interests: z.array(z.enum(ids(INTERESTS))).max(LIMITS.interestsMax).refine(list => new Set(list).size === list.length),
     adult: z.literal(true),
     discoverable: z.boolean(),
+    nearby: z.boolean().default(false),
   }).strict(),
-  'people.list': z.object({ interest: z.enum(ids(INTERESTS)).optional() }).strict(),
+  'people.list': z.object({ interest: z.enum(ids(INTERESTS)).optional(), activity: z.string().max(40).optional(), mode: z.literal('nearby').optional() }).strict(),
+  'activity.join': z.object({ activityId: z.string().max(40) }).strict(),
+  'recovery.answer': z.object({ submissionId: uuid, answer: z.enum(['fixed', 'not_fixed']) }).strict(),
   'affirm.send': z.object({ to: uuid, label: z.enum(ids(AFFIRMATIONS)) }).strict(),
   'affirm.respond': z.object({ id: uuid, response: z.enum(['acknowledge', 'ignore']) }).strict(),
   'meet.propose': z.object({ affirmationId: uuid, place: z.enum(ids(PLACES)) }).strict(),
@@ -33,12 +36,12 @@ const reportReasons = { uncomfortable: 'Made me uncomfortable', behaviour: 'Beha
 export const LOW_PULSE = 6
 
 async function profileOf(database, stayId) {
-  const { data, error } = await database.from('stay_profiles').select('id, stay_id, tenant_id, display_name, avatar, interests, adult_confirmed, discoverable, expires_on').eq('stay_id', stayId).maybeSingle()
+  const { data, error } = await database.from('stay_profiles').select('id, stay_id, tenant_id, display_name, avatar, interests, adult_confirmed, discoverable, expires_on, nearby_on, nearby_tokens, nearby_at').eq('stay_id', stayId).maybeSingle()
   if (error) throw error
   return data
 }
 
-export const publicProfile = profile => profile ? { id: profile.id, name: profile.display_name, avatar: profile.avatar, interests: profile.interests || [], discoverable: !!profile.discoverable } : null
+export const publicProfile = profile => profile ? { id: profile.id, name: profile.display_name, avatar: profile.avatar, interests: profile.interests || [], discoverable: !!profile.discoverable, nearby: !!profile.nearby_on } : null
 
 async function blockedWith(database, me) {
   const [mine, theirs] = await Promise.all([
@@ -61,22 +64,59 @@ async function profilesByIds(database, list) {
   return new Map((data || []).map(row => [row.id, row]))
 }
 
-async function listPeople(database, me, input, now) {
+async function listPeople(database, me, input, now, settings) {
   const blocked = await blockedWith(database, me)
-  const { data, error } = await database.from('stay_profiles').select('id, tenant_id, display_name, avatar, interests, adult_confirmed, discoverable, expires_on').eq('tenant_id', me.tenant_id).eq('discoverable', true).limit(500)
+  const { data, error } = await database.from('stay_profiles').select('id, stay_id, tenant_id, display_name, avatar, interests, adult_confirmed, discoverable, expires_on, nearby_on, proximity_token, nearby_at').eq('tenant_id', me.tenant_id).eq('discoverable', true).limit(500)
   if (error) throw error
   const { data: sent } = await database.from('stay_affirmations').select('to_profile').eq('from_profile', me.id).eq('service_date', dateOf(now))
   const sentTo = new Set((sent || []).map(row => row.to_profile))
   const mine = new Set(me.interests || [])
+  let allowed = null
+  if (input.mode === 'nearby') {
+    // Both guests opted in to Nearby, and the ship's app has recently said they can hear each other.
+    if (!me.nearby_on || !nearbyFresh(me.nearby_at, now)) return done({ people: [], nearbyReady: false })
+    const heard = new Set(me.nearby_tokens || [])
+    allowed = other => other.nearby_on && nearbyFresh(other.nearby_at, now) && heard.has(other.proximity_token)
+  } else if (input.activity) {
+    // Guests who took part in the same listed activity as you, today or in the last two days.
+    if (!(settings?.activity_items || []).some(item => item.id === input.activity)) return refuse(422, 'invalid_request')
+    const cutoff = dateOf(new Date(now.getTime() - LIMITS.activityLookbackDays * 86_400_000))
+    const { data: joins, error: joinError } = await database.from('stay_activity_joins').select('stay_id, service_date').eq('tenant_id', me.tenant_id).eq('activity_id', input.activity)
+    if (joinError) throw joinError
+    const recent = (joins || []).filter(row => row.service_date >= cutoff)
+    const together = new Set(recent.map(row => row.stay_id))
+    if (!together.has(me.stay_id)) return done({ people: [], joined: false })
+    allowed = other => together.has(other.stay_id)
+  }
   const people = (data || [])
-    .filter(other => visibleTo(other, me, blocked, now) && (!input.interest || (other.interests || []).includes(input.interest)))
+    .filter(other => visibleTo(other, me, blocked, now) && (!input.interest || (other.interests || []).includes(input.interest)) && (!allowed || allowed(other)))
     .map(other => {
       const shared = (other.interests || []).filter(interest => mine.has(interest))
       return { id: other.id, name: other.display_name, avatar: other.avatar, interests: other.interests || [], shared, sentToday: sentTo.has(other.id) }
     })
     .sort((a, b) => b.shared.length - a.shared.length || a.name.localeCompare(b.name))
     .slice(0, 40)
-  return done({ people })
+  return done(input.mode === 'nearby' ? { people, nearbyReady: true } : { people })
+}
+
+async function joinActivity(database, stay, me, settings, input, now) {
+  const activity = (settings?.activity_items || []).find(item => item.id === input.activityId)
+  if (!activity) return refuse(404, 'not_found')
+  const { error } = await database.from('stay_activity_joins').insert({ stay_id: stay.id, tenant_id: stay.tenant_id, activity_id: activity.id, service_date: dateOf(now) }).select('stay_id').single()
+  if (error && error.code !== '23505') throw error
+  return done({ joined: true })
+}
+
+// "Did we fix it?" Only the guest's own private message, only after the desk marked it resolved, only once.
+async function answerRecovery(database, stay, input, now) {
+  const { data: row, error } = await database.from('hotel_stay_submissions').select('id, stay_id, kind, status, recheck, payload').eq('id', input.submissionId).maybeSingle()
+  if (error) throw error
+  if (!row || row.stay_id !== stay.id || row.kind !== 'private' || row.status !== 'resolved') return refuse(404, 'not_found')
+  if (row.recheck) return refuse(409, 'already_answered')
+  const fixed = input.answer === 'fixed'
+  const { error: updateError } = await database.from('hotel_stay_submissions').update({ recheck: input.answer, rechecked_at: now.toISOString(), ...(fixed ? {} : { status: 'new' }) }).eq('id', row.id)
+  if (updateError) throw updateError
+  return done({ answered: true, reopened: !fixed }, fixed ? null : { kind: 'recheck', payload: { message: String(row.payload?.message || '').slice(0, 300) }, id: row.id })
 }
 
 async function inbox(database, me, now) {
@@ -207,7 +247,7 @@ export async function connectAction(database, stay, action, data, now = new Date
   const parsed = schema.safeParse(data ?? {})
   if (!parsed.success) return refuse(422, 'invalid_request')
   const input = parsed.data
-  const { data: settings, error } = await database.from('hotel_stay_settings').select('venue_type, crew_items').eq('tenant_id', stay.tenant_id).maybeSingle()
+  const { data: settings, error } = await database.from('hotel_stay_settings').select('venue_type, crew_items, activity_items').eq('tenant_id', stay.tenant_id).maybeSingle()
   if (error) throw error
   const venueType = settings?.venue_type || 'hotel'
   const features = featuresFor(venueType)
@@ -223,11 +263,16 @@ export async function connectAction(database, stay, action, data, now = new Date
     return submitPulse(database, stay, venueType, input, now)
   }
 
+  if (action === 'recovery.answer') {
+    if (!live) return refuse(409, 'not_open_for_this_stay')
+    return answerRecovery(database, stay, input, now)
+  }
+
   // Everything below is guest-to-guest and exists only where the venue has it switched on, while the stay is open.
   if (!features.people || !live) return refuse(409, 'not_open_for_this_stay')
   const existing = await profileOf(database, stay.id)
   if (action === 'profile.save') {
-    const row = { tenant_id: stay.tenant_id, display_name: input.displayName, avatar: input.avatar, interests: input.interests, adult_confirmed: true, discoverable: input.discoverable, expires_on: stay.valid_to, updated_at: now.toISOString() }
+    const row = { tenant_id: stay.tenant_id, display_name: input.displayName, avatar: input.avatar, interests: input.interests, adult_confirmed: true, discoverable: input.discoverable, nearby_on: input.nearby && input.discoverable, expires_on: stay.valid_to, updated_at: now.toISOString() }
     if (existing) {
       const { error: updateError } = await database.from('stay_profiles').update(row).eq('id', existing.id)
       if (updateError) throw updateError
@@ -239,7 +284,8 @@ export async function connectAction(database, stay, action, data, now = new Date
   }
   const me = existing
   if (!me || !me.adult_confirmed || !me.discoverable) return refuse(409, 'profile_required')
-  if (action === 'people.list') return listPeople(database, me, input, now)
+  if (action === 'people.list') return listPeople(database, me, input, now, settings)
+  if (action === 'activity.join') return joinActivity(database, stay, me, settings, input, now)
   if (action === 'inbox') return inbox(database, me, now)
   if (action === 'affirm.send') return sendAffirmation(database, me, input, now)
   if (action === 'affirm.respond') return respondAffirmation(database, me, input)

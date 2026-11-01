@@ -75,7 +75,22 @@ export const featuresFor = venueType => ({
   pulse: true,
 })
 
-export const LIMITS = { affirmationsPerDay: 10, reportsPerStay: 5, interestsMax: 10 }
+export const LIMITS = { affirmationsPerDay: 10, reportsPerStay: 5, interestsMax: 10, activityLookbackDays: 2 }
+
+// A nearby signal older than this is ignored.
+export const NEARBY_FRESH_MS = 10 * 60 * 1000
+export const nearbyFresh = (at, now) => Boolean(at) && now.getTime() - Date.parse(at) <= NEARBY_FRESH_MS && Date.parse(at) <= now.getTime() + 60_000
+
+export const activityItemsFromLines = lines => {
+  const seen = new Map()
+  return lines.slice(0, 20).map(line => {
+    const title = String(line.title || '').trim()
+    const base = slug(title) || 'activity'
+    const count = (seen.get(base) || 0) + 1
+    seen.set(base, count)
+    return { id: count > 1 ? `${base}-${count}` : base, title, when: String(line.when || '').trim() }
+  })
+}
 
 // Names are shown to other guests, so they may not carry contact details or links.
 export const nameIsSafe = value => !/\d{3,}|@|https?:|www\.|\.com\b/i.test(value)
