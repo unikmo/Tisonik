@@ -1,25 +1,31 @@
 User-agent: *
 Allow: /
 Disallow: /product-app/
+Disallow: /classic-home/
 
 User-agent: GPTBot
 Allow: /
 Disallow: /product-app/
+Disallow: /classic-home/
 
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /product-app/
+Disallow: /classic-home/
 
 User-agent: ChatGPT-User
 Allow: /
 Disallow: /product-app/
+Disallow: /classic-home/
 
 User-agent: ClaudeBot
 Allow: /
 Disallow: /product-app/
+Disallow: /classic-home/
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /product-app/
+Disallow: /classic-home/
 
 Sitemap: https://tisonik.com/sitemap.xml
