@@ -251,10 +251,20 @@ textarea{min-height:120px;resize:vertical}
   }
   function journeyBar(j){return el('div',{class:'journey'},[el('span',{text:(state.venueType==='ship'?'Day ':'Day ')+j.day+' of '+j.total}),el('div',{class:'bar','aria-hidden':'true'},[el('i',{style:'width:'+Math.round(j.day/j.total*100)+'%'})])])}
 
+  function ratingCard(){
+    var ship=state.venueType==='ship'
+    var r=el('section',{class:'card hero','aria-label':'Rate your '+(ship?'voyage':'stay')},[el('p',{class:'kicker',text:ship?'Before you disembark':'Before you leave'}),el('h2',{text:ship?'Rate your voyage':'Rate your stay'}),el('p',{class:'sub',text:'Five short questions, about a minute. It goes to the '+(ship?'hotel director':'manager')+' and helps the whole team.'})])
+    var open=el('button',{type:'button',class:'btn light',style:'margin-top:16px',text:'Start'})
+    open.addEventListener('click',function(){sheet(ship?'Rate your voyage':'Rate your stay',ratingForm)})
+    r.appendChild(open)
+    return r
+  }
+
   function viewToday(){
     var t=state.tiles,f=state.features,ship=state.venueType==='ship',v=el('div',{class:'view'})
     if(t.welcome&&state.welcome)v.appendChild(welcomeCard())
     else if(state.journey&&state.tiles.phase==='during'){var c=el('section',{class:'card hero'},[el('p',{class:'kicker',text:ship?'Your voyage':'Your stay'}),el('h2',{text:ship?'Make it a good one':'Make yourself at home'}),journeyBar(state.journey)]);v.appendChild(c)}
+    if(t.rating)v.appendChild(ratingCard())
     if(state.recovery&&state.recovery.length){
       state.recovery.forEach(function(r){
         var card=el('section',{class:'card','aria-label':'Did we fix it?'},[el('p',{class:'kicker',text:'Following up'}),el('h3',{text:'Did we fix it?'}),el('p',{class:'sub',text:'You told us: “'+r.about+(r.about.length>=90?'…':'')+'”'})])
@@ -434,12 +444,7 @@ textarea{min-height:120px;resize:vertical}
       })
       v.appendChild(card)
     }
-    if(t.rating){
-      var r=el('section',{class:'card hero'},[el('p',{class:'kicker',text:ship?'Before you disembark':'Before you leave'}),el('h2',{text:ship?'Rate your voyage':'Rate your stay'}),el('p',{class:'sub',text:'Five quick questions. It goes to the '+(ship?'hotel director':'manager')+' and helps the whole team.'})])
-      var open=el('button',{type:'button',class:'btn light',style:'margin-top:16px',text:'Start'})
-      open.addEventListener('click',function(){sheet(ship?'Rate your voyage':'Rate your stay',ratingForm)})
-      r.appendChild(open);v.appendChild(r)
-    }
+    if(t.rating)v.appendChild(ratingCard())
     if(!v.firstChild)v.appendChild(el('div',{class:'empty'},[el('b',{text:'Nothing to rate yet'}),el('span',{text:'This opens when your '+(ship?'voyage':'stay')+' begins.'})]))
     return v
   }

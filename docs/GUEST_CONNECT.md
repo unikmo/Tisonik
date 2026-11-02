@@ -13,7 +13,7 @@ The rules come from `docs/PRODUCT.md` (Cruise Connection). Code: `api/_lib/stay-
 | Daily pulse by department | Yes | Yes | 1 to 10, once per department per day. Six ship areas, five hotel areas. A score of 6 or below emails the desk the same day. 9 or above invites a recognition |
 | Need help? Let us fix it | Yes | Yes | During the stay. Goes to guest services or reception |
 | Share feedback | Yes | Yes | After checkout only |
-| Rate your voyage or stay | Yes | Yes | Five questions, last day and after |
+| Rate your voyage or stay | Yes | Yes | Five questions, from the day before departure and after |
 | Discover (venue recommendations) and keepsake | Yes | Yes | |
 | **Meet people** (opt-in profile, discover by interest) | **Yes** | **No** | Adults only, first name and preset avatar, never a photo, contact or cabin |
 | **Compliments** between guests | **Yes** | **No** | Six preset lines. One per guest pair per day, ten a day. Recipient can say thanks or pass, and the sender is never told about a pass |

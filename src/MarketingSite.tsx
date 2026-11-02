@@ -211,9 +211,9 @@ const BuyerReadiness = ({ schema = true }: { schema?: boolean }) => <section cla
 // The film and the crew photo share one frame. The film starts by itself unless the visitor prefers reduced motion, and can always be paused.
 const filmHooks: [string, string][] = [
   ['No new app required.', 'Works inside the app you already have, or from the card on any phone.'],
-  ['A welcome that becomes a keepsake.', 'Cruise Director greeting on day one. Digital memories they take home.'],
+  ['A welcome that becomes a keepsake.', 'Cruise Director greeting on day one. Their ship moments go to the keepsake when they leave.'],
   ['Offers that sell themselves.', '“Your friend Dee is going. 3 places left.”'],
-  ['Hear it before the review.', 'Guests rate the moment it ends. You can still fix it.'],
+  ['Hear it before the review.', 'Five short questions the day before guests leave, pushed by your Cruise Director and animation team. You can still fix it.'],
 ]
 const filmAlt = 'A card on the bed, a welcome from the Cruise Director, a friend going to dinner with three places left, a show rated as it ends, crew thanked by name, and a low score reaching the desk.'
 
@@ -284,7 +284,7 @@ const Home = () => (
     <Section id="service-recovery" eyebrow="SERVICE RECOVERY" title="Fix it while it still matters." crop="recovery" alt="Cruise crew member returning a child’s toy beside their parent" shot="/media/portal-service-recovery.jpg" shotAlt="The guest page: a low stateroom score, answered with thanks and a promise that the team has been told"><p>Guests signal friction discreetly. You respond before the experience is over.</p></Section>
     <Section id="engagement" eyebrow="LIVE EXPERIENCE FEEDBACK" title="Improve events while the sailing is still underway." crop="engagement" alt="Multigenerational passengers enjoying an inclusive deck activity" reverse shot="/media/portal-live-rating.jpg" shotAlt="The guest page: Just finished, how was the evening show, five one-tap answers"><p>After a live event, ask three to five structured questions with prepared response blocks. Leaders see feedback immediately; the cruise line decides which aggregated ratings to publish.</p></Section>
     <Section id="ancillary-revenue" eyebrow="ANCILLARY REVENUE" title="Make relevance commercial." crop="revenue" alt="A multicultural family choosing an onboard experience together" shot="/media/portal-offers-keepsake.jpg" shotAlt="The guest page: Chef table dinner, your friend Dee is going, 3 places left, and a button to hold a place"><p>When guests are already engaged, the right experiences appear naturally. Checkout and payment stay with you.</p></Section>
-    <Section id="keepsake" eyebrow="THE KEEPSAKE · LESS PAPER" title="Less disposable print. A keepsake that lasts." crop="keepsake" alt="A UNIKMO card standing on a made-up cabin bed" reverse><p>One card replaces the paper pile. Guests keep the welcome — and the memories — long after they leave the ship.</p></Section>
+    <Section id="keepsake" eyebrow="THE KEEPSAKE · LESS PAPER" title="Less disposable print. A keepsake that lasts." crop="keepsake" alt="A UNIKMO card standing on a made-up cabin bed" reverse><p>One card replaces the paper pile. When guests leave, their ship moments go to their UNIKMO keepsake. Curated moments from the ship are an optional extra.</p></Section>
     <EntityDefinition />
     <section className="quiet-proof"><p className="eyebrow">BUILT TO FIT THE CRUISE JOURNEY</p><div className="proof-grid"><article><strong>Inside the existing app</strong><span>No competing destination for the guest.</span></article><article><strong>Immediate operational feedback</strong><span>Structured event ratings reach leaders while they can still act.</span></article><article><strong>Revenue evidence without identity</strong><span>Confirmed booking value is attributed through opaque references and aggregated outcomes.</span></article></div></section>
     <BuyerReadiness />

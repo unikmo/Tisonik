@@ -120,14 +120,15 @@ export function tilesFor(stay, now = new Date()) {
   const phase = stayPhase(stay, now)
   const live = phase === 'during'
   const after = phase === 'after_checkout'
-  const lastDay = live && day(now) === stay.valid_to
+  // Opens the day before departure so a problem can still be put right while the guest is here.
+  const ratingOpen = live && day(now) >= addDays(stay.valid_to, -1)
   return {
     phase,
     thankYou: live || after,
     welcome: live,
     private: live,
     feedback: after,
-    rating: lastDay || after,
+    rating: ratingOpen || after,
     discover: phase !== 'voided',
     keepsake: phase !== 'voided',
   }
