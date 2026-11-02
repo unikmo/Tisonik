@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 
 const Arrow = () => <span aria-hidden="true">→</span>
 
@@ -211,27 +211,58 @@ const StayRatingDemo = () => {
   </div>
 }
 
+const filmHooks: [string, string][] = [
+  ['No new app required.', 'Works inside the app you already have, or from the card on any phone.'],
+  ['A welcome that becomes a keepsake.', 'A greeting from your General Manager on day one, on a card guests take home.'],
+  ['Offers that sell themselves.', '“Tonight’s tasting menu. 5 places left.”'],
+  ['Fix it before the review.', 'A low score reaches reception straight away, while the guest is still in the building.'],
+]
+const filmAlt = 'A card on the bed, a welcome from the General Manager, a tasting menu with five places left, an event rated as it ends, a team member recognised, and a low score reaching reception.'
+
+const HotelFilm = () => {
+  const [slide, setSlide] = useState<'film' | 'card'>('film')
+  const [playing, setPlaying] = useState(false)
+  const video = useRef<HTMLVideoElement>(null)
+  useEffect(() => {
+    const element = video.current
+    if (slide !== 'film' || !element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    element.play().catch(() => {})
+  }, [slide])
+  const toggle = () => {
+    const element = video.current
+    if (!element) return
+    if (element.paused) element.play().catch(() => {})
+    else element.pause()
+  }
+  return <section className="film-top" aria-label="What Tisonik does">
+    <div className="film-copy">
+      <p className="film-wordmark">Tisonik<span>.</span></p>
+      <h1 className="film-tagline">The guest experience layer for hotels.</h1>
+      <ul className="film-hooks">{filmHooks.map(([line, more]) => <li key={line}><i aria-hidden="true" /><span><strong>{line}</strong> {more}</span></li>)}</ul>
+      <div className="film-cta"><a className="resort-primary-button" href="#pilot">Start with one property <Arrow /></a><a className="resort-text-link" href={liveDemoHref}>VIEW PRODUCT DEMO <Arrow /></a></div>
+    </div>
+    <div className="film-side">
+      <figure className="film-frame">
+        {slide === 'film'
+          ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-hotel-poster.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
+            <source src="/media/tisonik-film-hotel.webm" type="video/webm" />
+          </video>
+          : <img src="/media/unikmo-card-on-bed-hotel.webp" alt="A UNIKMO welcome card resting on a hotel bed" />}
+        {slide === 'film' && <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>}
+      </figure>
+      <div className="film-tabs" role="group" aria-label="Choose what to show">
+        {([['film', 'The film'], ['card', 'The card']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={slide === key} onClick={() => setSlide(key)}>{label}</button>)}
+      </div>
+      <p className="film-custom">UNIKMO cards can be customised to your hotel’s brand. <a href="#pilot">Talk to us</a>.</p>
+    </div>
+  </section>
+}
+
 const ResortPillar = () => (
   <div className="tisonik-site resort-site">
     <Header />
     <main>
-      <section className="resort-hero resort-hero--people">
-        <div className="resort-hero-copy">
-          <p className="eyebrow">GUEST EXPERIENCE ACTIVATION FOR ALL-INCLUSIVE RESORTS</p>
-          <h1>Make more of <span>every stay.</span></h1>
-          <p>Help guests discover what is included, surface relevant paid experiences, rate the stay while it can still be improved and recognize exceptional service—while creating more useful ancillary-revenue moments inside the resort journey.</p>
-          <ButtonRow />
-          <div className="resort-proof-strip" aria-label="Tisonik resort product principles">
-            <span>No separate guest app</span>
-            <span>Resort-owned inventory &amp; checkout</span>
-            <span>White-label experience layer</span>
-          </div>
-        </div>
-        <figure className="resort-hero-media">
-          <img src={resortImages.hero} alt="Guests swimming and relaxing together at an all-inclusive resort pool" fetchPriority="high" />
-          <PhonePreview />
-        </figure>
-      </section>
+      <HotelFilm />
 
       <section className="resort-neutral-proof">
         <span>BUILT FOR ALL-INCLUSIVE RESORTS</span>
