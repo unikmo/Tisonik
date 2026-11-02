@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { isBlocked, limits, overLimit } from './rate-limit.mjs'
 import { AFFIRMATIONS, AVATARS, INTERESTS, PLACES, REASONS, departmentsFor, featuresFor, nearbyFresh } from './stay-connect-config.mjs'
 import { recoveryPrompts, voyageSummary } from './stay-connect-extras.mjs'
+import { liveRatingsFor, offersFor } from './stay-offers.mjs'
 
 export const TOKEN_LIFETIME_SECONDS = 15 * 60
 const SESSION_MAX_SECONDS = 30 * 86_400
@@ -335,9 +336,9 @@ export async function guestSession(database, stay, now = new Date()) {
   let profile = null
   let profileRow = null
   if (features.people) {
-    const { data } = await database.from('stay_profiles').select('id, display_name, avatar, interests, discoverable, nearby_on, nearby_at').eq('stay_id', stay.id).maybeSingle()
+    const { data } = await database.from('stay_profiles').select('id, display_name, avatar, interests, discoverable, nearby_on, nearby_at, share_plans').eq('stay_id', stay.id).maybeSingle()
     profileRow = data
-    if (data && tiles.phase === 'during') profile = { id: data.id, name: data.display_name, avatar: data.avatar, interests: data.interests || [], discoverable: !!data.discoverable, nearby: !!data.nearby_on, nearbyLive: !!data.nearby_on && nearbyFresh(data.nearby_at, now) }
+    if (data && tiles.phase === 'during') profile = { id: data.id, name: data.display_name, avatar: data.avatar, interests: data.interests || [], discoverable: !!data.discoverable, sharePlans: !!data.share_plans, nearby: !!data.nearby_on, nearbyLive: !!data.nearby_on && nearbyFresh(data.nearby_at, now) }
   }
   const phase = tiles.phase
   const recovery = phase === 'during' ? await recoveryPrompts(database, stay) : []
@@ -350,10 +351,14 @@ export async function guestSession(database, stay, now = new Date()) {
   const span = (from, to) => Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000)
   const total = span(stay.valid_from, stay.valid_to) + 1
   const nearEnd = phase === 'after_checkout' || (phase === 'during' && serviceDate >= addDays(stay.valid_to, -1))
+  const live = phase === 'during' ? await liveRatingsFor(database, stay, now) : []
+  const offers = phase === 'during' || phase === 'after_checkout' ? await offersFor(database, stay, settings, profileRow, now) : []
   const summary = nearEnd ? await voyageSummary(database, stay, profileRow, total) : null
   return {
     hotelName: settings?.hotel_name || null,
     recovery,
+    live,
+    offers,
     summary,
     journey: tiles.phase === 'during' ? { day: Math.min(total, Math.max(1, span(stay.valid_from, serviceDate) + 1)), total } : null,
     today: {
@@ -399,7 +404,7 @@ export const LOW_SCORE = 6
 // the hotel names) receives ratings only. If reception has no address, the manager's covers for it so nothing is lost.
 // Best-effort: an email failure never fails the guest's request.
 export async function notifyHotel(database, stay, kind, payload, submissionId) {
-  if (!['private', 'feedback', 'thank_you', 'rating', 'report', 'recognition', 'pulse', 'recheck'].includes(kind)) return { sent: false }
+  if (!['private', 'feedback', 'thank_you', 'rating', 'report', 'recognition', 'pulse', 'recheck', 'offer'].includes(kind)) return { sent: false }
   if (!process.env.RESEND_API_KEY || !process.env.TISONIK_ENQUIRY_FROM) return { sent: false }
   try {
     const { data: settings } = await database.from('hotel_stay_settings').select('reception_email, manager_email, hotel_name, venue_type').eq('tenant_id', stay.tenant_id).maybeSingle()
@@ -411,7 +416,7 @@ export async function notifyHotel(database, stay, kind, payload, submissionId) {
     const scores = kind === 'rating' ? questions.filter(question => payload.scores[question.id] !== undefined).map(question => ({ question, value: payload.scores[question.id] })) : []
     const low = scores.filter(item => item.value <= LOW_SCORE)
     const average = scores.length ? scores.reduce((sum, item) => sum + item.value, 0) / scores.length : null
-    const label = { private: 'Private message from a guest', feedback: 'Post-stay feedback', thank_you: 'A guest says thank you', rating: 'Stay rating', report: 'A guest reported another guest', recognition: 'A guest recognised a crew member', pulse: 'Low daily score', recheck: 'Guest says the problem is NOT fixed' }[kind]
+    const label = { private: 'Private message from a guest', feedback: 'Post-stay feedback', thank_you: 'A guest says thank you', rating: 'Stay rating', report: 'A guest reported another guest', recognition: 'A guest recognised a crew member', pulse: 'Low daily score', recheck: 'Guest says the problem is NOT fixed', offer: 'A guest asked to hold a place' }[kind]
     const pulseLow = kind === 'pulse' && payload.score <= LOW_SCORE
     if (kind === 'pulse' && !pulseLow) return { sent: false }
     const subject = clean(`${low.length || pulseLow ? 'LOW SCORE - ' : ''}${kind === 'recheck' ? 'NOT FIXED - ' : ''}${label} - booking ${stay.booking_ref}${average !== null ? ` - average ${average.toFixed(1)}` : ''}${kind === 'pulse' ? ` - ${payload.department} ${payload.score}/10` : ''}`)
@@ -424,6 +429,7 @@ export async function notifyHotel(database, stay, kind, payload, submissionId) {
       `${words.stay}: ${stay.valid_from} to ${stay.valid_to}`,
       ...(payload.recipient ? [`About: ${payload.recipient}`] : []),
       ...(payload.about ? [`About guest: ${payload.about}`] : []),
+      ...(payload.offer ? [`Offer: ${payload.offer}`, payload.left === null ? 'No limit on places.' : `Places left after this one: ${payload.left}`, '', 'Please confirm the place with the guest. Payment stays with you.'] : []),
       ...(payload.crewName ? [`Crew member: ${payload.crewName}${payload.crewRole ? ` (${payload.crewRole})` : ''}`, `Reasons: ${payload.reasons.join('; ')}`] : []),
       ...(payload.department ? [`Department: ${payload.department}`, `Score: ${payload.score}/10`, '', 'Please follow up with this guest today, while they are still here.'] : []),
       ...(scores.length ? ['', ...scores.map(item => `${item.value <= LOW_SCORE ? '!! ' : '   '}${item.value}/10  ${item.question.text}`), ...questions.filter(question => question.optional && payload.scores[question.id] === undefined).map(question => `   skipped  ${question.text}`)] : []),

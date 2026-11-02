@@ -27,6 +27,8 @@ More ways to find people and close the loop (all on, ships only unless noted):
 | **Nearby** | Guest turns it on in their profile. The cruise line's app sends a rotating token and the tokens it can hear to UNIKMO, which posts them to `POST /api/integrations/unikmo/nearby`. Two opted-in guests who can hear each other see each other. Signals older than 10 minutes are ignored. No map, no distance |
 | **Same activity** | Venue lists activities (settings, one per line: title, a bar, then when). A guest says "I took part today". They then see other guests who took part in the same one in the last two days. Self-declared, not verified |
 | **Did we fix it?** (ships and hotels) | When the desk marks a private message resolved, the guest is asked. "Yes" records it. "Not yet" reopens the message and emails the desk "NOT FIXED". Operators can read the answer |
+| **Offers with places left** (ships and hotels) | The venue lists offers as `Title \| Description \| Places` in settings. A guest taps "Hold my place"; the desk is emailed and the venue still confirms and takes payment. Places are counted here, so two guests tapping at the same instant can both get the last place. Ships show "Your friend Dee is going" only for guests the viewer has met (an accepted compliment) who are still opted in and chose to share their plans. Hotels show places left and a count, never names |
+| **Rate it now** (ships and hotels) | The front desk, an admin, the Cruise Director's or animation team's account asks every guest to rate a show, event or activity. It stays open three hours and each guest answers once, 1 to 10. It shows on the guest's page when they open it, return to it, or within a minute if it is open. It is not a phone notification (that needs the cruise line's app). Operators see answers and the average |
 | **Voyage or stay in numbers** (ships and hotels) | In the last two days and after checkout: days, crew recognised, compliments received and sent, top compliment. A share button shares the numbers only, never names |
 
 Nearby needs the ship's own app. The portal and the server are built, but nothing sends a proximity signal until the cruise line's app does. Request body:
@@ -44,7 +46,7 @@ Still not built: the cruise line's public end-of-voyage totals (counts across al
 
 ## Database
 
-Migrations `202611010016_guest_connect.sql` then `202611010017_connect_extras.sql` (apply after `202611010015_welcome_video.sql`, before deploying the code). The second adds `activity_items`, the re-check columns, the Nearby columns and `stay_activity_joins`.
+Migrations `202611010016_guest_connect.sql`, `202611010017_connect_extras.sql` then `202611010018_offers_and_live_ratings.sql` (apply after `202611010015_welcome_video.sql`, before deploying the code). The second adds `activity_items`, the re-check columns, the Nearby columns and `stay_activity_joins`.
 Adds `crew_items` to `hotel_stay_settings`, the `report` submission kind, and six tables:
 `stay_profiles`, `stay_affirmations`, `stay_meetups`, `stay_blocks`, `crew_recognitions`, `stay_pulses`.
 

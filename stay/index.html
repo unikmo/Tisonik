@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/><meta name="robots" content="noindex,nofollow,noarchive"/><meta name="color-scheme" content="light dark"/><meta name="theme-color" content="#12304a"/><meta name="description" content="Private guest page for a stay or voyage: welcome, meet people, recognise your crew, tell us how it is going and ask for help."/><link rel="canonical" href="https://tisonik.com/stay/"/><meta property="og:title" content="Your stay | Tisonik"/><meta property="og:description" content="Private guest page for a stay or voyage."/><meta property="og:image" content="https://tisonik.com/og-card.png"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Your stay | Tisonik"/><meta name="twitter:description" content="Private guest page for a stay or voyage."/><meta name="twitter:image" content="https://tisonik.com/og-card.png"/><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Tisonik Guest","url":"https://tisonik.com/stay/","applicationCategory":"LifestyleApplication"}</script><title>Your stay | Tisonik</title><link rel="icon" href="/favicon.svg"/>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/><meta name="robots" content="noindex,nofollow,noarchive"/><meta name="color-scheme" content="light dark"/><meta name="theme-color" content="#16292f"/><meta name="description" content="Private guest page for a stay or voyage: welcome, meet people, recognise your crew, tell us how it is going and ask for help."/><link rel="canonical" href="https://tisonik.com/stay/"/><meta property="og:title" content="Your stay | Tisonik"/><meta property="og:description" content="Private guest page for a stay or voyage."/><meta property="og:image" content="https://tisonik.com/og-card.png"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Your stay | Tisonik"/><meta name="twitter:description" content="Private guest page for a stay or voyage."/><meta name="twitter:image" content="https://tisonik.com/og-card.png"/><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Tisonik Guest","url":"https://tisonik.com/stay/","applicationCategory":"LifestyleApplication"}</script><title>Your stay | Tisonik</title><link rel="icon" href="/favicon.svg"/>
 <style>
 :root{
   --bg:#f5f2ec;--surface:#fff;--surface2:#efebe3;--ink:#14181e;--muted:#59616d;--line:rgba(20,24,30,.12);
-  --brand:#12304a;--brand2:#1d4a6e;--brand-ink:#fff;--accent:#b8893c;--accent-ink:#2a1d05;
+  --brand:#16292f;--brand2:#24474f;--brand-ink:#fff;--accent:#c9a35b;--accent-ink:#2a1d05;
   --ok:#23694a;--bad:#a23b2d;--focus:#2d6cdf;--shadow:0 1px 2px rgba(20,24,30,.06),0 8px 24px rgba(20,24,30,.07);
   --serif:ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
   --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -11,7 +11,7 @@
 }
 :root[data-venue="hotel"]{--brand:#233d36;--brand2:#34574d;--accent:#b5694a;--accent-ink:#2b1308}
 @media (prefers-color-scheme:dark){
-  :root{--bg:#0c1116;--surface:#141b23;--surface2:#1b242e;--ink:#eef1f4;--muted:#9aa5b2;--line:rgba(238,241,244,.14);--brand:#183c5c;--brand2:#245a85;--accent:#d8a85a;--accent-ink:#241803;--ok:#5fc596;--bad:#ff8a78;--focus:#7fb0ff;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);--icon:var(--accent)}
+  :root{--bg:#0c1116;--surface:#141b23;--surface2:#1b242e;--ink:#eef1f4;--muted:#9aa5b2;--line:rgba(238,241,244,.14);--brand:#1d3a42;--brand2:#2d5a66;--accent:#d8b369;--accent-ink:#241803;--ok:#5fc596;--bad:#ff8a78;--focus:#7fb0ff;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);--icon:var(--accent)}
   :root[data-venue="hotel"]{--brand:#2b4a42;--brand2:#3f6d60;--accent:#e09a78;--accent-ink:#2b1308}
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -103,6 +103,9 @@ textarea{min-height:120px;resize:vertical}
 .more{all:unset;cursor:pointer;width:32px;height:40px;display:grid;place-items:center;border-radius:50%;color:var(--muted)}
 .more:focus-visible{outline:3px solid var(--focus)}
 .pill{display:inline-block;white-space:nowrap;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--surface2);color:var(--muted)}
+.pill.warn{background:color-mix(in srgb,var(--accent) 22%,transparent);color:var(--ink)}
+.who{font-size:13.5px;font-weight:600;color:var(--ok);margin-top:4px}
+.offer .btn{flex:none}
 .pill.ok{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
 .rules{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:10px;font-size:14.5px}
 .rules li{display:flex;gap:10px;align-items:flex-start}.rules svg{flex:none;color:var(--ok);margin-top:2px}
@@ -282,6 +285,7 @@ textarea{min-height:120px;resize:vertical}
       sc.appendChild(sh);sc.appendChild(el('p',{class:'sub',style:'font-size:12.5px;margin-top:10px',text:'Only these numbers are shared. No names.'}))
       v.appendChild(sc)
     }
+    ;(state.live||[]).forEach(function(l){v.appendChild(liveCard(l))})
     var grid=el('div',{class:'grid2'}),n=0
     function action(id,ic,title,sub,badge){n++;var b=el('button',{type:'button',class:'action'},[el('span',{class:'ico'},[icon(ic,22)]),el('strong',{},[title,badge?el('span',{class:'badge',text:String(badge)}):null]),el('span',{class:'sub',text:sub})]);b.addEventListener('click',function(){go(id)});grid.appendChild(b)}
     if(f.people)action('people','people','Meet people','Opt in to say hello to guests who share your interests',cache.pending||0)
@@ -289,15 +293,46 @@ textarea{min-height:120px;resize:vertical}
     if(f.pulse)action('rate','rate','How is today?','Two taps per area. Low scores reach the team at once')
     if(t.private)action('help','help','Need help?','Let us fix it. Goes straight to '+(ship?'guest services':'reception'))
     if(n)v.appendChild(grid)
-    if(t.discover&&state.discover.length){
-      var d=el('section',{class:'card'},[el('p',{class:'kicker',text:ship?'Recommended by the ship':'Recommended by the hotel'}),el('h3',{text:'Discover'})])
-      state.discover.slice(0,12).forEach(function(x){d.appendChild(el('div',{class:'list-item',style:'margin-top:12px'},[el('strong',{text:String(x.title||'')}),el('div',{class:'sub',text:String(x.body||'')})]))})
+    var offers=state.offers||[]
+    if(t.discover&&offers.length){
+      var d=el('section',{class:'card','aria-label':'Offers'},[el('p',{class:'kicker',text:ship?'Recommended by the ship':'Recommended by the hotel'}),el('h3',{text:'Discover'})])
+      offers.forEach(function(o){d.appendChild(offerRow(o))})
       v.appendChild(d)
     }
     if(t.keepsake)v.appendChild(el('section',{class:'card flat'},[el('div',{class:'row'},[el('span',{style:'color:var(--icon)'},[icon('key',26)]),el('div',{class:'grow'},[el('h3',{text:'Your keepsake'}),el('p',{class:'sub',text:'Your UNIKMO card is yours to keep. Scan it any time to come back here while your '+(ship?'voyage':'stay')+' is open.'})])])]))
     v.appendChild(el('p',{class:'note',text:'Your messages go to '+(ship?'the guest services team':'the hotel team')+'. Nothing here is posted publicly.'}))
     v.appendChild(forgetButton())
     return v
+  }
+  function offerRow(o){
+    var left=o.left,who=''
+    if(o.friends&&o.friends.length)who=o.friends.length===1?'Your friend '+o.friends[0]+' is going':'Your friends '+o.friends.slice(0,-1).join(', ')+' and '+o.friends[o.friends.length-1]+' are going'
+    else if(o.going>1)who=o.going+' guests are going'
+    var meta=el('div',{class:'row wrap',style:'gap:8px;margin-top:6px'})
+    if(left!==null)meta.appendChild(el('span',{class:'pill'+(left===0?'':' warn'),text:left===0?'Full':left===1?'1 place left':left+' places left'}))
+    if(o.joined)meta.appendChild(el('span',{class:'pill ok',text:'Place held'}))
+    var info=el('div',{class:'grow'},[el('strong',{text:o.title}),o.body?el('div',{class:'sub',text:o.body}):null,who?el('div',{class:'who',text:who}):null,meta])
+    var btn
+    if(o.joined){btn=el('button',{type:'button',class:'btn small ghost',text:'Cancel'});btn.addEventListener('click',function(){btn.disabled=true;connect('offer.leave',{offerId:o.id}).then(function(res){if(res.status===200){o.joined=false;o.going=Math.max(0,o.going-1);if(o.left!==null)o.left++;toast('Place released.');render()}else btn.disabled=false}).catch(function(){btn.disabled=false})})}
+    else if(left===0){btn=el('button',{type:'button',class:'btn small',disabled:'',text:'Full'})}
+    else{btn=el('button',{type:'button',class:'btn small',text:'Hold my place'});btn.addEventListener('click',function(){btn.disabled=true;connect('offer.join',{offerId:o.id}).then(function(res){if(res.status===200){o.joined=true;o.going++;if(o.left!==null)o.left=Math.max(0,o.left-1);toast('Place held. The team will confirm it with you.');render()}else{btn.disabled=false;toast(res.body.error==='full'?'Sorry, that just filled up.':'That did not send. Please try again.');if(res.body.error==='full'){o.left=0;render()}}}).catch(function(){btn.disabled=false})})}
+    return el('div',{class:'list-item offer'},[el('div',{class:'row',style:'align-items:flex-start'},[info,btn])])
+  }
+  function liveCard(l){
+    var c=el('section',{class:'card','aria-label':'Rate now'},[el('p',{class:'kicker',text:'Just finished'}),el('h3',{text:'How was \u201c'+l.title+'\u201d?'}),el('p',{class:'sub',text:'One tap. The team sees it straight away.'})])
+    var scale=el('div',{class:'scale5',role:'group','aria-label':l.title})
+    LEVELS.forEach(function(lv){
+      var b=el('button',{type:'button'},[el('b',{text:String(lv[1])}),el('span',{text:lv[0]})])
+      b.addEventListener('click',function(){
+        scale.querySelectorAll('button').forEach(function(x){x.disabled=true})
+        connect('live.answer',{liveId:l.id,score:lv[1]}).then(function(res){
+          if(res.status===200||res.body.error==='already_answered'||res.body.error==='closed'){state.live=(state.live||[]).filter(function(x){return x.id!==l.id});toast(res.status===200?'Thank you. The team can see it.':'That one has closed.');render()}
+          else{scale.querySelectorAll('button').forEach(function(x){x.disabled=false});toast('That did not send. Please try again.')}
+        }).catch(function(){scale.querySelectorAll('button').forEach(function(x){x.disabled=false})})
+      })
+      scale.appendChild(b)
+    })
+    c.appendChild(scale);return c
   }
   function forgetButton(){var b=el('button',{type:'button',class:'forget',text:'Forget this device'});b.addEventListener('click',function(){token=undefined;api('logout',{}).then(function(){failure('This device has been signed out. '+again)})});return b}
 
@@ -489,18 +524,20 @@ textarea{min-height:120px;resize:vertical}
       state.connect.interests.forEach(function(i){var b=el('button',{type:'button',class:'chip','aria-pressed':String(interests.indexOf(i.id)>=0),text:i.label});b.addEventListener('click',function(){var at=interests.indexOf(i.id);if(at>=0)interests.splice(at,1);else interests.push(i.id);b.setAttribute('aria-pressed',String(interests.indexOf(i.id)>=0))});chips.appendChild(b)})
       body.appendChild(chips)
       var near=el('input',{type:'checkbox',id:'pf-near'});near.checked=existing?!!existing.nearby:false
+      var plans=el('input',{type:'checkbox',id:'pf-plans'});plans.checked=existing?!!existing.sharePlans:false
       var adult=el('input',{type:'checkbox',id:'pf-adult'});if(existing)adult.checked=true
       var show=el('input',{type:'checkbox',id:'pf-show'});show.checked=existing?existing.discoverable:true
       body.appendChild(el('label',{class:'check','for':'pf-adult'},[adult,el('span',{text:'I am 18 or over.'})]))
       body.appendChild(el('label',{class:'check','for':'pf-show'},[show,el('span',{text:'Show me to other guests on this sailing.'})]))
       body.appendChild(el('label',{class:'check','for':'pf-near'},[near,el('span',{text:'Also show me to guests close by. This works through the ship\u2019s app: no map, no distance.'})]))
+      body.appendChild(el('label',{class:'check','for':'pf-plans'},[plans,el('span',{text:'Let guests I have met see which offers I am going to.'})]))
       var msg=el('p',{class:'msg',role:'status'}),save=el('button',{type:'button',class:'btn block',style:'margin-top:16px',text:existing?'Save':'Join'})
       body.appendChild(save);body.appendChild(msg)
       save.addEventListener('click',function(){
         if(!name.value.trim()){msg.className='msg bad';msg.textContent='Please add a first name.';return}
         if(!adult.checked){msg.className='msg bad';msg.textContent='This is for guests aged 18 or over.';return}
         save.disabled=true
-        connect('profile.save',{displayName:name.value.trim(),avatar:avKey,interests:interests,adult:true,discoverable:show.checked,nearby:near.checked}).then(function(res){
+        connect('profile.save',{displayName:name.value.trim(),avatar:avKey,interests:interests,adult:true,discoverable:show.checked,nearby:near.checked,sharePlans:plans.checked}).then(function(res){
           if(res.status===200){state.profile=res.body.profile;cache.people=null;cache.inbox=null;close();toast(show.checked?'You are on the list.':'You are hidden.');render();refreshPending()}
           else{save.disabled=false;msg.className='msg bad';msg.textContent=res.status===422?'Names can not include numbers, links or contact details.':'That did not save. Please try again.'}
         }).catch(function(){save.disabled=false;msg.className='msg bad';msg.textContent='That did not save. Please try again.'})
@@ -654,9 +691,24 @@ textarea{min-height:120px;resize:vertical}
     shell(view,heading,sub)
   }
   function failure(text){root.innerHTML='';root.appendChild(el('main',{class:'app'},[el('div',{class:'top'},[el('p',{class:'kicker',text:'Tisonik'}),el('h1',{text:'This page is not open'}),el('p',{class:'lead',text:text})])]))}
+  var lastPoll=0
+  function poll(){
+    if(document.hidden||!state||Date.now()-lastPoll<4000)return
+    lastPoll=Date.now()
+    api('session',{token:token}).then(function(res){
+      if(res.status!==200)return
+      var before=(state.live||[]).map(function(x){return x.id}).join()
+      state.offers=res.body.offers;state.live=res.body.live
+      var after=(state.live||[]).map(function(x){return x.id}).join()
+      if(tab!=='today'||document.querySelector('.scrim'))return
+      if(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName))return
+      if(after!==before&&state.live.length)toast('New: '+state.live[0].title)
+      render()
+    }).catch(function(){})
+  }
   function open(){
     return api('session',{token:token}).then(function(res){
-      if(res.status===200){state=res.body;document.documentElement.setAttribute('data-venue',state.venueType==='ship'?'ship':'hotel');(state.today||{}).pulses&&(today.pulses=state.today.pulses);(state.today||{}).recognised&&(today.recognised=state.today.recognised);render();refreshPending()}
+      if(res.status===200){state=res.body;document.documentElement.setAttribute('data-venue',state.venueType==='ship'?'ship':'hotel');(state.today||{}).pulses&&(today.pulses=state.today.pulses);(state.today||{}).recognised&&(today.recognised=state.today.recognised);render();refreshPending();setInterval(poll,60000);window.addEventListener('focus',poll);document.addEventListener('visibilitychange',poll)}
       else failure(again)
     })
   }

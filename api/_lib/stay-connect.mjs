@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { stayPhase } from './stays.mjs'
+import { withIds } from './stay-offers.mjs'
 import { AFFIRMATIONS, AVATARS, INTERESTS, LIMITS, PLACES, REASONS, departmentsFor, featuresFor, nameIsSafe, nearbyFresh } from './stay-connect-config.mjs'
 
 const ids = list => list.map(item => item.id)
@@ -17,7 +18,11 @@ const schemas = {
     adult: z.literal(true),
     discoverable: z.boolean(),
     nearby: z.boolean().default(false),
+    sharePlans: z.boolean().default(false),
   }).strict(),
+  'offer.join': z.object({ offerId: z.string().max(40) }).strict(),
+  'offer.leave': z.object({ offerId: z.string().max(40) }).strict(),
+  'live.answer': z.object({ liveId: uuid, score: z.number().int().min(1).max(10) }).strict(),
   'people.list': z.object({ interest: z.enum(ids(INTERESTS)).optional(), activity: z.string().max(40).optional(), mode: z.literal('nearby').optional() }).strict(),
   'activity.join': z.object({ activityId: z.string().max(40) }).strict(),
   'recovery.answer': z.object({ submissionId: uuid, answer: z.enum(['fixed', 'not_fixed']) }).strict(),
@@ -232,6 +237,41 @@ async function recogniseCrew(database, stay, settings, input, now) {
   return done({ recognised: true }, { kind: 'recognition', payload: { crewName: crew.name, crewRole: crew.role || null, reasons: input.reasons.map(id => labelOf(REASONS, id)) }, id: data.id })
 }
 
+// Hold a place on an offer. The venue still takes payment and confirms. Places are counted here, so two guests tapping at
+// the same instant can both get the last place; the desk is told each time and can say no.
+async function joinOffer(database, stay, settings, input) {
+  const item = withIds(settings?.discover_items || []).find(entry => entry.id === input.offerId)
+  if (!item) return refuse(404, 'not_found')
+  const { data: mine } = await database.from('stay_offer_rsvps').select('stay_id').eq('stay_id', stay.id).eq('offer_id', item.id).maybeSingle()
+  if (mine) return done({ joined: true })
+  let left = null
+  if (item.spots) {
+    const { count } = await database.from('stay_offer_rsvps').select('stay_id', { count: 'exact', head: true }).eq('tenant_id', stay.tenant_id).eq('offer_id', item.id)
+    if ((count || 0) >= item.spots) return refuse(409, 'full')
+    left = item.spots - (count || 0) - 1
+  }
+  const { error } = await database.from('stay_offer_rsvps').insert({ stay_id: stay.id, tenant_id: stay.tenant_id, offer_id: item.id }).select('stay_id').single()
+  if (error && error.code !== '23505') throw error
+  return done({ joined: true, left }, { kind: 'offer', payload: { offer: item.title, left }, id: item.id })
+}
+
+async function leaveOffer(database, stay, input) {
+  const { error } = await database.from('stay_offer_rsvps').delete().eq('stay_id', stay.id).eq('offer_id', input.offerId)
+  if (error) throw error
+  return done({ left: true })
+}
+
+// A guest rates something staff asked about. One answer each, only while it is open.
+async function answerLive(database, stay, input, now) {
+  const { data: row, error } = await database.from('stay_live_ratings').select('id, tenant_id, opened_at, closes_at').eq('id', input.liveId).maybeSingle()
+  if (error) throw error
+  if (!row || row.tenant_id !== stay.tenant_id) return refuse(404, 'not_found')
+  if (Date.parse(row.opened_at) > now.getTime() || Date.parse(row.closes_at) <= now.getTime()) return refuse(409, 'closed')
+  const { error: insertError } = await database.from('stay_live_answers').insert({ live_id: row.id, stay_id: stay.id, tenant_id: stay.tenant_id, score: input.score }).select('live_id').single()
+  if (insertError) return insertError.code === '23505' ? refuse(409, 'already_answered') : (() => { throw insertError })()
+  return done({ saved: true })
+}
+
 async function submitPulse(database, stay, venueType, input, now) {
   const department = departmentsFor(venueType).find(item => item.id === input.department)
   if (!department) return refuse(422, 'invalid_submission')
@@ -247,7 +287,7 @@ export async function connectAction(database, stay, action, data, now = new Date
   const parsed = schema.safeParse(data ?? {})
   if (!parsed.success) return refuse(422, 'invalid_request')
   const input = parsed.data
-  const { data: settings, error } = await database.from('hotel_stay_settings').select('venue_type, crew_items, activity_items').eq('tenant_id', stay.tenant_id).maybeSingle()
+  const { data: settings, error } = await database.from('hotel_stay_settings').select('venue_type, crew_items, activity_items, discover_items').eq('tenant_id', stay.tenant_id).maybeSingle()
   if (error) throw error
   const venueType = settings?.venue_type || 'hotel'
   const features = featuresFor(venueType)
@@ -263,6 +303,12 @@ export async function connectAction(database, stay, action, data, now = new Date
     return submitPulse(database, stay, venueType, input, now)
   }
 
+  if (action === 'offer.join' || action === 'offer.leave' || action === 'live.answer') {
+    if (!live) return refuse(409, 'not_open_for_this_stay')
+    if (action === 'offer.join') return joinOffer(database, stay, settings, input)
+    if (action === 'offer.leave') return leaveOffer(database, stay, input)
+    return answerLive(database, stay, input, now)
+  }
   if (action === 'recovery.answer') {
     if (!live) return refuse(409, 'not_open_for_this_stay')
     return answerRecovery(database, stay, input, now)
@@ -272,7 +318,7 @@ export async function connectAction(database, stay, action, data, now = new Date
   if (!features.people || !live) return refuse(409, 'not_open_for_this_stay')
   const existing = await profileOf(database, stay.id)
   if (action === 'profile.save') {
-    const row = { tenant_id: stay.tenant_id, display_name: input.displayName, avatar: input.avatar, interests: input.interests, adult_confirmed: true, discoverable: input.discoverable, nearby_on: input.nearby && input.discoverable, expires_on: stay.valid_to, updated_at: now.toISOString() }
+    const row = { tenant_id: stay.tenant_id, display_name: input.displayName, avatar: input.avatar, interests: input.interests, adult_confirmed: true, discoverable: input.discoverable, nearby_on: input.nearby && input.discoverable, share_plans: input.sharePlans && input.discoverable, expires_on: stay.valid_to, updated_at: now.toISOString() }
     if (existing) {
       const { error: updateError } = await database.from('stay_profiles').update(row).eq('id', existing.id)
       if (updateError) throw updateError

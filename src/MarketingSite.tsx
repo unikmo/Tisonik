@@ -205,35 +205,64 @@ const faqStructuredData = JSON.stringify({
 
 const BuyerReadiness = ({ schema = true }: { schema?: boolean }) => <section className="buyer-readiness" aria-labelledby="buyer-readiness-title">{schema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqStructuredData }}/>}<p className="eyebrow">FAQs</p><h2 id="buyer-readiness-title">Frequently asked questions about CruiseConnect.</h2><div className="buyer-readiness-grid">{buyerFaqs.map(([question,answer],index)=><details key={question} open={index===0}><summary><span>{String(index+1).padStart(2,'0')}</span><h3>{question}</h3><i aria-hidden="true">+</i></summary><p>{answer}</p></details>)}</div></section>
 
-// Silent film for the homepage. It starts by itself unless the visitor prefers reduced motion, and can always be paused.
+// The first thing on the homepage: the four promises, readable before any video plays, and a silent film for each kind of venue.
+// The film starts by itself unless the visitor prefers reduced motion, and can always be paused.
+type FilmKind = 'cruise' | 'hotel'
+const filmHooks: Record<FilmKind, [string, string][]> = {
+  cruise: [
+    ['No new app required.', 'Works inside the app you already have, or from the card on any phone.'],
+    ['A welcome that goes home.', 'Your Cruise Director’s hello on day one, and a keepsake the guest takes with them.'],
+    ['Offers that sell themselves.', '“Your friend Dee is going. 3 places left.”'],
+    ['Hear it before the review.', 'Rate shows as they end. Fix problems while the guest is still on board.'],
+  ],
+  hotel: [
+    ['No new app required.', 'Works from the card on any phone.'],
+    ['A welcome that goes home.', 'Your manager’s message, in their own words, and a keepsake to take with them.'],
+    ['Offers that sell themselves.', '“Tonight’s tasting menu. 5 places left.”'],
+    ['Hear it before the review.', 'Rate events as they end. Fix problems while the guest is still in the house.'],
+  ],
+}
+const filmText: Record<FilmKind, { tagline: string; alt: string }> = {
+  cruise: { tagline: 'The guest experience layer for cruise lines.', alt: 'A card on the bed, a welcome from the Cruise Director, a friend going to dinner with three places left, a show rated as it ends, crew thanked by name, and a low score reaching the desk.' },
+  hotel: { tagline: 'The guest experience layer for hotels.', alt: 'A welcome from the hotel manager that the guest keeps, tonight’s tasting menu with places left, an event rated as it ends, the team thanked by name, and a low score reaching reception.' },
+}
+
 const HomeFilm = () => {
-  const video = useRef<HTMLVideoElement>(null)
+  const [kind, setKind] = useState<FilmKind>('cruise')
   const [playing, setPlaying] = useState(false)
+  const video = useRef<HTMLVideoElement>(null)
   useEffect(() => {
     const element = video.current
     if (!element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     element.play().catch(() => {})
-  }, [])
+  }, [kind])
   const toggle = () => {
     const element = video.current
     if (!element) return
     if (element.paused) element.play().catch(() => {})
     else element.pause()
   }
-  return <section className="home-film" aria-labelledby="home-film-title">
-    <p className="eyebrow">SEE IT IN 50 SECONDS</p>
-    <h2 id="home-film-title">From the card on the bed to the desk that puts it right.</h2>
-    <figure>
-      <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-home-film-poster.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label="Four promises for cruise lines and hotels, then a guest scans a card, sees a welcome and offers, thanks a crew member and gives a low score. The desk is told straight away.">
-        <source src="/media/tisonik-home-film.webm" type="video/webm" />
+  return <section className="film-top" aria-label="What Tisonik does">
+    <div className="film-copy">
+      <div className="film-switch" role="group" aria-label="Choose your kind of venue">
+        {(['cruise', 'hotel'] as FilmKind[]).map(item => <button key={item} type="button" aria-pressed={kind === item} onClick={() => setKind(item)}>{item === 'cruise' ? 'Cruise lines' : 'Hotels'}</button>)}
+      </div>
+      <p className="film-wordmark">Tisonik<span>.</span></p>
+      <p className="film-tagline">{filmText[kind].tagline}</p>
+      <ul className="film-hooks">{filmHooks[kind].map(([line, more]) => <li key={line}><i aria-hidden="true" /><span><strong>{line}</strong> {more}</span></li>)}</ul>
+    </div>
+    <figure className="film-frame">
+      <video key={kind} ref={video} muted loop playsInline preload="metadata" poster={`/media/tisonik-film-${kind}-poster.jpg`} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmText[kind].alt}>
+        <source src={`/media/tisonik-film-${kind}.webm`} type="video/webm" />
       </video>
-      <button type="button" className="home-film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>
+      <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>
     </figure>
   </section>
 }
 
 const Home = () => (
   <>
+    <HomeFilm />
     <section id="top" className="hero">
       <p className="eyebrow hero-eyebrow">GUEST EXPERIENCE FOR CRUISE LINES &amp; ALL-INCLUSIVE RESORTS</p>
       <h1>Turn more guest moments into <span>unforgettable experiences.</span></h1>
@@ -247,7 +276,6 @@ const Home = () => (
         <a className="pilot-link" href="/all-inclusive-resorts/">EXPLORE HOTELS &amp; RESORTS <Arrow /></a>
       </div>
     </section>
-    <HomeFilm />
     <section className="quiet-proof" aria-label="Tisonik hospitality environments">
       <p className="eyebrow">ONE EXPERIENCE LAYER · TWO HOSPITALITY ENVIRONMENTS</p>
       <div className="proof-grid">

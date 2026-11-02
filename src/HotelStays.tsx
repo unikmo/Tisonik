@@ -2,9 +2,10 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { supabase } from './supabaseClient'
 import './portal-hotel.css'
 
-type Settings = { venue_type: 'hotel' | 'ship'; hotel_name: string | null; unikmo_hotel_id: string | null; reception_email: string | null; manager_email: string | null; default_window_days: number; welcome_video_url: string | null; welcome_from_name: string | null; welcome_from_role: string | null; welcome_note: string | null; discover_items: { title: string; body: string }[]; crew_items: { id: string; name: string; role: string }[]; activity_items: { id: string; title: string; when: string }[] }
+type Settings = { venue_type: 'hotel' | 'ship'; hotel_name: string | null; unikmo_hotel_id: string | null; reception_email: string | null; manager_email: string | null; default_window_days: number; welcome_video_url: string | null; welcome_from_name: string | null; welcome_from_role: string | null; welcome_note: string | null; discover_items: { title: string; body: string; spots?: number }[]; crew_items: { id: string; name: string; role: string }[]; activity_items: { id: string; title: string; when: string }[] }
 type Stay = { id: string; booking_ref: string; room: string | null; guest_label: string | null; valid_from: string; valid_to: string; window_days: number; status: 'active' | 'voided'; app_sessions: number; card_sessions: number; created_at: string }
 type Submission = { id: string; stay_id: string; kind: 'thank_you' | 'private' | 'feedback' | 'rating'; payload: Record<string, unknown>; status: 'new' | 'seen' | 'resolved'; created_at: string }
+type Live = { id: string; title: string; opened_at: string; closes_at: string; answers: number; average: number | null }
 type Filter = 'action' | 'thank_you' | 'rating'
 
 const kindLabel: Record<Submission['kind'], string> = { private: 'Private message', feedback: 'Post-stay feedback', thank_you: 'Thank you', rating: 'Rating' }
@@ -21,8 +22,8 @@ const crewToText = (items: Settings['crew_items']) => items.map(item => `${item.
 const textToCrew = (text: string) => text.split('\n').map(line => line.trim()).filter(Boolean).slice(0, 40).map(line => { const [name, ...rest] = line.split('|'); return { name: name.trim(), role: rest.join('|').trim() } }).filter(item => item.name)
 const activitiesToText = (items: Settings['activity_items']) => items.map(item => `${item.title} | ${item.when}`).join('\n')
 const textToActivities = (text: string) => text.split('\n').map(line => line.trim()).filter(Boolean).slice(0, 20).map(line => { const [title, ...rest] = line.split('|'); return { title: title.trim(), when: rest.join('|').trim() } }).filter(item => item.title)
-const itemsToText = (items: Settings['discover_items']) => items.map(item => `${item.title} | ${item.body}`).join('\n')
-const textToItems = (text: string) => text.split('\n').map(line => line.trim()).filter(Boolean).slice(0, 12).map(line => { const [title, ...rest] = line.split('|'); return { title: title.trim(), body: rest.join('|').trim() } }).filter(item => item.title)
+const itemsToText = (items: Settings['discover_items']) => items.map(item => `${item.title} | ${item.body}${item.spots ? ` | ${item.spots}` : ''}`).join('\n')
+const textToItems = (text: string) => text.split('\n').map(line => line.trim()).filter(Boolean).slice(0, 12).map(line => { const parts = line.split('|').map(part => part.trim()); const spots = parts.length > 2 && /^\d{1,3}$/.test(parts[parts.length - 1]) ? Number(parts.pop()) : undefined; return { title: parts[0], body: parts.slice(1).join(' | '), ...(spots ? { spots } : {}) } }).filter(item => item.title)
 
 export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAdmin }: { tenantId: string; token: string; canWrite: boolean; isTisonikAdmin: boolean }) {
   const [settings, setSettings] = useState<Settings | null | undefined>(undefined)
@@ -30,6 +31,8 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
   const [subs, setSubs] = useState<Submission[]>([])
   const [filter, setFilter] = useState<Filter>('action')
   const [settingsForm, setSettingsForm] = useState({ venueType: 'hotel' as 'hotel' | 'ship', hotelName: '', unikmoHotelId: '', receptionEmail: '', managerEmail: '', defaultWindowDays: 14, welcomeVideoUrl: '', welcomeFromName: '', welcomeFromRole: '', welcomeNote: '', discover: '', crew: '', activities: '' })
+  const [lives, setLives] = useState<Live[]>([])
+  const [liveTitle, setLiveTitle] = useState('')
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -43,6 +46,10 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
     setStays((st.data || []) as Stay[])
     const su = await supabase.from('hotel_stay_submissions').select('id,stay_id,kind,payload,status,created_at').eq('tenant_id', tenantId).order('created_at', { ascending: false }).limit(150)
     setSubs((su.data || []) as Submission[])
+    const lr = await supabase.from('stay_live_ratings').select('id,title,opened_at,closes_at').eq('tenant_id', tenantId).order('opened_at', { ascending: false }).limit(8)
+    const la = await supabase.from('stay_live_answers').select('live_id,score').eq('tenant_id', tenantId).limit(5000)
+    const answers = (la.data || []) as { live_id: string; score: number }[]
+    setLives(((lr.data || []) as Omit<Live, 'answers' | 'average'>[]).map(row => { const mine = answers.filter(answer => answer.live_id === row.id); return { ...row, answers: mine.length, average: mine.length ? mine.reduce((sum, answer) => sum + answer.score, 0) / mine.length : null } }))
   }, [tenantId])
   useEffect(() => { void load() }, [load])
 
@@ -60,6 +67,19 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
     return { key, average: values.length ? values.reduce((a, b) => a + b, 0) / values.length : null }
   })
 
+  const pushLive = async (event: FormEvent) => {
+    event.preventDefault()
+    if (!liveTitle.trim()) return
+    const result = await call(token, 'push', tenantId, { title: liveTitle.trim(), minutes: 180 })
+    setMessage(result.ok ? 'Sent. Guests will see it on their page within a minute.' : 'Your role cannot ask guests to rate. Ask an admin or the front desk.')
+    if (result.ok) setLiveTitle('')
+    void load()
+  }
+  const closeLive = async (live: Live) => {
+    const result = await call(token, 'close', tenantId, { liveId: live.id })
+    setMessage(result.ok ? 'Closed.' : 'Could not close that one.')
+    void load()
+  }
   const voidStay = async (stay: Stay) => {
     if (!window.confirm(`Void booking ${stay.booking_ref}? The guest page for this stay will stop opening.`)) return
     const result = await call(token, 'void', tenantId, { stayId: stay.id })
@@ -101,6 +121,21 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
       </article> })}</div> : <p className="portal-empty">Nothing here yet.</p>}
     </section>
 
+    <section className="portal-panel hotel-panel">
+      <h2>Ask guests to rate something now</h2>
+      <p className="portal-empty">For a show, an event or an activity that has just finished. It appears on every guest&apos;s page, stays open for three hours, and each guest answers once.</p>
+      <form className="hotel-form" onSubmit={pushLive}>
+        <label className="hotel-wide">What should they rate?<input value={liveTitle} maxLength={80} placeholder="Evening show, Theatre" onChange={event => setLiveTitle(event.target.value)} /></label>
+        <button className="portal-button" type="submit" disabled={!liveTitle.trim()}>Ask guests now</button>
+      </form>
+      {lives.length > 0 && <div className="portal-requests">{lives.map(live => { const open = Date.parse(live.closes_at) > Date.now(); return <article key={live.id}>
+        <div><strong>{live.title}</strong><span>{open ? 'open' : 'closed'}</span></div>
+        <p>{live.answers} {live.answers === 1 ? 'answer' : 'answers'}{live.average === null ? '' : ` · average ${live.average.toFixed(1)} out of 10`}</p>
+        <small>{new Date(live.opened_at).toLocaleString()}</small>
+        {open && <div className="hotel-actions"><button type="button" className="hotel-link" onClick={() => void closeLive(live)}>Close now</button></div>}
+      </article> })}</div>}
+    </section>
+
     {canWrite && <section className="portal-panel hotel-panel">
       <h2>Settings</h2>
       <form className="hotel-form" onSubmit={saveSettings}>
@@ -114,7 +149,7 @@ export default function HotelStaysPanel({ tenantId, token, canWrite, isTisonikAd
         <label>Welcome from (name)<input maxLength={80} value={settingsForm.welcomeFromName} onChange={e => setSettingsForm({ ...settingsForm, welcomeFromName: e.target.value })} /></label>
         <label>Welcome from (title, for example {settingsForm.venueType === 'ship' ? 'Cruise Director' : 'General Manager'})<input maxLength={60} value={settingsForm.welcomeFromRole} onChange={e => setSettingsForm({ ...settingsForm, welcomeFromRole: e.target.value })} /></label>
         <label className="hotel-wide">Short note under the video (optional)<textarea rows={2} maxLength={300} value={settingsForm.welcomeNote} onChange={e => setSettingsForm({ ...settingsForm, welcomeNote: e.target.value })} /></label>
-        <label className="hotel-wide">Discover tile, one per line as "Title | Description" (up to 12)<textarea rows={4} value={settingsForm.discover} onChange={e => setSettingsForm({ ...settingsForm, discover: e.target.value })} /></label>
+        <label className="hotel-wide">Offers, one per line as "Title | Description | Places" (up to 12). Places is optional. With it, guests can hold a place and see how many are left.<textarea rows={4} value={settingsForm.discover} onChange={e => setSettingsForm({ ...settingsForm, discover: e.target.value })} /></label>
         <label className="hotel-wide">Crew or team members guests can recognise, one per line as "Name | Role" (up to 40). Guests pick from this list and choose up to two reasons, once per person per day.<textarea rows={4} value={settingsForm.crew} onChange={e => setSettingsForm({ ...settingsForm, crew: e.target.value })} /></label>
         <label className="hotel-wide">Activities guests can say they joined (ships), one per line as "Title | When" (up to 20). Guests who joined the same one can find each other.<textarea rows={3} value={settingsForm.activities} onChange={e => setSettingsForm({ ...settingsForm, activities: e.target.value })} /></label>
         <button disabled={busy}>{busy ? 'Saving…' : 'Save settings'}</button>

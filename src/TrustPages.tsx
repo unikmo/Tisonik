@@ -218,8 +218,10 @@ const dataRows: Row[] = [
   ['What the guest writes', 'Thank-yous, private messages, feedback and ratings', 'The product itself. Delivered to staff'],
   ['Session counters', 'How many times the page was opened, from card or app', 'Shows the operator whether guests use it'],
   ['Crew recognitions and daily scores', 'Which team member a guest recognised and why (up to two preset reasons), and 1 to 10 scores for areas such as dining', 'Lets the operator thank staff and fix problems while the guest is still there'],
+  ['Places held on offers', 'Which venue offer a guest asked to hold a place on', 'Counts places left and tells the desk. Payment stays with the venue'],
+  ['Event ratings', 'A guest score of 1 to 10 for a show or event staff asked about', 'Tells the operator how it went'],
   ['Follow-up answer', 'Whether a guest says a problem was fixed', 'Tells the operator if a fix worked'],
-  ['Opt-in profile (ships only)', 'A first name, a preset avatar and chosen interests, kept only if a guest turns on People. If they also turn on Nearby, a rotating code from the ship app, kept for ten minutes of use, and which listed activities they joined', 'Lets guests who both opted in say hello. Hotels do not have this feature'],
+  ['Opt-in profile (ships only)', 'A first name, a preset avatar and chosen interests, kept only if a guest turns on People. If they also turn on Nearby, a rotating code from the ship app, kept for ten minutes of use, which listed activities they joined, and, if they choose, that guests they have met can see which offers they are going to', 'Lets guests who both opted in say hello. Hotels do not have this feature'],
   ['Compliments and meet-up suggestions (ships only)', 'Preset compliments between two opted-in guests and a suggested public place. No free text, no chat', 'Makes a safe first hello. Operators cannot read them'],
 ]
 

@@ -8,7 +8,7 @@ const stays = await import('../api/_lib/stays.mjs')
 
 // Minimal in-memory stand-in for the Supabase query builder used by the stay layer.
 function fakeDatabase() {
-  const tables = { hotel_stays: [], hotel_stay_submissions: [], hotel_stay_settings: [], memberships: [], stay_profiles: [], stay_pulses: [], crew_recognitions: [] }
+  const tables = { hotel_stays: [], hotel_stay_submissions: [], hotel_stay_settings: [], memberships: [], stay_profiles: [], stay_pulses: [], crew_recognitions: [], stay_offer_rsvps: [], stay_live_ratings: [], stay_live_answers: [] }
   let serial = 0
   return {
     tables,
@@ -29,6 +29,7 @@ function fakeDatabase() {
       const builder = {
         select(_columns, options) { countOnly = options?.head === true; return builder },
         eq(key, value) { filters.push([key, value]); return builder },
+        limit() { return builder },
         async maybeSingle() { return { data: run()[0] || null, error: null } },
         insert(value) {
           const duplicate = name === 'hotel_stays' && rows.some(row => row.tenant_id === value.tenant_id && row.booking_ref === value.booking_ref)

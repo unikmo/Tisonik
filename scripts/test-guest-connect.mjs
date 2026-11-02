@@ -8,6 +8,7 @@ const stays = await import('../api/_lib/stays.mjs')
 const { connectAction } = await import('../api/_lib/stay-connect.mjs')
 const { featuresFor, crewItemsFromLines, activityItemsFromLines, nameIsSafe } = await import('../api/_lib/stay-connect-config.mjs')
 const { registerNearby, nearbySchema } = await import('../api/_lib/stay-nearby.mjs')
+const { offerItemsFromLines } = await import('../api/_lib/stay-offers.mjs')
 
 // In-memory stand-in for the Supabase query builder, with the unique rules of the guest-connect tables.
 const unique = {
@@ -17,9 +18,11 @@ const unique = {
   crew_recognitions: [['stay_id', 'crew_id', 'service_date']],
   stay_pulses: [['stay_id', 'department', 'service_date']],
   stay_activity_joins: [['stay_id', 'activity_id', 'service_date']],
+  stay_offer_rsvps: [['stay_id', 'offer_id']],
+  stay_live_answers: [['live_id', 'stay_id']],
 }
 function fakeDatabase() {
-  const tables = { hotel_stay_settings: [], hotel_stay_submissions: [], stay_profiles: [], stay_affirmations: [], stay_meetups: [], stay_blocks: [], crew_recognitions: [], stay_pulses: [], stay_activity_joins: [], hotel_stays: [] }
+  const tables = { hotel_stay_settings: [], hotel_stay_submissions: [], stay_profiles: [], stay_affirmations: [], stay_meetups: [], stay_blocks: [], crew_recognitions: [], stay_pulses: [], stay_activity_joins: [], hotel_stays: [], stay_offer_rsvps: [], stay_live_ratings: [], stay_live_answers: [], memberships: [] }
   let serial = 0
   return {
     tables,
@@ -41,14 +44,16 @@ function fakeDatabase() {
           const row = { id: `00000000-0000-4000-8000-${String(++serial).padStart(12, '0')}`, status: name === 'stay_affirmations' ? 'sent' : name === 'stay_meetups' ? 'proposed' : 'new', created_at: `2026-11-12T10:00:${String(serial).padStart(2, '0')}Z`, ...value }
           const clash = (unique[name] || []).some(keys => rows.some(other => keys.every(key => other[key] === row[key])))
             || (name === 'stay_meetups' && row.status === 'proposed' && rows.some(other => other.affirmation_id === row.affirmation_id && other.status === 'proposed'))
-          return { select: () => ({ single: async () => {
+          return { then(resolve) { if (!clash) rows.push(row); resolve({ error: clash ? { code: '23505' } : null }) }, select: () => ({ single: async () => {
             if (clash) return { data: null, error: { code: '23505' } }
             rows.push(row)
             return { data: { id: row.id, blocker_profile: row.blocker_profile }, error: null }
           } }) }
         },
         update(values) { patch = values; return builder },
+        delete() { patch = '__delete'; return builder },
         then(resolve) {
+          if (patch === '__delete') { run().forEach(row => rows.splice(rows.indexOf(row), 1)); return resolve({ error: null }) }
           if (patch) { run().forEach(row => Object.assign(row, patch)); return resolve({ error: null }) }
           resolve(countOnly ? { count: run().length, error: null } : { data: run(), error: null })
         },
@@ -322,5 +327,75 @@ assert.equal(hotelEnding.crewRecognised, 1)
 await stays.notifyHotel(database, ann, 'recheck', { message: 'The shower in my cabin is broken.' }, 'r5')
 assert.match(mails.at(-1).subject, /NOT FIXED/)
 assert.match(mails.at(-1).text, /shower/)
+
+// ---- Part three: offers with places left and friends, and ratings staff push ----
+const ship = database.tables.hotel_stay_settings[0]
+ship.discover_items = offerItemsFromLines([{ title: 'Chef table dinner', body: 'Deck 7, 19:30', spots: 3 }, { title: 'Spa day pass', body: '20% off today' }, { title: 'Chef table dinner', body: 'second sitting', spots: 1 }])
+assert.deepEqual(ship.discover_items.map(item => item.id), ['chef-table-dinner', 'spa-day-pass', 'chef-table-dinner-2'])
+const offerOf = async (stay, id, at = day) => (await stays.guestSession(database, stay, at)).offers.find(item => item.id === id)
+assert.equal((await offerOf(ann, 'chef-table-dinner')).left, 3)
+assert.equal((await offerOf(ann, 'spa-day-pass')).left, null, 'no limit means no places left shown')
+no(await connectAction(database, ann, 'offer.join', { offerId: 'nope' }, day), 404, 'not_found')
+const held = ok(await connectAction(database, ann, 'offer.join', { offerId: 'chef-table-dinner' }, day))
+assert.equal(held.notify.kind, 'offer')
+assert.equal(held.notify.payload.left, 2)
+assert.equal(ok(await connectAction(database, ann, 'offer.join', { offerId: 'chef-table-dinner' }, day)).notify, null, 'holding twice does nothing and tells no one')
+assert.equal((await offerOf(ann, 'chef-table-dinner')).joined, true)
+assert.equal((await offerOf(ann, 'chef-table-dinner')).left, 2)
+ok(await connectAction(database, dan, 'offer.join', { offerId: 'chef-table-dinner' }, day))
+ok(await connectAction(database, eve, 'offer.join', { offerId: 'chef-table-dinner' }, day))
+assert.equal((await offerOf(bo, 'chef-table-dinner')).left, 0)
+no(await connectAction(database, bo, 'offer.join', { offerId: 'chef-table-dinner' }, day), 409, 'full')
+ok(await connectAction(database, eve, 'offer.leave', { offerId: 'chef-table-dinner' }, day))
+ok(await connectAction(database, bo, 'offer.join', { offerId: 'chef-table-dinner' }, day))
+no(await connectAction(database, bo, 'offer.join', { offerId: 'chef-table-dinner' }, new Date('2026-11-20T10:00:00Z')), 409, 'not_open_for_this_stay')
+
+// Names appear only for guests you have met, who are opted in and chose to share their plans.
+ok(await connectAction(database, ann, 'affirm.send', { to: database.tables.stay_profiles.find(row => row.stay_id === 'dan').id, label: 'kind' }, day))
+assert.deepEqual((await offerOf(ann, 'chef-table-dinner')).friends, [], 'not met yet')
+const danInbox = ok(await connectAction(database, dan, 'inbox', {}, day)).body.items
+ok(await connectAction(database, dan, 'affirm.respond', { id: danInbox.find(item => item.label === 'That was kind of you').id, response: 'acknowledge' }, day))
+assert.deepEqual((await offerOf(ann, 'chef-table-dinner')).friends, [], 'met, but Dan has not chosen to share')
+ok(await connectAction(database, dan, 'profile.save', profile('Dan', { sharePlans: true }), day))
+ok(await connectAction(database, eve, 'profile.save', profile('Eve', { sharePlans: true }), day))
+ok(await connectAction(database, eve, 'offer.join', { offerId: 'spa-day-pass' }, day))
+assert.deepEqual((await offerOf(ann, 'chef-table-dinner')).friends, ['Dan'])
+assert.deepEqual((await offerOf(ann, 'spa-day-pass')).friends, [], 'Eve shares but Ann has not met Eve')
+assert.equal((await offerOf(ann, 'spa-day-pass')).going, 1)
+assert.deepEqual((await offerOf(dan, 'chef-table-dinner')).friends, [], 'Ann has not chosen to share')
+ok(await connectAction(database, ann, 'block', { profile: database.tables.stay_profiles.find(row => row.stay_id === 'dan').id }, day))
+assert.deepEqual((await offerOf(ann, 'chef-table-dinner')).friends, [], 'a blocked guest is never named')
+// Hotels use offers with places left, but never name other guests.
+database.tables.hotel_stay_settings[1].discover_items = offerItemsFromLines([{ title: 'Tasting menu', body: 'Tonight 20:00', spots: 4 }])
+const hotelOffer = (await stays.guestSession(database, hotelStay, day)).offers[0]
+assert.equal(hotelOffer.left, 4)
+assert.deepEqual(hotelOffer.friends, [])
+assert.equal(ok(await connectAction(database, hotelStay, 'offer.join', { offerId: 'tasting-menu' }, day)).notify.payload.left, 3)
+
+// Staff ask for a rating now. The front desk and admins can; an analyst cannot.
+const { portalAction: portal } = await import('../api/_lib/stays-portal.mjs')
+const portalTenant = '33333333-3333-4333-8333-333333333333'
+database.tables.memberships.push({ tenant_id: portalTenant, user_id: 'director', role: 'front_desk' }, { tenant_id: portalTenant, user_id: 'analyst', role: 'operator_analyst' })
+assert.equal((await portal(database, 'director', { action: 'push', tenantId: portalTenant, data: { title: 'Evening show, Theatre', minutes: 90 } })).status, 200)
+assert.equal((await portal(database, 'analyst', { action: 'push', tenantId: portalTenant, data: { title: 'x' } })).status, 403)
+assert.equal((await portal(database, 'director', { action: 'push', tenantId: portalTenant, data: { title: '' } })).status, 422)
+assert.equal(database.tables.stay_live_ratings.length, 1)
+database.tables.stay_live_ratings.length = 0
+const liveId = '44444444-4444-4444-8444-444444444444'
+database.tables.stay_live_ratings.push({ id: liveId, tenant_id: tenant, title: 'Evening show', opened_at: '2026-11-12T09:00:00Z', closes_at: '2026-11-12T12:00:00Z' })
+assert.deepEqual((await stays.guestSession(database, ann, day)).live, [{ id: liveId, title: 'Evening show' }])
+no(await connectAction(database, ann, 'live.answer', { liveId, score: 11 }, day), 422)
+no(await connectAction(database, other, 'live.answer', { liveId, score: 8 }, day), 404, 'not_found')
+ok(await connectAction(database, ann, 'live.answer', { liveId, score: 8 }, day))
+no(await connectAction(database, ann, 'live.answer', { liveId, score: 9 }, day), 409, 'already_answered')
+assert.deepEqual((await stays.guestSession(database, ann, day)).live, [], 'answered, so it disappears')
+assert.equal((await stays.guestSession(database, dan, day)).live.length, 1, 'others still see it')
+const afterClose = new Date('2026-11-12T13:00:00Z')
+assert.deepEqual((await stays.guestSession(database, dan, afterClose)).live, [])
+no(await connectAction(database, dan, 'live.answer', { liveId, score: 7 }, afterClose), 409, 'closed')
+assert.equal(database.tables.stay_live_answers.length, 1)
+await stays.notifyHotel(database, ann, 'offer', { offer: 'Chef table dinner', left: 2 }, 'r6')
+assert.match(mails.at(-1).subject, /hold a place/)
+assert.match(mails.at(-1).text, /Places left after this one: 2/)
 
 console.log('guest connect checks passed')

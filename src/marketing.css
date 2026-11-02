@@ -274,11 +274,23 @@ img { display: block; width: 100%; }
   .trust-flow > div { max-width: none; flex-basis: 100%; }
 }
 
-.home-film { max-width: 1120px; margin: 0 auto; padding: 72px 24px 24px; text-align: center; }
-.home-film h2 { max-width: 760px; margin: 0 auto 34px; font-size: clamp(30px,3.4vw,48px); line-height: 1.06; letter-spacing: -.045em; font-weight: 400; text-wrap: balance; }
-.home-film figure { position: relative; margin: 0; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 40px 80px -48px rgba(23,23,21,.5); background: var(--paper); }
-.home-film video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
-.home-film-toggle { position: absolute; right: 16px; bottom: 16px; min-height: 40px; padding: 0 18px; border: 1px solid var(--line); border-radius: 99px; background: rgba(250,248,244,.92); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; backdrop-filter: blur(8px); }
-.home-film-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-@media (max-width: 720px) { .home-film { padding: 48px 16px 8px; } .home-film figure { border-radius: 16px; } }
-@media (max-width: 720px) { .home-film-toggle { right: 8px; bottom: 8px; min-height: 32px; padding: 0 12px; font-size: 12px; } }
+
+/* Homepage opener: Tisonik. and four ticked promises beside a silent film. */
+.film-top { max-width: 1280px; margin: 0 auto; padding: 56px 32px 40px; display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr); gap: 56px; align-items: center; }
+.film-switch { display: inline-flex; padding: 4px; gap: 4px; border: 1px solid var(--line); border-radius: 99px; margin-bottom: 34px; }
+.film-switch button { font: inherit; font-size: 14px; padding: 8px 18px; border: 0; border-radius: 99px; background: transparent; color: var(--muted); cursor: pointer; }
+.film-switch button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.film-switch button:focus-visible, .film-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.film-wordmark { margin: 0; font-size: clamp(64px, 8vw, 112px); line-height: .95; letter-spacing: -.06em; font-weight: 400; color: var(--ink); }
+.film-wordmark span { color: var(--accent); }
+.film-tagline { margin: 14px 0 34px; font-size: 20px; line-height: 1.4; color: var(--muted); letter-spacing: -.01em; }
+.film-hooks { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }
+.film-hooks li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 16px; align-items: start; font-size: 18px; line-height: 1.45; color: var(--muted); letter-spacing: -.01em; }
+.film-hooks strong { color: var(--ink); font-weight: 500; }
+.film-hooks i { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); position: relative; margin-top: 1px; }
+.film-hooks i::after { content: ""; position: absolute; left: 10px; top: 5px; width: 6px; height: 12px; border: solid #fff; border-width: 0 2.5px 2.5px 0; transform: rotate(42deg); }
+.film-frame { position: relative; margin: 0; border-radius: 22px; overflow: hidden; background: #0f1d21; box-shadow: 0 50px 90px -50px rgba(23,23,21,.65); }
+.film-frame video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+.film-toggle { position: absolute; right: 14px; bottom: 14px; min-height: 40px; padding: 0 18px; border: 1px solid rgba(243,236,220,.35); border-radius: 99px; background: rgba(15,29,33,.72); color: #f3ecdc; font: inherit; font-size: 14px; cursor: pointer; backdrop-filter: blur(8px); }
+@media (max-width: 960px) { .film-top { grid-template-columns: minmax(0, 1fr); gap: 36px; padding: 36px 20px 24px; } .film-hooks li { font-size: 17px; } }
+@media (max-width: 720px) { .film-frame { border-radius: 16px; } .film-toggle { right: 8px; bottom: 8px; min-height: 32px; padding: 0 12px; font-size: 12px; } }

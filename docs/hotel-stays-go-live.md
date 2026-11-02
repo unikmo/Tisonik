@@ -24,6 +24,7 @@ Apply in this order, in the SQL editor or with the Supabase CLI. Take a backup f
 4. `supabase/migrations/202611010015_welcome_video.sql` - welcome video columns. Apply before deploying the code that reads them.
 5. `supabase/migrations/202611010016_guest_connect.sql` - crew list, crew recognitions, daily pulse and (ships) opt-in guest profiles, compliments and meet-ups. See `docs/GUEST_CONNECT.md`. Apply before deploying.
 6. `supabase/migrations/202611010017_connect_extras.sql` - shared activities, the did-we-fix-it re-check and the Nearby columns. Apply before deploying.
+7. `supabase/migrations/202611010018_offers_and_live_ratings.sql` - places held on offers, "share my plans", and staff-pushed ratings. Apply before deploying.
 
 Check: `select count(*) from hotel_stays;` returns 0 and `select public.stay_rate_limit_hit('test', 60, 5);` returns `true`.
 
