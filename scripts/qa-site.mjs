@@ -89,7 +89,7 @@ if (!clientBundles.includes('The privacy gateway aggregates before anything reac
 if (!clientBundles.includes('Live event feedback reaches leaders while they can still act')) fail('executive walkthrough is missing structured live-event feedback')
 if (!clientBundles.includes('Confirmed attributed revenue')) fail('executive walkthrough is missing revenue attribution')
 if (!clientBundles.includes('Did someone make your day today?')) fail('executive walkthrough is missing the passive-guest recognition prompt')
-if (!clientBundles.includes('Frequently asked questions about CruiseConnect')) fail('site is missing the public FAQ')
+if (!clientBundles.includes('Frequently asked questions about Tisonik')) fail('site is missing the public FAQ')
 if (!clientBundles.includes('Where does Tisonik run?')) fail('FAQ is missing the deployment architecture answer')
 if (!clientBundles.includes('How do passenger privacy and data residency work?')) fail('FAQ is missing privacy and data residency')
 if (!clientBundles.includes('Does the cruise line retain ownership and avoid lock-in?')) fail('FAQ is missing ownership and lock-in')

@@ -297,3 +297,14 @@ img { display: block; width: 100%; }
 .film-tabs button { font: inherit; font-size: 14px; padding: 8px 18px; border: 0; border-radius: 99px; background: transparent; color: var(--muted); cursor: pointer; }
 .film-tabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
 .film-tabs button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.story-visual { position: relative; }
+.story-visual--keepsake { background-image: url('/media/unikmo-card-on-bed.webp'); }
+.story-phone { position: absolute; right: 7%; top: 9%; width: 29%; border-radius: 26px 26px 0 0; padding: 6px 6px 0; background: #0a1214; box-shadow: 0 30px 60px -24px rgba(0,0,0,.7), 0 0 0 1px rgba(201,163,91,.5) inset; }
+.story-phone img { display: block; width: 100%; height: auto; border-radius: 21px 21px 0 0; }
+.story-section--reverse .story-phone { right: auto; left: 7%; }
+.film-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 32px; }
+.film-cta .pilot-button, .film-cta .pilot-link { margin-top: 0; }
+.pilot-button--primary { background: var(--ink); color: var(--paper); }
+.pilot-button--primary:hover { background: transparent; color: var(--ink); }
+@media (max-width: 760px) { .story-phone { width: 36%; } }

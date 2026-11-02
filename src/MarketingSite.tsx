@@ -6,7 +6,7 @@ const contactHref = '/contact/#contact'
 const pilotContactHref = '/pilot/#contact'
 const demoHref = '/product-app/'
 
-type StoryCrop = 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue'
+type StoryCrop = 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue' | 'keepsake'
 type PageKey = 'home' | 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue' | 'dashboard' | 'integration' | 'security' | 'pilot' | 'contact'
 
 type Detail = {
@@ -93,7 +93,7 @@ const details: Record<Exclude<PageKey, 'home' | 'contact' | 'security'>, Detail>
       { title: 'Outcome-led', body: 'A pilot should measure agreed behavior and operational outcomes, not just page opens or feature taps.' },
       { title: 'No invented proof', body: 'Public performance claims should follow real pilot evidence rather than demo data.' },
       { title: 'Management context', body: 'Signals can be grouped by sailing, team, experience area and defined pilot KPI.' },
-      { title: 'Revenue without passenger identity', body: 'Opaque handoff references can connect CruiseConnect activity to confirmed booking value without giving Tisonik passenger names, payment data or booking references.' },
+      { title: 'Revenue without passenger identity', body: 'Opaque handoff references can connect Tisonik activity to confirmed booking value without giving Tisonik passenger names, payment data or booking references.' },
     ],
   },
   integration: {
@@ -162,10 +162,12 @@ const Footer = () => (
   </footer>
 )
 
-const Section = ({ id, eyebrow, title, children, crop, reverse = false, alt }: { id: string; eyebrow: string; title: string; children: ReactNode; crop: StoryCrop; reverse?: boolean; alt: string }) => (
+const Section = ({ id, eyebrow, title, children, crop, reverse = false, alt, shot, shotAlt }: { id: string; eyebrow: string; title: string; children: ReactNode; crop: StoryCrop; reverse?: boolean; alt: string; shot?: string; shotAlt?: string }) => (
   <section id={id} className={`story-section ${reverse ? 'story-section--reverse' : ''}`}>
     <div className="story-copy"><p className="eyebrow">{eyebrow}</p><h2>{title}</h2><div className="story-body">{children}</div></div>
-    <figure className={`story-visual story-visual--${crop}`} role="img" aria-label={alt} />
+    <figure className={`story-visual story-visual--${crop}`} role="img" aria-label={shot ? `${alt}. ${shotAlt}` : alt}>
+      {shot && <span className="story-phone" aria-hidden="true"><img src={shot} alt="" loading="lazy" width="390" height="843" /></span>}
+    </figure>
   </section>
 )
 
@@ -182,19 +184,19 @@ const EntityDefinition = () => (
 
 const buyerFaqs = [
   ['Where does Tisonik run?', 'The passenger experience runs inside the cruise line’s existing app as a white-label SDK or embedded module. Identity resolution and source actions run on-device, ship-local or in the operator’s systems. Tisonik cloud receives only aggregate KPI reports and non-identifying service-health telemetry.'],
-  ['How do passenger privacy and data residency work?', 'Passenger and crew source records remain in the operator-controlled environment and residency region. Tisonik receives no names, photos, biometric templates, face-match scores or person-level identifiers; cells below 20 are suppressed.'],
+  ['How do passenger privacy and data residency work?', 'Passenger and crew records stay in your environment and your region. Tisonik receives no names, photos, biometric templates or person-level identifiers, and any group under 20 is suppressed.'],
   ['How much IT integration is required?', 'One embedded feature connects to scoped host interfaces for launch context, operator-side identity, ship operations, booking outcomes and aggregate reporting. The pilot defines each interface before deployment.'],
-  ['What happens when ship connectivity is limited?', 'The interface is cacheable and core actions can use device and ship-local services. Public internet is not required for every interaction; approved aggregate reports synchronize later.'],
-  ['How does Tisonik pass cybersecurity and vendor review?', 'The production requirements include signed requests, tenant separation, role-based access, replay protection, allow-listed aggregate schemas, body-free analytics logs and independent security testing.'],
-  ['How are anonymous passenger vibes, safety and minors handled?', 'Anonymous Vibes are adult-only. The operator resolves a photographed receiver inside its identity zone, returns no name, rejects same-cabin/booking-group and duplicate attempts, caps each sender at five vibes per sailing day, discards the capture after matching and delivers prepared compliments without sender identity or exact timing. A sixth attempt pauses sending until the next sailing day. Children cannot send, receive or be matched.'],
+  ['What happens when ship connectivity is limited?', 'Core actions run on the device and ship-local services, so the public internet is not needed for every interaction. Approved aggregate reports sync when the link returns.'],
+  ['How does Tisonik pass cybersecurity and vendor review?', 'Production requirements: signed requests, tenant separation, role-based access, replay protection, allow-listed aggregate schemas, body-free analytics logs and independent security testing.'],
+  ['How are anonymous passenger vibes, safety and minors handled?', 'Adults only. Children cannot send, receive or be matched. The operator resolves the receiver and returns no name, each sender is capped at five a sailing day, the capture is discarded after matching, and compliments arrive without the sender’s identity or exact time.'],
   ['Can passengers choose to connect?', 'Yes, through the separate VConnect flow—not by replying to an Anonymous Vibe. An adult may send one predefined connection request per sailing day. The recipient can accept, decline, block or report; the requester receives an update only after acceptance. Thereafter, both passengers can use prepared public-venue, activity and time options. Free text, cabins, room numbers, live location and dating-oriented prompts are excluded.'],
-  ['Does Anonymous Vibe require a second consent screen?', 'No. The cruise line can include CruiseConnect recognition as a clearly stated purpose in its adult boarding imaging enrolment. Adults who accept are enrolled once for that sailing and are not interrupted again when using Anonymous Vibe; those who decline or opt out are excluded from matching.'],
+  ['Does Anonymous Vibe require a second consent screen?', 'No. The cruise line can include Tisonik recognition as a clearly stated purpose in its adult boarding imaging enrolment. Adults who accept are enrolled once for that sailing and are not interrupted again when using Anonymous Vibe; those who decline or opt out are excluded from matching.'],
   ['Can the cruise line publish passenger rankings or identities?', 'No. Top Five uses dense score positions and the result is private. Only the passenger can choose to share their own Vibe Card. Event RSVPs show a count by default; chosen name/image visibility is a separate passenger choice limited to confirmed attendees.'],
   ['Does crew recognition become employee ranking?', 'No public leaderboard or passenger-facing crew rating is created. Identity verification stays operator-side, recognition uses prepared positive reasons, and employment decisions remain solely with the cruise line.'],
   ['Will this create additional operational workload?', 'Prepared response blocks, routing rules and priority states turn activity into structured operational signals instead of another free-text inbox.'],
-  ['Can the revenue attribution be trusted?', 'The operator resolves bookings locally and sends signed confirmed, cancelled, refunded and net-value totals. Tisonik does not rely on self-reported clicks or receive booking references.'],
+  ['Can the revenue attribution be trusted?', 'Your systems resolve bookings and send signed confirmed, cancelled, refunded and net-value totals. Tisonik does not rely on self-reported clicks and never receives booking references.'],
   ['Who controls the brand and published ratings?', 'The cruise line controls the feature name, co-branding, placement and whether any aggregate event rating is published.'],
-  ['Does the cruise line retain ownership and avoid lock-in?', 'Yes. The operator keeps identity, commerce and all source records. Tisonik can be removed without migrating a passenger or biometric database from us.'],
+  ['Does the cruise line retain ownership and avoid lock-in?', 'Yes. You keep identity, commerce and every source record. Tisonik can be removed without migrating a passenger or biometric database from us.'],
 ]
 
 const faqStructuredData = JSON.stringify({
@@ -203,7 +205,7 @@ const faqStructuredData = JSON.stringify({
   mainEntity: buyerFaqs.map(([question, answer]) => ({ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } })),
 })
 
-const BuyerReadiness = ({ schema = true }: { schema?: boolean }) => <section className="buyer-readiness" aria-labelledby="buyer-readiness-title">{schema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqStructuredData }}/>}<p className="eyebrow">FAQs</p><h2 id="buyer-readiness-title">Frequently asked questions about CruiseConnect.</h2><div className="buyer-readiness-grid">{buyerFaqs.map(([question,answer],index)=><details key={question} open={index===0}><summary><span>{String(index+1).padStart(2,'0')}</span><h3>{question}</h3><i aria-hidden="true">+</i></summary><p>{answer}</p></details>)}</div></section>
+const BuyerReadiness = ({ schema = true }: { schema?: boolean }) => <section className="buyer-readiness" aria-labelledby="buyer-readiness-title">{schema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqStructuredData }}/>}<p className="eyebrow">FAQs</p><h2 id="buyer-readiness-title">Frequently asked questions about Tisonik.</h2><div className="buyer-readiness-grid">{buyerFaqs.map(([question,answer],index)=><details key={question} open={index===0}><summary><span>{String(index+1).padStart(2,'0')}</span><h3>{question}</h3><i aria-hidden="true">+</i></summary><p>{answer}</p></details>)}</div></section>
 
 // The first thing on the homepage: Tisonik and four promises, readable before any video plays, beside a silent film.
 // The film and the crew photo share one frame. The film starts by itself unless the visitor prefers reduced motion, and can always be paused.
@@ -235,6 +237,7 @@ const HomeFilm = () => {
       <p className="film-wordmark">Tisonik<span>.</span></p>
       <p className="film-tagline">The guest experience layer for cruise lines.</p>
       <ul className="film-hooks">{filmHooks.map(([line, more]) => <li key={line}><i aria-hidden="true" /><span><strong>{line}</strong> {more}</span></li>)}</ul>
+      <div className="film-cta"><a className="pilot-button pilot-button--primary" href="#pilot">See the one-ship pilot <Arrow /></a><a className="pilot-link" href={demoHref}>VIEW PRODUCT DEMO <Arrow /></a></div>
     </div>
     <div className="film-side">
       <figure className="film-frame">
@@ -257,7 +260,7 @@ const Home = () => (
     <HomeFilm />
     <section id="top" className="hero">
       <p className="eyebrow hero-eyebrow">GUEST EXPERIENCE FOR CRUISE LINES &amp; ALL-INCLUSIVE RESORTS</p>
-      <h1>Turn more guest moments into <span>unforgettable experiences.</span></h1>
+      <h1>Transform guest experiences. <span>Grow ancillary revenue.</span></h1>
       <p className="hero-positioning">A white-label experience layer inside the digital journey you already own—not another app for guests to download.</p>
     </section>
     <section className="hero-after" aria-labelledby="hero-after-title">
@@ -276,15 +279,16 @@ const Home = () => (
       </div>
     </section>
     <section className="manifesto" aria-label="Tisonik cruise promise"><p className="eyebrow">FOR THE CRUISE JOURNEY</p><h2>Built to feel natural onboard.</h2><p className="manifesto-copy">A quieter interaction layer for guests, crew and the moments between the itinerary.</p></section>
-    <Section id="passenger-experience" eyebrow="PASSENGER EXPERIENCE" title="Make the app feel more alive." crop="passenger" alt="Multicultural cruise passengers of different ages relaxing together"><p>Give guests more relevant reasons to interact throughout the sailing—without making the experience feel busy, intrusive or transactional.</p></Section>
-    <Section id="crew-recognition" eyebrow="CREW RECOGNITION" title="Let great service be seen." crop="crew" alt="Diverse cruise crew members sharing a candid end-of-shift moment" reverse><p>A simple moment of recognition becomes visible, measurable and memorable—for the guest, the crew member and the operator.</p></Section>
-    <Section id="service-recovery" eyebrow="SERVICE RECOVERY" title="Resolve the moment while it still matters." crop="recovery" alt="Cruise crew member returning a child’s toy beside their parent"><p>Give guests a discreet way to signal friction during the journey, creating the opportunity to respond before the experience is over.</p></Section>
-    <Section id="engagement" eyebrow="LIVE EXPERIENCE FEEDBACK" title="Improve events while the sailing is still underway." crop="engagement" alt="Multigenerational passengers enjoying an inclusive deck activity" reverse><p>After a live event, ask three to five structured questions with prepared response blocks. Leaders see feedback immediately; the cruise line decides which aggregated ratings to publish.</p></Section>
-    <Section id="ancillary-revenue" eyebrow="ANCILLARY REVENUE" title="Make relevance commercial." crop="revenue" alt="A multicultural family choosing an onboard experience together"><p>When the guest is already engaged, relevant experiences and offers can appear naturally—while checkout, pricing and payment stay with the cruise line.</p></Section>
+    <Section id="passenger-experience" eyebrow="PASSENGER EXPERIENCE" title="Make the app feel more alive." crop="passenger" alt="Multicultural cruise passengers of different ages relaxing together" shot="/media/portal-welcome.jpg" shotAlt="The guest page: a welcome from the Cruise Director, then a show the guest has just seen, ready to rate with one tap"><p>Give guests more relevant reasons to interact throughout the sailing—without making the experience feel busy, intrusive or transactional.</p></Section>
+    <Section id="crew-recognition" eyebrow="CREW RECOGNITION" title="Let great service be seen." crop="crew" alt="Diverse cruise crew members sharing a candid end-of-shift moment" reverse shot="/media/portal-crew-recognition.jpg" shotAlt="The guest page: a crew member chosen, two preset reasons picked, ready to send"><p>A simple moment of recognition becomes visible, measurable and memorable—for the guest, the crew member and the operator.</p></Section>
+    <Section id="service-recovery" eyebrow="SERVICE RECOVERY" title="Resolve the moment while it still matters." crop="recovery" alt="Cruise crew member returning a child’s toy beside their parent" shot="/media/portal-service-recovery.jpg" shotAlt="The guest page: a low stateroom score, answered with thanks and a promise that the team has been told"><p>Give guests a discreet way to signal friction during the journey, creating the opportunity to respond before the experience is over.</p></Section>
+    <Section id="engagement" eyebrow="LIVE EXPERIENCE FEEDBACK" title="Improve events while the sailing is still underway." crop="engagement" alt="Multigenerational passengers enjoying an inclusive deck activity" reverse shot="/media/portal-live-rating.jpg" shotAlt="The guest page: Just finished, how was the evening show, five one-tap answers"><p>After a live event, ask three to five structured questions with prepared response blocks. Leaders see feedback immediately; the cruise line decides which aggregated ratings to publish.</p></Section>
+    <Section id="ancillary-revenue" eyebrow="ANCILLARY REVENUE" title="Make relevance commercial." crop="revenue" alt="A multicultural family choosing an onboard experience together" shot="/media/portal-offers-keepsake.jpg" shotAlt="The guest page: Chef table dinner, your friend Dee is going, 3 places left, and a button to hold a place"><p>When the guest is already engaged, relevant experiences and offers can appear naturally—while checkout, pricing and payment stay with the cruise line.</p></Section>
+    <Section id="keepsake" eyebrow="THE KEEPSAKE · LESS PAPER" title="Less disposable print. A keepsake that lasts." crop="keepsake" alt="A UNIKMO card standing on a made-up cabin bed" reverse><p>One card and one guest page can stand in for the printed welcome letters and flyers a guest throws away. The card stays with them after the sailing, and so does the welcome.</p></Section>
     <EntityDefinition />
     <section className="quiet-proof"><p className="eyebrow">BUILT TO FIT THE CRUISE JOURNEY</p><div className="proof-grid"><article><strong>Inside the existing app</strong><span>No competing destination for the guest.</span></article><article><strong>Immediate operational feedback</strong><span>Structured event ratings reach leaders while they can still act.</span></article><article><strong>Revenue evidence without identity</strong><span>Confirmed booking value is attributed through opaque references and aggregated outcomes.</span></article></div></section>
     <BuyerReadiness />
-    <section id="pilot" className="pilot-section"><p className="eyebrow">ONE SHIP. THE COMPLETE EXPERIENCE.</p><h2>See the product, then pilot it inside the cruise app guests already use.</h2><p>Walk through the connected passenger and management experience, then request a complete one-ship pilot.</p><div className="pilot-actions"><a className="pilot-button" href={demoHref}>View product demo <Arrow /></a><a className="pilot-button pilot-button--secondary" href={pilotContactHref}>Request a pilot <Arrow /></a></div></section>
+    <section id="pilot" className="pilot-section"><p className="eyebrow">ONE SHIP. THE COMPLETE EXPERIENCE.</p><h2>See the product, then pilot it inside the cruise app guests already use.</h2><p>Walk through the connected passenger and management experience, then request a complete one-ship pilot.</p><div className="pilot-actions"><a className="pilot-button pilot-button--primary" href={pilotContactHref}>Request a pilot <Arrow /></a><a className="pilot-button pilot-button--secondary" href={demoHref}>View product demo <Arrow /></a></div></section>
   </>
 )
 
