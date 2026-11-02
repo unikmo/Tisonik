@@ -7,7 +7,7 @@ const pilotContactHref = '/pilot/#contact'
 const demoHref = '/product-app/'
 
 type StoryCrop = 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue' | 'keepsake'
-type PageKey = 'home' | 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue' | 'dashboard' | 'integration' | 'security' | 'pilot' | 'contact'
+type PageKey = 'home' | 'passenger' | 'crew' | 'recovery' | 'engagement' | 'revenue' | 'dashboard' | 'integration' | 'hospitality' | 'security' | 'pilot' | 'contact'
 
 type Detail = {
   eyebrow: string
@@ -19,7 +19,7 @@ type Detail = {
   note?: string
 }
 
-const details: Record<Exclude<PageKey, 'home' | 'contact' | 'security'>, Detail> = {
+const details: Record<Exclude<PageKey, 'home' | 'contact' | 'security' | 'hospitality'>, Detail> = {
   passenger: {
     eyebrow: 'PASSENGER EXPERIENCE',
     title: 'Turn a good passenger moment into an anonymous vibe.',
@@ -134,6 +134,7 @@ const pageFromPath = (path: string): PageKey => {
   if (normalized === '/ancillary-revenue' || normalized === '/social-commerce') return 'revenue'
   if (normalized === '/cruise-dashboard') return 'dashboard'
   if (normalized === '/integration') return 'integration'
+  if (normalized === '/hospitality') return 'hospitality'
   if (normalized === '/security') return 'security'
   if (normalized === '/pilot') return 'pilot'
   if (normalized === '/contact') return 'contact'
@@ -349,12 +350,44 @@ const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) =>
   </section>
 }
 
+const hospitalityRows: [string, string, string][] = [
+  ['Welcome from', 'The Cruise Director', 'The General Manager'],
+  ['Offers', '“Your friend Dee is going. 3 places left.”', '“Tonight’s tasting menu. 5 places left.” Guests never see each other.'],
+  ['Hearing it early', 'Five short questions the day before guests leave, pushed by your Cruise Director and animation team', 'Events rated the moment they end; a low score reaches reception straight away'],
+  ['The keepsake', 'Cruise highlights added to the same welcome code by our cruise media team', 'A card guests take home, with the welcome behind it'],
+  ['Where to start', 'One ship', 'One property'],
+]
+
+const sharedPromises: [string, string][] = [
+  ['No new app required.', 'Works inside the app you already have, or from the card on any phone.'],
+  ['A welcome that becomes a keepsake.', 'A greeting on day one, on a card guests can keep.'],
+  ['Offers that sell themselves.', 'Places left, shown at the moment they matter.'],
+  ['Hear it before the review.', 'Find out what guests think while you can still fix it.'],
+]
+
+const HospitalityPage = () => <>
+  <section className="detail-hero hosp-hero"><p className="eyebrow">ONE EXPERIENCE LAYER · TWO HOSPITALITY ENVIRONMENTS</p><h1>One guest experience layer for cruise lines and hotels.</h1><p className="detail-intro">A UNIKMO card opens a Tisonik guest page: a welcome, offers, ratings and thanks, with no new app required. The same layer, set up for a ship or for a property.</p></section>
+  <section className="hosp-films" aria-label="The Tisonik films">
+    {([['Cruise lines', 'cruise', '/', 'Explore cruise'], ['Hotels & resorts', 'hotel', '/all-inclusive-resorts/', 'Explore hotels']] as const).map(([name, key, href, cta]) => <article key={key}>
+      <video muted loop playsInline controls preload="none" poster={`/media/tisonik-film-${key}-poster.jpg`} aria-label={`The Tisonik film for ${name.toLowerCase()}`}><source src={`/media/tisonik-film-${key}.webm`} type="video/webm" /></video>
+      <h2>{name}</h2><a className="pilot-link" href={href}>{cta.toUpperCase()} <Arrow /></a>
+    </article>)}
+  </section>
+  <section className="quiet-proof"><p className="eyebrow">THE SAME FOUR PROMISES</p><div className="proof-grid">{sharedPromises.map(([line, more]) => <article key={line}><strong>{line}</strong><span>{more}</span></article>)}</div></section>
+  <section className="hosp-compare" aria-labelledby="hosp-compare-title"><p className="eyebrow">WHERE THEY DIFFER</p><h2 id="hosp-compare-title">Set up for how each place actually works.</h2>
+    <div className="hosp-table" role="table"><div role="row" className="hosp-head"><span role="columnheader" /><span role="columnheader">Cruise</span><span role="columnheader">Hotel</span></div>{hospitalityRows.map(([label, cruise, hotel]) => <div role="row" key={label}><strong role="rowheader">{label}</strong><span role="cell">{cruise}</span><span role="cell">{hotel}</span></div>)}</div>
+    <p className="hosp-custom">UNIKMO cards can be customised to your brand. <a href={contactHref}>Talk to us</a>.</p>
+  </section>
+  <section className="pilot-section"><p className="eyebrow">START SMALL</p><h2>One ship, or one property.</h2><p>Define the guest journeys and success measures first. Then scale, iterate or stop.</p><div className="pilot-actions"><a className="pilot-button pilot-button--primary" href={pilotContactHref}>See the one-ship pilot <Arrow /></a><a className="pilot-button" href="/resort-pilot/#contact">Start with one property <Arrow /></a><a className="pilot-link" href={demoHref}>VIEW PRODUCT DEMO <Arrow /></a></div></section>
+</>
+
 const DetailPage = ({ page }: { page: Exclude<PageKey, 'home'> }) => {
   if (page === 'security') return <><SecurityPage /><section className="detail-next"><p className="eyebrow">THE CONNECTED PRODUCT</p><h2>See how this fits into the complete Tisonik experience.</h2><a className="pilot-button" href={demoHref}>View product demo <Arrow /></a></section></>
   if (page === 'integration') {
     const cruise = details.integration
     return <><HowItWorksPage cruiseDetail={<><section className="detail-facts" id="details">{cruise.facts.map((fact,index)=><article key={fact.title}><span>0{index+1}</span><h3>{fact.title}</h3><p>{fact.body}</p></article>)}</section>{cruise.note && <p className="architecture-note">{cruise.note}</p>}<BuyerReadiness schema={false} /></>} /><section className="detail-next"><p className="eyebrow">THE CONNECTED PRODUCT</p><h2>See how this fits into the complete Tisonik experience.</h2><a className="pilot-button" href={demoHref}>View product demo <Arrow /></a></section></>
   }
+  if (page === 'hospitality') return <HospitalityPage />
   if (page === 'pilot') return <PilotContactForm mode="pilot" />
   if (page === 'contact') return <PilotContactForm mode="contact" />
   const detail = details[page]
