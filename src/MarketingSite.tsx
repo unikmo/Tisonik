@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { HowItWorksPage, SecurityPage } from './TrustPages'
 
 const Arrow = () => <span aria-hidden="true">→</span>
@@ -205,6 +205,33 @@ const faqStructuredData = JSON.stringify({
 
 const BuyerReadiness = ({ schema = true }: { schema?: boolean }) => <section className="buyer-readiness" aria-labelledby="buyer-readiness-title">{schema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqStructuredData }}/>}<p className="eyebrow">FAQs</p><h2 id="buyer-readiness-title">Frequently asked questions about CruiseConnect.</h2><div className="buyer-readiness-grid">{buyerFaqs.map(([question,answer],index)=><details key={question} open={index===0}><summary><span>{String(index+1).padStart(2,'0')}</span><h3>{question}</h3><i aria-hidden="true">+</i></summary><p>{answer}</p></details>)}</div></section>
 
+// Silent film for the homepage. It starts by itself unless the visitor prefers reduced motion, and can always be paused.
+const HomeFilm = () => {
+  const video = useRef<HTMLVideoElement>(null)
+  const [playing, setPlaying] = useState(false)
+  useEffect(() => {
+    const element = video.current
+    if (!element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    element.play().catch(() => {})
+  }, [])
+  const toggle = () => {
+    const element = video.current
+    if (!element) return
+    if (element.paused) element.play().catch(() => {})
+    else element.pause()
+  }
+  return <section className="home-film" aria-labelledby="home-film-title">
+    <p className="eyebrow">SEE IT IN 45 SECONDS</p>
+    <h2 id="home-film-title">From the card on the bed to the desk that puts it right.</h2>
+    <figure>
+      <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-home-film-poster.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label="A guest scans a card, sees a welcome, thanks a crew member and gives a low score. The desk is told straight away.">
+        <source src="/media/tisonik-home-film.webm" type="video/webm" />
+      </video>
+      <button type="button" className="home-film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>
+    </figure>
+  </section>
+}
+
 const Home = () => (
   <>
     <section id="top" className="hero">
@@ -220,6 +247,7 @@ const Home = () => (
         <a className="pilot-link" href="/all-inclusive-resorts/">EXPLORE HOTELS &amp; RESORTS <Arrow /></a>
       </div>
     </section>
+    <HomeFilm />
     <section className="quiet-proof" aria-label="Tisonik hospitality environments">
       <p className="eyebrow">ONE EXPERIENCE LAYER · TWO HOSPITALITY ENVIRONMENTS</p>
       <div className="proof-grid">
