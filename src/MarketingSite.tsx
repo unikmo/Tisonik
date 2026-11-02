@@ -221,10 +221,10 @@ const HomeFilm = () => {
     else element.pause()
   }
   return <section className="home-film" aria-labelledby="home-film-title">
-    <p className="eyebrow">SEE IT IN 45 SECONDS</p>
+    <p className="eyebrow">SEE IT IN 50 SECONDS</p>
     <h2 id="home-film-title">From the card on the bed to the desk that puts it right.</h2>
     <figure>
-      <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-home-film-poster.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label="A guest scans a card, sees a welcome, thanks a crew member and gives a low score. The desk is told straight away.">
+      <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-home-film-poster.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label="Four promises for cruise lines and hotels, then a guest scans a card, sees a welcome and offers, thanks a crew member and gives a low score. The desk is told straight away.">
         <source src="/media/tisonik-home-film.webm" type="video/webm" />
       </video>
       <button type="button" className="home-film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>
