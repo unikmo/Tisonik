@@ -234,25 +234,21 @@ const HomeFilm = () => {
     else element.pause()
   }
   return <section className="film-top" aria-label="What Tisonik does">
-    <div className="film-copy">
-      <p className="film-wordmark">Tisonik<span>.</span></p>
-      <p className="film-tagline">The guest experience layer for cruise lines.</p>
-      <ul className="film-hooks">{filmHooks.map(([line, more]) => <li key={line}><i aria-hidden="true" /><span><strong>{line}</strong> {more}</span></li>)}</ul>
-      <div className="film-cta"><a className="pilot-button pilot-button--primary" href="#pilot">See the one-ship pilot <Arrow /></a><a className="pilot-link" href={demoHref}>VIEW PRODUCT DEMO <Arrow /></a></div>
+    <p className="film-wordmark">Tisonik<span>.</span></p>
+    <p className="film-tagline">The guest experience layer for cruise lines.</p>
+    <div className="film-tabs" role="group" aria-label="Choose what to show">
+      {([['film', 'The film'], ['crew', 'Your crew']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={slide === key} onClick={() => setSlide(key)}>{label}</button>)}
     </div>
-    <div className="film-side">
-      <figure className="film-frame">
-        {slide === 'film'
-          ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-cruise-poster.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
-            <source src="/media/tisonik-film-cruise.webm" type="video/webm" />
-          </video>
-          : <img src="/media/hero-centered-black-crew-amara.jpg" alt="Black cruise crew member welcoming guests onboard" />}
-        {slide === 'film' && <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>}
-      </figure>
-      <div className="film-tabs" role="group" aria-label="Choose what to show">
-        {([['film', 'The film'], ['crew', 'Your crew']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={slide === key} onClick={() => setSlide(key)}>{label}</button>)}
-      </div>
-    </div>
+    <figure className="film-frame">
+      {slide === 'film'
+        ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-cruise-poster.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
+          <source src="/media/tisonik-film-cruise.webm" type="video/webm" />
+        </video>
+        : <img src="/media/hero-centered-black-crew-amara.jpg" alt="Black cruise crew member welcoming guests onboard" />}
+      {slide === 'film' && <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>}
+    </figure>
+    <ul className="film-hooks">{filmHooks.map(([line]) => <li key={line}><i aria-hidden="true" /><strong>{line}</strong></li>)}</ul>
+    <div className="film-cta"><a className="pilot-button pilot-button--primary" href="#pilot">See the one-ship pilot <Arrow /></a></div>
   </section>
 }
 

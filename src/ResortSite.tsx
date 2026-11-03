@@ -235,26 +235,21 @@ const HotelFilm = () => {
     else element.pause()
   }
   return <section className="film-top" aria-label="What Tisonik does">
-    <div className="film-copy">
-      <p className="film-wordmark">Tisonik<span>.</span></p>
-      <h1 className="film-tagline">The guest experience layer for hotels.</h1>
-      <ul className="film-hooks">{filmHooks.map(([line, more]) => <li key={line}><i aria-hidden="true" /><span><strong>{line}</strong> {more}</span></li>)}</ul>
-      <div className="film-cta"><a className="resort-primary-button" href="#pilot">Start with one property <Arrow /></a><a className="resort-text-link" href={liveDemoHref}>VIEW PRODUCT DEMO <Arrow /></a></div>
+    <p className="film-wordmark">Tisonik<span>.</span></p>
+    <h1 className="film-tagline">The guest experience layer for hotels.</h1>
+    <div className="film-tabs" role="group" aria-label="Choose what to show">
+      {([['film', 'The film'], ['card', 'The card']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={slide === key} onClick={() => setSlide(key)}>{label}</button>)}
     </div>
-    <div className="film-side">
-      <figure className="film-frame">
-        {slide === 'film'
-          ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-hotel-poster.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
-            <source src="/media/tisonik-film-hotel.webm" type="video/webm" />
-          </video>
-          : <img src="/media/unikmo-card-on-bed-hotel.webp" alt="A UNIKMO welcome card resting on a hotel bed" />}
-        {slide === 'film' && <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>}
-      </figure>
-      <div className="film-tabs" role="group" aria-label="Choose what to show">
-        {([['film', 'The film'], ['card', 'The card']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={slide === key} onClick={() => setSlide(key)}>{label}</button>)}
-      </div>
-      <p className="film-custom">UNIKMO cards can be customised to your hotel’s brand. <a href="#pilot">Talk to us</a>.</p>
-    </div>
+    <figure className="film-frame">
+      {slide === 'film'
+        ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-hotel-poster.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
+          <source src="/media/tisonik-film-hotel.webm" type="video/webm" />
+        </video>
+        : <img src="/media/unikmo-card-on-bed-hotel.webp" alt="A UNIKMO welcome card resting on a hotel bed" />}
+      {slide === 'film' && <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>}
+    </figure>
+    <ul className="film-hooks">{filmHooks.map(([line]) => <li key={line}><i aria-hidden="true" /><strong>{line}</strong></li>)}</ul>
+    <div className="film-cta"><a className="resort-primary-button" href="#pilot">Start with one property <Arrow /></a></div>
   </section>
 }
 
