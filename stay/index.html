@@ -332,7 +332,7 @@ textarea{min-height:120px;resize:vertical}
     var c=el('section',{class:'card','aria-label':'Rate now'},[el('p',{class:'kicker',text:'Just finished'}),el('h3',{text:'How was \u201c'+l.title+'\u201d?'}),el('p',{class:'sub',text:'One tap. The team sees it straight away.'})])
     var scale=el('div',{class:'scale5',role:'group','aria-label':l.title})
     LEVELS.forEach(function(lv){
-      var b=el('button',{type:'button'},[el('b',{text:String(lv[1])}),el('span',{text:lv[0]})])
+      var b=el('button',{type:'button'},[el('span',{text:lv[0]})])
       b.addEventListener('click',function(){
         scale.querySelectorAll('button').forEach(function(x){x.disabled=true})
         connect('live.answer',{liveId:l.id,score:lv[1]}).then(function(res){
@@ -428,7 +428,7 @@ textarea{min-height:120px;resize:vertical}
         var scale=el('div',{class:'scale5',role:'group','aria-label':d.label,'data-done':done?'true':'false'})
         var note=el('p',{class:'msg',role:'status'})
         LEVELS.forEach(function(l){
-          var b=el('button',{type:'button','aria-pressed':done===l[1]?'true':'false'},[el('b',{text:String(l[1])}),el('span',{text:l[0]})])
+          var b=el('button',{type:'button','aria-pressed':done===l[1]?'true':'false'},[el('span',{text:l[0]})])
           b.addEventListener('click',function(){
             if(today.pulses[d.id])return
             scale.querySelectorAll('button').forEach(function(x){x.disabled=true})
