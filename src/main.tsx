@@ -10,7 +10,7 @@ const useLegacyLegalShell = ['/imprint/', '/privacy/', '/terms/', '/cookies/'].s
 const usePortal = path.startsWith('/portal/')
 const useSandbox = path.startsWith('/sandbox/')
 const resortRoutes = [
-  '/all-inclusive-resorts/',
+  '/hotels/',
   '/resort-live-demo/',
   '/resort-pilot/',
   '/resort-guest-engagement-software/',
@@ -37,10 +37,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><
 if (!useLegacyProductShell && !useLegacyLegalShell && !usePortal && !useSandbox) {
   requestAnimationFrame(() => {
     const footer = document.querySelector<HTMLElement>('.footer-links')
-    if (!footer || footer.querySelector('a[href="/all-inclusive-resorts/"]')) return
+    if (!footer || footer.querySelector('a[href="/hotels/"]')) return
     const link = document.createElement('a')
-    link.href = '/all-inclusive-resorts/'
-    link.textContent = 'All-Inclusive Hotels & Resorts'
+    link.href = '/hotels/'
+    link.textContent = 'Hotels & Resorts'
     link.dataset.resortPreview = 'true'
     footer.prepend(link)
   })

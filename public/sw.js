@@ -8,7 +8,7 @@ const SHELL = [
   '/ancillary-revenue/',
   '/cruise-dashboard/',
   '/integration/',
-  '/all-inclusive-resorts/',
+  '/hotels/',
   '/pilot/',
   '/product-app/',
   '/imprint/',

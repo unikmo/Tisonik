@@ -30,7 +30,7 @@ For all-inclusive hotels and resorts, Tisonik focuses on experience discovery an
 - Passenger and crew privacy, recognition, recovery and aggregate-measurement boundaries are described in the extended public reference.
 
 ## Canonical resort pages
-- https://tisonik.com/all-inclusive-resorts/ — all-inclusive resort overview
+- https://tisonik.com/hotels/ — hotel and resort overview
 - https://tisonik.com/resort-live-demo/ — interactive resort demo
 - https://tisonik.com/resort-pilot/ — one-property pilot and live-demo enquiry
 - https://tisonik.com/resort-guest-engagement-software/ — resort guest engagement

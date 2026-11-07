@@ -38,7 +38,7 @@ USA
 
 ## Resort vertical routes
 
-- `/all-inclusive-resorts/`
+- `/hotels/`
 - `/resort-live-demo/`
 - `/resort-pilot/`
 - `/resort-guest-engagement-software/`

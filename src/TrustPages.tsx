@@ -136,7 +136,7 @@ export function HowItWorksPage({ cruiseDetail }: { cruiseDetail: ReactNode }) {
           <small>AVAILABLE · HOTELS AND RESORTS</small>
           <h3>From the first night to the review</h3>
           <p>A card, a guest page and a team inbox, with no change to your property systems. Resorts can add experience discovery, in-stay service recovery, staff recognition and relevant ancillary revenue, with inventory, pricing and checkout staying with the resort.</p>
-          <a href="/all-inclusive-resorts/">Hotels and resorts <Arrow /></a>
+          <a href="/hotels/">Hotels and resorts <Arrow /></a>
         </article>
         <article>
           <small>NEXT · OTHER VENUES</small>

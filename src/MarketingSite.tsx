@@ -146,7 +146,7 @@ const Header = ({ page }: { page: PageKey }) => (
     <a className="brand" href="/" aria-label="Tisonik home">TISONIK</a>
     <nav className="desktop-nav" aria-label="Primary navigation">
       <a href="/">Cruise Lines</a>
-      <a href="/all-inclusive-resorts/">Hotels &amp; Resorts</a>
+      <a href="/hotels/">Hotels &amp; Resorts</a>
       <a href="/service-recovery/">Service Recovery</a>
       <a href="/crew-recognition/">Recognition</a>
       <a href="/ancillary-revenue/">Ancillary Revenue</a>
@@ -178,7 +178,7 @@ const EntityDefinition = () => (
     <h2 id="what-is-tisonik">Not another app. One experience layer inside the guest journey you already own.</h2>
     <p>Tisonik is a white-label guest-experience interaction layer for cruise lines and all-inclusive hotels and resorts. It fits into the operator’s existing app or digital guest journey without replacing the booking, property-management or commerce stack. The operator retains control of its brand, inventory, pricing, checkout and payment.</p>
     <div className="entity-links" aria-label="Tisonik product areas">
-      <a href="/">Cruise lines</a><a href="/all-inclusive-resorts/">Hotels &amp; resorts</a><a href="/service-recovery/">Service recovery</a><a href="/crew-recognition/">Recognition</a><a href="/ancillary-revenue/">Ancillary revenue</a><a href="/integration/">How it works</a><a href="/security/">Security</a>
+      <a href="/">Cruise lines</a><a href="/hotels/">Hotels &amp; resorts</a><a href="/service-recovery/">Service recovery</a><a href="/crew-recognition/">Recognition</a><a href="/ancillary-revenue/">Ancillary revenue</a><a href="/integration/">How it works</a><a href="/security/">Security</a>
     </div>
   </section>
 )
@@ -264,14 +264,14 @@ const Home = () => (
       <p id="hero-after-title" className="hero-after-copy">Tisonik helps cruise lines and resort operators personalise interactions, recognise excellence, recover service issues earlier and surface more relevant experiences.</p>
       <div className="pilot-actions">
         <a className="pilot-link" href={demoHref}>VIEW CRUISE PRODUCT DEMO <Arrow /></a>
-        <a className="pilot-link" href="/all-inclusive-resorts/">EXPLORE HOTELS &amp; RESORTS <Arrow /></a>
+        <a className="pilot-link" href="/hotels/">EXPLORE HOTELS &amp; RESORTS <Arrow /></a>
       </div>
     </section>
     <section className="quiet-proof" aria-label="Tisonik hospitality environments">
       <p className="eyebrow">ONE EXPERIENCE LAYER · TWO HOSPITALITY ENVIRONMENTS</p>
       <div className="proof-grid">
         <article><strong>Cruise lines</strong><span>Passenger experience, crew recognition, service recovery, engagement and onboard revenue discovery.</span><a className="pilot-link" href="#passenger-experience">Explore cruise <Arrow /></a></article>
-        <article><strong>Hotels &amp; all-inclusive resorts</strong><span>Guest discovery, in-stay service recovery, staff recognition, ratings and ancillary-revenue activation.</span><a className="pilot-link" href="/all-inclusive-resorts/">Explore resorts <Arrow /></a></article>
+        <article><strong>Hotels &amp; all-inclusive resorts</strong><span>Guest discovery, in-stay service recovery, staff recognition, ratings and ancillary-revenue activation.</span><a className="pilot-link" href="/hotels/">Explore resorts <Arrow /></a></article>
         <article><strong>Controlled pilots</strong><span>Start with one ship or one property, define success measures first, then scale, iterate or stop on evidence.</span></article>
       </div>
     </section>
@@ -364,7 +364,7 @@ const sharedPromises: [string, string][] = [
 const HospitalityPage = () => <>
   <section className="detail-hero hosp-hero"><p className="eyebrow">ONE EXPERIENCE LAYER · TWO HOSPITALITY ENVIRONMENTS</p><h1>One guest experience layer for cruise lines and hotels.</h1><p className="detail-intro">A UNIKMO card opens a Tisonik guest page: a welcome, offers, ratings and thanks, with no new app required. The same layer, set up for a ship or for a property.</p></section>
   <section className="hosp-films" aria-label="The Tisonik films">
-    {([['Cruise lines', 'cruise', '/', 'Explore cruise'], ['Hotels & resorts', 'hotel', '/all-inclusive-resorts/', 'Explore hotels']] as const).map(([name, key, href, cta]) => <article key={key}>
+    {([['Cruise lines', 'cruise', '/', 'Explore cruise'], ['Hotels & resorts', 'hotel', '/hotels/', 'Explore hotels']] as const).map(([name, key, href, cta]) => <article key={key}>
       <video muted loop playsInline controls preload="none" poster={`/media/tisonik-film-${key}-poster.jpg`} aria-label={`The Tisonik film for ${name.toLowerCase()}`}><source src={`/media/tisonik-film-${key}.webm`} type="video/webm" /></video>
       <h2>{name}</h2><a className="pilot-link" href={href}>{cta.toUpperCase()} <Arrow /></a>
     </article>)}

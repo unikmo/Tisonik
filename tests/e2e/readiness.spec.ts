@@ -10,7 +10,7 @@ const publicRoutes = [
   '/ancillary-revenue/',
   '/integration/',
   '/pilot/',
-  '/all-inclusive-resorts/',
+  '/hotels/',
   '/resort-live-demo/',
   '/resort-pilot/',
   '/resort-guest-engagement-software/',
@@ -53,14 +53,14 @@ test('pilot form is labelled, first-party and keyboard reachable', async ({ page
 })
 
 test('resort pillar contains no unapproved hotel-chain logos or affiliations', async ({ page }) => {
-  await page.goto('/all-inclusive-resorts/')
+  await page.goto('/hotels/')
   const body = await page.locator('body').innerText()
   for (const unapprovedBrand of ['Atlantis', 'RIU', 'Barceló', 'Iberostar', 'Secrets']) expect(body).not.toContain(unapprovedBrand)
-  await expect(page.getByText('BUILT FOR ALL-INCLUSIVE RESORTS')).toBeVisible()
+  await expect(page.getByText('ENGINEERED FOR PREMIUM & LUXURY HOSPITALITY')).toBeVisible()
 })
 
 test('resort pillar makes ancillary revenue opportunity explicit', async ({ page }) => {
-  await page.goto('/all-inclusive-resorts/#revenue')
+  await page.goto('/hotels/#revenue')
   await expect(page.getByText('More of the stay can become bookable.')).toBeVisible()
   for (const opportunity of ['Spa & wellness', 'Speciality dining', 'Excursions', 'Cabanas & daybeds', 'Private transfers', 'Celebrations', 'Watersports']) await expect(page.getByText(opportunity, { exact: true })).toBeVisible()
   await expect(page.getByRole('link', { name: /ancillary revenue use case/i })).toHaveAttribute('href', '/hotel-ancillary-revenue-software/')
@@ -108,7 +108,7 @@ test('resort live demo uses a clear three-step buyer flow', async ({ page }) => 
 
 test('TSquare is the public operator identity and the service-recovery image is replaced', async ({ page }) => {
   const legacyBrand = ['Planet', 'Hike'].join('')
-  for (const route of ['/', '/all-inclusive-resorts/', '/resort-pilot/', '/imprint/', '/privacy/', '/terms/', '/cookies/']) {
+  for (const route of ['/', '/hotels/', '/resort-pilot/', '/imprint/', '/privacy/', '/terms/', '/cookies/']) {
     await page.goto(route)
     expect(await page.locator('body').innerText()).not.toContain(legacyBrand)
   }
@@ -116,7 +116,7 @@ test('TSquare is the public operator identity and the service-recovery image is 
   await expect(page.getByText('TSquare Ventures LLC', { exact: true }).first()).toBeVisible()
   await expect(page.getByText(/30 N Gould St Ste R/).first()).toBeVisible()
   await expect(page.getByText(/Sheridan, WY 82801, USA/).first()).toBeVisible()
-  await page.goto('/all-inclusive-resorts/')
+  await page.goto('/hotels/')
   const recoveryImage = page.locator('.resort-feature').filter({ hasText: 'SERVICE RECOVERY' }).locator('img')
   await expect(recoveryImage).toHaveAttribute('src', /photo-1759143545924-beb85b33c0f1/)
   expect(await recoveryImage.getAttribute('src')).not.toContain('photo-1776977507261-81e4ab0dd806')

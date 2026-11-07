@@ -40,13 +40,13 @@ const resortPageFromPath = (path: string): ResortPageKey => {
 
 const Header = ({ compact = false }: { compact?: boolean }) => (
   <header className="site-header resort-header">
-    <a className="brand" href="/all-inclusive-resorts/" aria-label="Tisonik resorts home">TISONIK</a>
+    <a className="brand" href="/hotels/" aria-label="Tisonik resorts home">TISONIK</a>
     {!compact && <nav className="resort-header-nav" aria-label="Resort navigation">
-      <a href="/all-inclusive-resorts/#experience">Experience</a>
-      <a href="/all-inclusive-resorts/#revenue">Revenue</a>
-      <a href="/all-inclusive-resorts/#ratings">Ratings</a>
-      <a href="/all-inclusive-resorts/#integration">Integration</a>
-      <a href="/all-inclusive-resorts/#pilot">Pilot</a>
+      <a href="/hotels/#experience">Experience</a>
+      <a href="/hotels/#revenue">Revenue</a>
+      <a href="/hotels/#ratings">Ratings</a>
+      <a href="/hotels/#integration">Integration</a>
+      <a href="/hotels/#pilot">Pilot</a>
     </nav>}
     <div className="resort-header-actions">
       <a className="resort-header-link" href={liveDemoHref}>Live demo</a>
@@ -60,7 +60,7 @@ const Footer = () => (
     <div><strong>TISONIK</strong><span>A product of TSquare Ventures LLC</span></div>
     <p>Guest experience activation for all-inclusive hotels and resorts: discovery, ancillary revenue, in-stay ratings, service recovery and staff recognition.</p>
     <nav className="footer-links" aria-label="Footer navigation">
-      <a href="/all-inclusive-resorts/">Resorts</a>
+      <a href="/hotels/">Resorts</a>
       <a href={liveDemoHref}>Live demo</a>
       <a href="/hotel-ancillary-revenue-software/">Ancillary revenue</a>
       <a href="/resort-pilot/">Pilot</a>
@@ -260,7 +260,7 @@ const ResortPillar = () => (
       <HotelFilm />
 
       <section className="resort-neutral-proof">
-        <span>BUILT FOR ALL-INCLUSIVE RESORTS</span>
+        <span>ENGINEERED FOR PREMIUM & LUXURY HOSPITALITY</span>
         <strong>More guest participation.</strong>
         <strong>Earlier service recovery.</strong>
         <strong>More visible staff recognition.</strong>

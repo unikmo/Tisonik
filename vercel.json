@@ -1,5 +1,7 @@
 {
-  "regions": ["fra1"],
+  "regions": [
+    "fra1"
+  ],
   "crons": [
     {
       "path": "/api/cron/enquiry-notifications",
@@ -20,6 +22,16 @@
         }
       ],
       "destination": "https://tisonik.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/all-inclusive-resorts",
+      "destination": "/hotels/",
+      "permanent": true
+    },
+    {
+      "source": "/all-inclusive-resorts/:path*",
+      "destination": "/hotels/:path*",
       "permanent": true
     }
   ],

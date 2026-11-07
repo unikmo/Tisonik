@@ -79,7 +79,7 @@ Tisonik is a product of TSquare Ventures LLC for guest-experience activation in 
 - Integration, data, privacy and deployment details must be agreed with each operator for a real implementation.
 
 ## Canonical resort pages
-- https://tisonik.com/all-inclusive-resorts/
+- https://tisonik.com/hotels/
 - https://tisonik.com/resort-live-demo/
 - https://tisonik.com/resort-pilot/
 - https://tisonik.com/resort-guest-engagement-software/
