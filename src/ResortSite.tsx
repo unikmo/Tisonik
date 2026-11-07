@@ -58,7 +58,7 @@ const Header = ({ compact = false }: { compact?: boolean }) => (
 const Footer = () => (
   <footer className="site-footer resort-footer">
     <div><strong>TISONIK</strong><span>A product of TSquare Ventures LLC</span></div>
-    <p>Guest experience activation for all-inclusive hotels and resorts: discovery, ancillary revenue, in-stay ratings, service recovery and staff recognition.</p>
+    <p>Guest experience activation for premium hotels and resorts: discovery, ancillary revenue, in-stay ratings, service recovery and staff recognition.</p>
     <nav className="footer-links" aria-label="Footer navigation">
       <a href="/hotels/">Resorts</a>
       <a href={liveDemoHref}>Live demo</a>
@@ -124,90 +124,39 @@ const Feature = ({ number, eyebrow, title, children, image, alt, reverse = false
   </section>
 )
 
+const ratingWords = ['Poor', 'Fair', 'Okay', 'Great', 'Superb'] as const
+const ratingAreas = ['Reception', 'Your room', 'Dining', 'Spa & pool', 'Bar & lounge'] as const
+
 const RatingPreview = ({ compact = false }: { compact?: boolean }) => (
   <div className={`resort-rating-preview ${compact ? 'is-compact' : ''}`}>
     <div className="resort-rating-head">
-      <div><small>STAY PULSE · DEMO</small><strong>How is your stay going?</strong></div>
-      <span>&lt; 5 min</span>
+      <div><small>HOW IS TODAY? · DEMO</small><strong>Reception</strong></div>
+      <span>One tap</span>
     </div>
-    <p><b>Question 5 of 10</b> · How would you rate waiting times and speed of service?</p>
-    <div className="rating-scale" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <span key={index}>{index + 1}</span>)}</div>
+    <p>Only rate what you used. If something is not right, the team hears about it today.</p>
+    <div className="rating-scale rating-scale--words" aria-hidden="true">{ratingWords.map(word => <span key={word}>{word}</span>)}</div>
     {!compact && <div className="rating-roundup-preview">
-      <span><b>Q9</b> What was good? · up to 400 characters</span>
-      <span><b>Q10</b> What could be improved? · up to 400 characters</span>
+      <span>A low score reaches the team at once</span>
+      <span>Private to the hotel team. Not published by Tisonik.</span>
     </div>}
   </div>
 )
-
-const ratingScaleQuestions = [
-  'How clean and well maintained is your room?',
-  'How comfortable is your room for sleeping and relaxing?',
-  'How would you rate the quality and choice of food?',
-  'How would you rate drinks and bar service?',
-  'How would you rate waiting times and speed of service?',
-  'How helpful and welcoming are the staff?',
-  'How clean and well maintained are the pools, beach and shared areas?',
-  'How easy is it to find and join activities, entertainment and included experiences?',
-] as const
-
 const StayRatingDemo = () => {
-  const [question, setQuestion] = useState(0)
-  const [scores, setScores] = useState<number[]>([])
-  const [good, setGood] = useState('')
-  const [improve, setImprove] = useState('')
-  const [done, setDone] = useState(false)
-
-  const selectScore = (score: number) => {
-    const nextScores = [...scores]
-    nextScores[question] = score
-    setScores(nextScores)
-  }
-
-  const reset = () => {
-    setQuestion(0)
-    setScores([])
-    setGood('')
-    setImprove('')
-    setDone(false)
-  }
-
-  if (done) return <div className="rating-demo-card rating-complete">
-    <p className="eyebrow">DEMO COMPLETE</p>
-    <h3>Rating published. The resort can still act while you are here.</h3>
-    <p>For a participating property, submission publishes the rating. The property receives the same signal for recovery but cannot selectively hold back a rating because it is poor.</p>
-    <button type="button" onClick={reset}>Try again</button>
-  </div>
-
-  if (question === 8) return <div className="rating-demo-card">
-    <div className="rating-demo-progress"><span>QUESTION 9 OF 10 · DEMO</span><span>UP TO 400 CHARACTERS</span></div>
-    <h3>What was good?</h3>
-    <p>A short wrap-up question after the eight 1–10 ratings.</p>
-    <label htmlFor="rating-good">Your answer <span>{good.length}/400</span></label>
-    <textarea id="rating-good" maxLength={400} value={good} onChange={event => setGood(event.target.value)} rows={5} placeholder="What stood out positively?" />
-    <button className="resort-primary-button" type="button" onClick={() => setQuestion(9)}>Next question <Arrow /></button>
-  </div>
-
-  if (question === 9) return <div className="rating-demo-card">
-    <div className="rating-demo-progress"><span>QUESTION 10 OF 10 · DEMO</span><span>UP TO 400 CHARACTERS</span></div>
-    <h3>What could be improved?</h3>
-    <p>The final question gives the resort specific context it can act on while the guest is still there.</p>
-    <label htmlFor="rating-improve">Your answer <span>{improve.length}/400</span></label>
-    <textarea id="rating-improve" maxLength={400} value={improve} onChange={event => setImprove(event.target.value)} rows={5} placeholder="What could the resort improve?" />
-    <button className="resort-primary-button" type="button" onClick={() => setDone(true)}>Submit &amp; publish demo rating <Arrow /></button>
-  </div>
-
+  const [picked, setPicked] = useState<Record<string, number>>({})
+  const answers = Object.values(picked)
+  const low = answers.some(index => index <= 1)
   return <div className="rating-demo-card">
-    <div className="rating-demo-progress"><span>QUESTION {question + 1} OF 10 · DEMO</span><span>1–10</span></div>
-    <h3>{ratingScaleQuestions[question]}</h3>
-    <p>Questions 1–8 use the same simple 1–10 scale. Questions 9 and 10 are the short written wrap-up.</p>
-    <div className="rating-demo-scale">
-      {Array.from({ length: 10 }, (_, index) => {
-        const value = index + 1
-        return <button className={scores[question] === value ? 'is-selected' : ''} type="button" key={value} onClick={() => selectScore(value)} aria-label={`Rate ${value} out of 10`}>{value}</button>
-      })}
-    </div>
-    <div className="rating-demo-labels"><span>Needs work</span><span>Excellent</span></div>
-    <button className="resort-primary-button" type="button" disabled={!scores[question]} onClick={() => setQuestion(question + 1)}>Next question <Arrow /></button>
+    <div className="rating-demo-progress"><span>HOW IS TODAY GOING? · DEMO</span><span>ONE TAP PER AREA</span></div>
+    <h3>Only rate what you used.</h3>
+    <p>Guests rate each area from Poor to Superb. If something is not right, the team hears about it today.</p>
+    {ratingAreas.map(area => <div key={area} className="rating-demo-area">
+      <strong>{area}</strong>
+      <div className="rating-demo-words" role="group" aria-label={area}>
+        {ratingWords.map((word, index) => <button key={word} type="button" className={picked[area] === index ? 'is-selected' : ''} aria-pressed={picked[area] === index} disabled={picked[area] !== undefined} onClick={() => setPicked({ ...picked, [area]: index })}>{word}</button>)}
+      </div>
+    </div>)}
+    {answers.length > 0 && <p className="rating-demo-note" role="status">{low ? 'Thank you. We have told the team so they can put it right today.' : 'Thank you.'}</p>}
+    {answers.length > 0 && <button type="button" onClick={() => setPicked({})}>Try again</button>}
   </div>
 }
 
@@ -317,11 +266,11 @@ const ResortPillar = () => (
         <div className="resort-ratings-copy">
           <p className="eyebrow">IN-STAY RATINGS</p>
           <h2>Ask while there is still time to make it right.</h2>
-          <p>The flow is deliberately short: questions 1–8 are standard guest pain-point ratings scored from 1 to 10. Question 9 asks “What was good?” and question 10 asks “What could be improved?” Each written answer is capped at 400 characters.</p>
+          <p>Guests rate their day with one tap per area, from Poor to Superb. A low score reaches the team at once, while the guest is still on property. Before they leave, five short questions and an optional comment go to the manager.</p>
           <div className="resort-rating-benefits">
-            <article><strong>One standard format</strong><span>Every property using the in-app resort rating uses the same 10-question flow: eight scored pain-point questions followed by two short written wrap-up questions.</span></article>
+            <article><strong>One tap, not a survey</strong><span>Reception, room, dining, spa and pool, bar and lounge. Guests rate only what they used.</span></article>
             <article><strong>Recovery while it matters</strong><span>The resort receives the signal while the guest is still there and has a real chance to respond before checkout.</span></article>
-            <article><strong>Participation means publication</strong><span>Submitted ratings go public. A participating property cannot selectively suppress or hold back poor ratings.</span></article>
+            <article><strong>Private to the hotel team</strong><span>Ratings go to the property&apos;s team. Tisonik does not publish them.</span></article>
           </div>
           <a className="resort-text-link" href="/hotel-guest-rating-software/">See the resort rating workflow <Arrow /></a>
         </div>
@@ -335,7 +284,7 @@ const ResortPillar = () => (
         <div>
           <p className="eyebrow">LIVE PRODUCT DEMO</p>
           <h2>See the guest journey in action.</h2>
-          <p>Explore discovery, relevant paid experiences, the complete 10-question in-stay rating and the resort-team response flow in one self-serve demo.</p>
+          <p>Explore discovery, relevant paid experiences, the in-stay rating and the hotel-team response flow in one self-serve demo.</p>
         </div>
         <a className="resort-primary-button" href={liveDemoHref}>Open live demo <Arrow /></a>
       </section>
@@ -387,7 +336,7 @@ const ResortPillar = () => (
         <div className="resort-related-grid">
           <a href="/resort-guest-engagement-software/"><strong>Guest engagement</strong><span>Discovery and participation across the stay.</span></a>
           <a href="/hotel-service-recovery-software/"><strong>Service recovery</strong><span>Act on friction before the guest leaves.</span></a>
-          <a href="/hotel-guest-rating-software/"><strong>In-stay ratings</strong><span>Eight 1–10 ratings plus two short wrap-up questions.</span></a>
+          <a href="/hotel-guest-rating-software/"><strong>In-stay ratings</strong><span>One tap per area, private to the hotel team.</span></a>
           <a href="/resort-experience-discovery/"><strong>Experience discovery</strong><span>Make included value easier to find.</span></a>
           <a href="/resort-upselling-software/"><strong>Premium discovery</strong><span>Relevant extras without catalogue overload.</span></a>
           <a href="/hotel-ancillary-revenue-software/"><strong>Ancillary revenue</strong><span>Surface more bookable moments while commerce stays with the resort.</span></a>
@@ -420,7 +369,7 @@ const ResortLiveDemo = () => {
           <aside>
             <p className="eyebrow">AZURE BAY · DEMO PROPERTY</p>
             <h2>Day 3 of 7</h2>
-            <p>Included value comes first. Relevant paid experiences appear naturally in the same journey. The guest can then rate the stay before departure, giving the resort time to respond without changing the publication path.</p>
+            <p>Included value comes first. Relevant paid experiences appear naturally in the same journey. The guest can then rate the stay before departure, giving the hotel time to respond while the guest is still there.</p>
           </aside>
           <div className="resort-demo-canvas">
             {mode === 'guest' && <div className="demo-guest-phone">
@@ -436,11 +385,11 @@ const ResortLiveDemo = () => {
             {mode === 'team' && <div className="demo-team-view">
               <p className="eyebrow">ILLUSTRATIVE RESORT VIEW</p>
               <h3>Act before checkout.</h3>
-              <div className="demo-team-row"><strong>Rating format</strong><span>Questions 1–8 use the 1–10 scale. Q9 is “What was good?” and Q10 is “What could be improved?”, up to 400 characters each.</span></div>
+              <div className="demo-team-row"><strong>Rating format</strong><span>One tap per area, from Poor to Superb. A low score reaches the hotel team at once.</span></div>
               <div className="demo-team-row"><strong>In-stay signal</strong><span>The guest is still on property, so the team can respond while the stay is still happening.</span></div>
               <div className="demo-team-row"><strong>Recovery</strong><span>Route → acknowledge → resolve → follow up.</span></div>
               <div className="demo-team-row"><strong>Ancillary revenue</strong><span>Surface relevant spa, dining, excursion, cabana, transfer and celebration opportunities while the resort keeps commerce.</span></div>
-              <div className="demo-team-row"><strong>Publishing</strong><span>Automatic for participating properties; submitted ratings cannot be selectively held back.</span></div>
+              <div className="demo-team-row"><strong>Privacy</strong><span>Ratings are private to the hotel team. Tisonik does not publish them.</span></div>
             </div>}
           </div>
         </div>
@@ -518,7 +467,7 @@ const ResortPilot = () => (
             <span>Ancillary revenue opportunities</span>
           </div>
         </div>
-        <figure><img src={resortImages.hero} alt="Guests enjoying an all-inclusive resort pool" fetchPriority="high" /></figure>
+        <figure><img src={resortImages.hero} alt="Guests enjoying a resort pool" fetchPriority="high" /></figure>
       </section>
 
       <section className="resort-pilot-steps">
@@ -555,7 +504,7 @@ const seoPages: Record<Exclude<ResortPageKey, 'pillar' | 'demo' | 'pilot'>, {
     title: 'Make the resort easier to experience.',
     intro: 'Tisonik connects discovery, participation, public in-stay ratings, service recovery, recognition and ancillary-revenue discovery in one resort-focused experience layer.',
     image: resortImages.hero,
-    alt: 'Guests enjoying an all-inclusive resort pool',
+    alt: 'Guests enjoying a resort pool',
     points: [
       { title: 'Discover what is included', body: 'Surface dining, activities, entertainment and wellness at useful moments.' },
       { title: 'Capture the stay while it is happening', body: 'Short in-stay ratings give the resort time to respond before departure.' },
@@ -612,15 +561,15 @@ const seoPages: Record<Exclude<ResortPageKey, 'pillar' | 'demo' | 'pilot'>, {
   },
   'ratings': {
     eyebrow: 'HOTEL GUEST RATING SOFTWARE',
-    title: 'A five-minute rating that gives the resort time to act.',
-    intro: 'The standard flow has 10 questions in total: eight guest pain-point questions scored 1–10, then “What was good?” and “What could be improved?” with up to 400 characters each.',
+    title: 'One tap per area, while the guest is still there.',
+    intro: 'Guests rate their day from Poor to Superb, one tap per area. A low score reaches the hotel team at once, so it can be put right before the guest leaves.',
     image: resortImages.sunset,
     alt: 'Couple enjoying a resort pool at sunset',
     points: [
-      { title: 'Questions 1–8: score', body: 'Eight fixed guest pain-point questions use the same 1–10 scale. Participating hotels do not choose or rewrite them.' },
-      { title: 'Questions 9–10: context', body: '“What was good?” and “What could be improved?” close the rating with two separate answers of up to 400 characters each.' },
-      { title: 'Shorter for card-based hotel stays', body: 'Hotels that connect a UNIKMO guest card use a shorter private rating instead: five 1–10 questions plus “Anything else to tell us?”. It goes to the hotel team and is not published by Tisonik.' },
-      { title: 'Public by participation', body: 'Submitted ratings go public. The resort can respond while the guest is still there, but participation does not include a right to suppress poor ratings.' },
+      { title: 'One tap, not a survey', body: 'Reception, room, dining, spa and pool, bar and lounge. Guests rate only what they used, from Poor to Superb.' },
+      { title: 'Low scores reach the team at once', body: 'A Poor or Fair score alerts the hotel team and thanks the guest. Staff can put it right while the guest is still on property.' },
+      { title: 'Before they leave', body: 'A short rating before departure asks five questions and one optional comment. It goes to the manager.' },
+      { title: 'Private to the hotel team', body: 'Ratings go to the property’s team. Tisonik does not publish them.' },
     ],
   },
 }
@@ -645,8 +594,8 @@ const ResortSeoPage = ({ page }: { page: Exclude<ResortPageKey, 'pillar' | 'demo
       {page === 'ratings' && <section className="resort-seo-rating-demo">
         <div>
           <p className="eyebrow">TRY THE STANDARD FLOW</p>
-          <h2>Eight scores. Two wrap-up questions. Then publish.</h2>
-          <p>The live demo uses the complete standard 10-question format. Participating properties cannot change the questions or selectively hold back submitted ratings.</p>
+          <h2>One tap per area. Poor to Superb.</h2>
+          <p>The demo uses the same words guests see. Everything here is illustrative, and ratings in the real product go only to the hotel team.</p>
         </div>
         <StayRatingDemo />
       </section>}

@@ -66,35 +66,20 @@ test('resort pillar makes ancillary revenue opportunity explicit', async ({ page
   await expect(page.getByRole('link', { name: /ancillary revenue use case/i })).toHaveAttribute('href', '/hotel-ancillary-revenue-software/')
 })
 
-test('resort rating demo uses eight scored questions plus two written wrap-up questions', async ({ page }) => {
+test('resort rating demo shows only words, one tap per area', async ({ page }) => {
   await page.goto('/resort-live-demo/')
   await page.getByRole('button', { name: /2 · Stay rating/i }).click()
-  for (let question = 0; question < 8; question++) {
-    await expect(page.getByText(new RegExp(`QUESTION ${question + 1} OF 10`))).toBeVisible()
-    const scoreButtons = page.getByRole('button', { name: /Rate \d+ out of 10/ })
-    await expect(scoreButtons).toHaveCount(10)
-    await page.getByRole('button', { name: 'Rate 8 out of 10' }).click()
-    await page.getByRole('button', { name: 'Next question' }).click()
-  }
-  await expect(page.getByText('QUESTION 9 OF 10 · DEMO')).toBeVisible()
-  const good = page.getByLabel(/Your answer/).first()
-  await expect(good).toHaveAttribute('maxlength', '400')
-  await good.fill('Warm staff, beautiful pool and excellent breakfast.')
-  await page.getByRole('button', { name: 'Next question' }).click()
-  await expect(page.getByText('QUESTION 10 OF 10 · DEMO')).toBeVisible()
-  const improve = page.getByLabel(/Your answer/).first()
-  await expect(improve).toHaveAttribute('maxlength', '400')
-  await improve.fill('Dinner waiting time could be shorter.')
-  await page.getByRole('button', { name: /submit & publish demo rating/i }).click()
-  await expect(page.getByText('Rating published. The resort can still act while you are here.')).toBeVisible()
-  await expect(page.getByText(/cannot selectively hold back a rating because it is poor/i)).toBeVisible()
+  for (const word of ['Poor', 'Fair', 'Okay', 'Great', 'Superb']) await expect(page.getByRole('button', { name: word }).first()).toBeVisible()
+  await expect(page.getByRole('button', { name: /Rate \d+ out of 10/ })).toHaveCount(0)
+  await page.getByRole('group', { name: 'Reception' }).getByRole('button', { name: 'Fair' }).click()
+  await expect(page.getByText('Thank you. We have told the team so they can put it right today.')).toBeVisible()
 })
 
-test('resort rating copy explains the 10-question format and publication rule', async ({ page }) => {
+test('resort rating copy says ratings are private to the hotel team', async ({ page }) => {
   await page.goto('/hotel-guest-rating-software/')
-  await expect(page.getByText(/eight guest pain-point questions scored 1–10/i).first()).toBeVisible()
-  await expect(page.getByText(/questions 9–10: context/i).first()).toBeVisible()
-  await expect(page.getByText(/participation does not include a right to suppress poor ratings/i).first()).toBeVisible()
+  await expect(page.getByText(/one tap per area/i).first()).toBeVisible()
+  await expect(page.getByText(/does not publish them/i).first()).toBeVisible()
+  await expect(page.getByText(/go public|participation means publication/i)).toHaveCount(0)
 })
 
 test('resort live demo uses a clear three-step buyer flow', async ({ page }) => {

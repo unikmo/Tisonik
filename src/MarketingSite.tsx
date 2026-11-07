@@ -158,7 +158,7 @@ const Header = ({ page }: { page: PageKey }) => (
 const Footer = () => (
   <footer className="site-footer">
     <div><strong>TISONIK</strong><span>A product of TSquare Ventures LLC</span></div>
-    <p>Guest experience activation for cruise lines and all-inclusive hotels &amp; resorts: service recovery, recognition, engagement, discovery and ancillary revenue.</p>
+    <p>Guest experience activation for cruise lines and premium hotels &amp; resorts: service recovery, recognition, engagement, discovery and ancillary revenue.</p>
     <nav className="footer-links" aria-label="Footer navigation"><a href={contactHref}>Contact</a><a href="/imprint/">Imprint</a><a href="/security/">Security</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/cookies/">Cookies</a></nav>
   </footer>
 )
@@ -176,7 +176,7 @@ const EntityDefinition = () => (
   <section className="entity-definition" aria-labelledby="what-is-tisonik">
     <p className="eyebrow">WHAT TISONIK IS</p>
     <h2 id="what-is-tisonik">Not another app. One experience layer inside the guest journey you already own.</h2>
-    <p>Tisonik is a white-label guest-experience interaction layer for cruise lines and all-inclusive hotels and resorts. It fits into the operator’s existing app or digital guest journey without replacing the booking, property-management or commerce stack. The operator retains control of its brand, inventory, pricing, checkout and payment.</p>
+    <p>Tisonik is a white-label guest-experience interaction layer for cruise lines and premium hotels and resorts. It fits into the operator’s existing app or digital guest journey without replacing the booking, property-management or commerce stack. The operator retains control of its brand, inventory, pricing, checkout and payment.</p>
     <div className="entity-links" aria-label="Tisonik product areas">
       <a href="/">Cruise lines</a><a href="/hotels/">Hotels &amp; resorts</a><a href="/service-recovery/">Service recovery</a><a href="/crew-recognition/">Recognition</a><a href="/ancillary-revenue/">Ancillary revenue</a><a href="/integration/">How it works</a><a href="/security/">Security</a>
     </div>
@@ -256,7 +256,7 @@ const Home = () => (
   <>
     <HomeFilm />
     <section id="top" className="hero">
-      <p className="eyebrow hero-eyebrow">GUEST EXPERIENCE FOR CRUISE LINES &amp; ALL-INCLUSIVE RESORTS</p>
+      <p className="eyebrow hero-eyebrow">GUEST EXPERIENCE FOR CRUISE LINES &amp; HOTELS</p>
       <h1>Transform guest experiences. <span>Grow ancillary revenue.</span></h1>
       <p className="hero-positioning">A white-label experience layer inside the digital journey you already own—not another app for guests to download.</p>
     </section>
@@ -271,7 +271,7 @@ const Home = () => (
       <p className="eyebrow">ONE EXPERIENCE LAYER · TWO HOSPITALITY ENVIRONMENTS</p>
       <div className="proof-grid">
         <article><strong>Cruise lines</strong><span>Passenger experience, crew recognition, service recovery, engagement and onboard revenue discovery.</span><a className="pilot-link" href="#passenger-experience">Explore cruise <Arrow /></a></article>
-        <article><strong>Hotels &amp; all-inclusive resorts</strong><span>Guest discovery, in-stay service recovery, staff recognition, ratings and ancillary-revenue activation.</span><a className="pilot-link" href="/hotels/">Explore resorts <Arrow /></a></article>
+        <article><strong>Hotels &amp; resorts</strong><span>Guest discovery, in-stay service recovery, staff recognition, ratings and ancillary-revenue activation.</span><a className="pilot-link" href="/hotels/">Explore resorts <Arrow /></a></article>
         <article><strong>Controlled pilots</strong><span>Start with one ship or one property, define success measures first, then scale, iterate or stop on evidence.</span></article>
       </div>
     </section>

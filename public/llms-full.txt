@@ -1,8 +1,8 @@
 # Tisonik — Public Product Reference
 
-Tisonik is a product of TSquare Ventures LLC for guest-experience activation in cruise lines and all-inclusive hotels and resorts. It is designed as a white-label interaction layer inside an operator's existing digital journey rather than as a separate consumer destination.
+Tisonik is a product of TSquare Ventures LLC for guest-experience activation in cruise lines and premium hotels and resorts. It is designed as a white-label interaction layer inside an operator's existing digital journey rather than as a separate consumer destination.
 
-## All-inclusive hotels and resorts
+## Hotels and resorts
 
 ### Experience discovery and participation
 - Tisonik can help guests find included dining, activities, entertainment, sports, wellness and resort programming while they are on property.
@@ -11,16 +11,10 @@ Tisonik is a product of TSquare Ventures LLC for guest-experience activation in 
 
 ### In-stay ratings and service recovery
 - The resort can invite guests to rate the stay while they are still on property or shortly before departure, when there is still time to act on poor experiences.
-- The rating flow is designed to take no more than about five minutes.
-- The in-app resort rating product uses exactly 10 standard questions. Participating hotels do not choose, replace or rewrite the questions.
-- Hotels that connect a UNIKMO guest card use a separate private five-question rating (five 1–10 questions plus an optional comment). It goes to the hotel team and is not published by Tisonik.
-- Questions 1–8 are fixed guest pain-point questions, each using the same 1–10 score scale.
-- Those eight scored areas cover room cleanliness and maintenance, room comfort, food quality and choice, drinks and bar service, waiting times and speed of service, staff helpfulness and welcome, pools/beach/shared areas, and ease of finding and joining activities, entertainment and included experiences.
-- Question 9 is “What was good?” and allows up to 400 characters.
-- Question 10 is “What could be improved?” and allows up to 400 characters.
-- A poor or concerning in-stay rating can be routed into a service-recovery workflow so the resort can acknowledge, resolve and follow up before checkout where possible.
-- Participation means publication: submitted ratings go public, and a participating property cannot selectively suppress or hold back a rating because it is poor.
-- Service recovery does not remove the submitted rating from the publication path.
+- Guests rate their day with one tap per area (for example reception, room, dining, spa and pool, bar and lounge), from Poor to Superb. Staff can also ask every guest to rate an event the moment it ends.
+- A low score reaches the hotel team at once, so the resort can acknowledge, resolve and follow up before checkout where possible.
+- Before departure, guests answer five short questions (scored 1–10) with an optional comment. It goes to the hotel team and is not published by Tisonik.
+- Ratings are private to the property's team. Tisonik does not publish them.
 
 ### Staff recognition
 - Tisonik can give guests a simple way to recognize resort employees who made the stay better.

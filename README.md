@@ -1,6 +1,6 @@
 # Tisonik
 
-Tisonik is a white-label guest-experience interaction layer for cruise lines and all-inclusive hotels and resorts. It fits inside an operator's existing digital journey rather than replacing the operator's core app, PMS, booking or commerce stack.
+Tisonik is a white-label guest-experience interaction layer for cruise lines and premium hotels and resorts. It fits inside an operator's existing digital journey rather than replacing the operator's core app, PMS, booking or commerce stack.
 
 ## Run locally
 
@@ -50,15 +50,9 @@ USA
 
 ### Resort rating model
 
-The in-app resort rating flow contains exactly 10 standard Tisonik questions. Participating hotels do not choose, replace or rewrite them.
+Guests rate their day with one tap per area, from Poor to Superb (scored 2, 4, 6, 8, 10 behind the buttons; the numbers are never shown). A low score (Poor or Fair) reaches the hotel team at once. Staff can also ask every guest to rate an event the moment it ends.
 
-Hotels that connect a UNIKMO guest card use a separate, shorter rating: five 1–10 questions plus “Anything else to tell us?”. It is private to the hotel and is not published by Tisonik. See `docs/hotel-stays-go-live.md`.
-
-- Questions 1–8 are guest pain-point questions scored on a 1–10 scale.
-- Question 9 is **What was good?**, with up to 400 characters.
-- Question 10 is **What could be improved?**, with up to 400 characters.
-- Submitted ratings publish for participating properties. A property cannot selectively suppress a poor rating.
-- The in-stay timing gives the resort a chance to respond before departure without removing the rating from the publication path.
+Before departure, guests answer five short questions (scored 1–10) plus an optional comment. All ratings are private to the property's team and are not published by Tisonik. See `docs/hotel-stays-go-live.md`.
 
 ### Resort ancillary-revenue model
 
