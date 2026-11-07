@@ -75,6 +75,14 @@ test('resort rating demo shows only words, one tap per area', async ({ page }) =
   await expect(page.getByText('Thank you. We have told the team so they can put it right today.')).toBeVisible()
 })
 
+test('hotel pages open the hotel site with or without the trailing slash', async ({ page }) => {
+  for (const route of ['/hotels', '/hotels/', '/hotel-guest-rating-software']) {
+    await page.goto(route)
+    await expect(page.getByRole('link', { name: 'Tisonik resorts home' }).or(page.getByRole('link', { name: /TISONIK/ })).first()).toBeVisible()
+    await expect(page.getByText('Transform guest experiences. Grow ancillary revenue.')).toHaveCount(0)
+  }
+})
+
 test('resort rating copy says ratings are private to the hotel team', async ({ page }) => {
   await page.goto('/hotel-guest-rating-software/')
   await expect(page.getByText(/one tap per area/i).first()).toBeVisible()

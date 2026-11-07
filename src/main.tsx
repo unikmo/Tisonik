@@ -4,7 +4,7 @@ import { registerOfflineShell } from './offline'
 
 registerOfflineShell()
 
-const path = window.location.pathname
+const path = window.location.pathname.replace(/\/?$/, '/')
 const useLegacyProductShell = path.startsWith('/product-app/')
 const useLegacyLegalShell = ['/imprint/', '/privacy/', '/terms/', '/cookies/'].some((route) => path.startsWith(route))
 const usePortal = path.startsWith('/portal/')

@@ -38,6 +38,51 @@
       "source": "/all-inclusive-resorts/:path+",
       "destination": "/hotels/:path",
       "permanent": true
+    },
+    {
+      "source": "/hotels",
+      "destination": "/hotels/",
+      "permanent": true
+    },
+    {
+      "source": "/resort-live-demo",
+      "destination": "/resort-live-demo/",
+      "permanent": true
+    },
+    {
+      "source": "/resort-pilot",
+      "destination": "/resort-pilot/",
+      "permanent": true
+    },
+    {
+      "source": "/resort-guest-engagement-software",
+      "destination": "/resort-guest-engagement-software/",
+      "permanent": true
+    },
+    {
+      "source": "/hotel-service-recovery-software",
+      "destination": "/hotel-service-recovery-software/",
+      "permanent": true
+    },
+    {
+      "source": "/resort-upselling-software",
+      "destination": "/resort-upselling-software/",
+      "permanent": true
+    },
+    {
+      "source": "/hotel-ancillary-revenue-software",
+      "destination": "/hotel-ancillary-revenue-software/",
+      "permanent": true
+    },
+    {
+      "source": "/resort-experience-discovery",
+      "destination": "/resort-experience-discovery/",
+      "permanent": true
+    },
+    {
+      "source": "/hotel-guest-rating-software",
+      "destination": "/hotel-guest-rating-software/",
+      "permanent": true
     }
   ],
   "headers": [
