@@ -30,8 +30,13 @@
       "permanent": true
     },
     {
-      "source": "/all-inclusive-resorts/:path*",
-      "destination": "/hotels/:path*",
+      "source": "/all-inclusive-resorts/",
+      "destination": "/hotels/",
+      "permanent": true
+    },
+    {
+      "source": "/all-inclusive-resorts/:path+",
+      "destination": "/hotels/:path",
       "permanent": true
     }
   ],
