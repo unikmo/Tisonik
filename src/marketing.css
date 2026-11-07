@@ -343,3 +343,16 @@ h1.film-tagline { font-weight: 400; }
 .film-top .film-frame { max-width: 1000px; }
 .header-cta, .resort-header-cta { background: transparent !important; color: var(--ink) !important; border: 1px solid var(--line); box-shadow: none; }
 .header-cta:hover, .resort-header-cta:hover { border-color: var(--ink); }
+
+/* Hotel page: why it exists, the complete journey, quiet links. */
+.film-quiet { display: inline-block; margin-top: 16px; font-size: 14px; color: var(--muted); text-decoration: none; letter-spacing: -.005em; }
+.film-quiet:hover { color: var(--ink); text-decoration: underline; }
+.film-quiet--left { margin-top: 18px; }
+.resort-why { max-width: 1040px; margin: 0 auto; padding: clamp(64px, 7vw, 100px) 22px 12px; text-align: center; }
+.resort-why h2 { margin: 8px auto 28px; max-width: 760px; font-family: Georgia, serif; font-weight: 400; font-size: clamp(32px, 3.6vw, 48px); line-height: 1.12; letter-spacing: -.04em; text-wrap: balance; }
+.resort-why-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; text-align: left; }
+.resort-why-grid p { margin: 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 17px; line-height: 1.55; color: var(--muted); }
+.resort-why-line { display: block; margin-top: 30px; font-family: Georgia, serif; font-weight: 400; font-size: clamp(22px, 2.4vw, 30px); letter-spacing: -.03em; }
+.resort-journey .resort-integration-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.resort-journey-link { margin: 34px 0 0; text-align: center; }
+@media (max-width: 760px) { .resort-why-grid, .resort-journey .resort-integration-grid { grid-template-columns: minmax(0, 1fr); } }

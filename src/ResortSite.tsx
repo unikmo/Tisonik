@@ -250,6 +250,7 @@ const HotelFilm = () => {
     </figure>
     <ul className="film-hooks">{filmHooks.map(([line]) => <li key={line}><i aria-hidden="true" /><strong>{line}</strong></li>)}</ul>
     <div className="film-cta"><a className="resort-primary-button" href="#pilot">Start with one property <Arrow /></a></div>
+    <a className="film-quiet" href="https://www.unikmo.com/hotels">See the physical welcome card <Arrow /></a>
   </section>
 }
 
@@ -265,6 +266,17 @@ const ResortPillar = () => (
         <strong>Earlier service recovery.</strong>
         <strong>More visible staff recognition.</strong>
         <strong>More ancillary revenue moments.</strong>
+      </section>
+
+      <section className="resort-why" aria-labelledby="resort-why-title">
+        <p className="eyebrow">WHY IT EXISTS</p>
+        <h2 id="resort-why-title">Guests stay quiet, then say it online.</h2>
+        <div className="resort-why-grid">
+          <p>Guests often stay quiet during the stay, then share problems online when it is too late.</p>
+          <p>Great service goes unnoticed.</p>
+          <p>Relevant experiences stay undiscovered.</p>
+        </div>
+        <strong className="resort-why-line">Tisonik changes the timing.</strong>
       </section>
 
       <section className="resort-intro">
@@ -334,11 +346,24 @@ const ResortPillar = () => (
           <h2>An experience layer—not another destination.</h2>
         </div>
         <div className="resort-integration-grid">
-          <article><span>01</span><strong>Inside the existing journey</strong><p>White-label or embedded rather than another app guests must download.</p></article>
+          <article><span>01</span><strong>Inside the existing journey</strong><p>White-label inside your existing guest app, or opened from a UNIKMO card in the room. Not another app to download.</p></article>
           <article><span>02</span><strong>Resort-owned commerce</strong><p>Inventory, availability, pricing, checkout and payment stay with the property.</p></article>
           <article><span>03</span><strong>Actionable signals</strong><p>Discovery, ratings, recovery and recognition are structured for resort teams to act on.</p></article>
           <article><span>04</span><strong>One-property start</strong><p>Define scope and measures before wider rollout.</p></article>
         </div>
+      </section>
+
+      <section className="resort-integration resort-journey" aria-labelledby="resort-journey-title">
+        <div>
+          <p className="eyebrow">THE COMPLETE JOURNEY</p>
+          <h2 id="resort-journey-title">One connected guest journey. Two complementary products.</h2>
+        </div>
+        <div className="resort-integration-grid">
+          <article><span>ARRIVAL</span><strong>A premium physical welcome</strong><p>A UNIKMO card is waiting in the room. Scanning it opens a personal welcome.</p></article>
+          <article><span>DURING THE STAY</span><strong>Engagement, recovery and discovery</strong><p>Tisonik lets guests flag issues while you can still fix them, thank great staff and find relevant offers.</p></article>
+          <article><span>DEPARTURE</span><strong>A lasting digital keepsake</strong><p>The same card stays with the guest after checkout.</p></article>
+        </div>
+        <p className="resort-journey-link"><a className="resort-text-link" href="https://www.unikmo.com/hotels">Explore UNIKMO for Hotels <Arrow /></a></p>
       </section>
 
       <section id="pilot" className="resort-pilot-hero">
@@ -346,11 +371,13 @@ const ResortPillar = () => (
         <div>
           <p className="eyebrow">PILOT TISONIK AT YOUR RESORT</p>
           <h2>Start with one property.</h2>
-          <p>Run a focused pilot with clear guest journeys, defined success measures and a controlled integration boundary.</p>
+          <p>Define success together. Scale only when the numbers prove it.</p>
+          <p>We agree the measures up front, for example activation, recovery time, recognition volume, and offers viewed and places held.</p>
           <div className="resort-pilot-checks">
             <span>Defined use cases</span><span>Resort-owned data and brand</span><span>Measurable pilot outcomes</span><span>Scale, iterate or stop</span>
           </div>
-          <ButtonRow />
+          <div className="resort-button-row"><a className="resort-primary-button" href={pilotHref}>Start with one property <Arrow /></a></div>
+          <a className="film-quiet film-quiet--left" href={liveDemoHref}>View the product demo <Arrow /></a>
         </div>
       </section>
 
