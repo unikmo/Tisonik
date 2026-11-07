@@ -1,4 +1,4 @@
-const CACHE = 'tisonik-shell-v8'
+const CACHE = 'tisonik-shell-v9'
 const SHELL = [
   '/',
   '/passenger-experience/',
@@ -43,11 +43,16 @@ self.addEventListener('fetch', event => {
     }).catch(async () => (await caches.match(request)) || (await caches.match('/'))))
     return
   }
-  event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
-    if (response.ok) {
-      const copy = response.clone()
-      caches.open(CACHE).then(cache => cache.put(request, copy))
-    }
+  if (/\.(webm|mp4)$/.test(url.pathname)) return
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
+      if (response.ok) { const copy = response.clone(); caches.open(CACHE).then(cache => cache.put(request, copy)) }
+      return response
+    })))
+    return
+  }
+  event.respondWith(fetch(request).then(response => {
+    if (response.ok) { const copy = response.clone(); caches.open(CACHE).then(cache => cache.put(request, copy)) }
     return response
-  })))
+  }).catch(async () => (await caches.match(request)) || Response.error()))
 })

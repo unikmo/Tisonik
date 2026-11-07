@@ -191,8 +191,8 @@ const HotelFilm = () => {
     </div>
     <figure className="film-frame">
       {slide === 'film'
-        ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-hotel-poster.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
-          <source src="/media/tisonik-film-hotel.webm" type="video/webm" />
+        ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-hotel-poster-v2.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
+          <source src="/media/tisonik-film-hotel-v2.webm" type="video/webm" />
         </video>
         : <img src="/media/unikmo-card-on-bed-hotel.webp" alt="A UNIKMO welcome card resting on a hotel bed" />}
       {slide === 'film' && <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>}

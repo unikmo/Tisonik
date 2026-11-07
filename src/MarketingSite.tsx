@@ -241,8 +241,8 @@ const HomeFilm = () => {
     </div>
     <figure className="film-frame">
       {slide === 'film'
-        ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-cruise-poster.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
-          <source src="/media/tisonik-film-cruise.webm" type="video/webm" />
+        ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-cruise-poster-v2.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
+          <source src="/media/tisonik-film-cruise-v2.webm" type="video/webm" />
         </video>
         : <img src="/media/hero-centered-black-crew-amara.jpg" alt="Black cruise crew member welcoming guests onboard" />}
       {slide === 'film' && <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>}
@@ -365,7 +365,7 @@ const HospitalityPage = () => <>
   <section className="detail-hero hosp-hero"><p className="eyebrow">ONE EXPERIENCE LAYER · TWO HOSPITALITY ENVIRONMENTS</p><h1>One guest experience layer for cruise lines and hotels.</h1><p className="detail-intro">A UNIKMO card opens a Tisonik guest page: a welcome, offers, ratings and thanks, with no new app required. The same layer, set up for a ship or for a property.</p></section>
   <section className="hosp-films" aria-label="The Tisonik films">
     {([['Cruise lines', 'cruise', '/', 'Explore cruise'], ['Hotels & resorts', 'hotel', '/hotels/', 'Explore hotels']] as const).map(([name, key, href, cta]) => <article key={key}>
-      <video muted loop playsInline controls preload="none" poster={`/media/tisonik-film-${key}-poster.jpg`} aria-label={`The Tisonik film for ${name.toLowerCase()}`}><source src={`/media/tisonik-film-${key}.webm`} type="video/webm" /></video>
+      <video muted loop playsInline controls preload="none" poster={`/media/tisonik-film-${key}-poster-v2.jpg`} aria-label={`The Tisonik film for ${name.toLowerCase()}`}><source src={`/media/tisonik-film-${key}-v2.webm`} type="video/webm" /></video>
       <h2>{name}</h2><a className="pilot-link" href={href}>{cta.toUpperCase()} <Arrow /></a>
     </article>)}
   </section>
