@@ -203,6 +203,34 @@ const HotelFilm = () => {
   </section>
 }
 
+const hotelFaqs: [string, string][] = [
+  ['Do guests need to download an app?', 'No. A UNIKMO card in the room opens the guest page on any phone, or Tisonik runs inside the guest app you already have. No new app required.'],
+  ['What do guests see?', 'A welcome from your General Manager, a one-tap way to rate their day (Poor to Superb), a way to thank a team member by name, a private way to ask for help, relevant offers, and a card they keep.'],
+  ['What happens when a guest rates something low?', 'A Poor or Fair score reaches your hotel team at once and the guest is thanked. If a guest asks for help, it goes straight to reception. Once the desk marks it resolved, the guest is asked whether it was fixed.'],
+  ['Are ratings published?', 'No. Ratings are private to your team. Reception receives everything, and the manager can receive the ratings. Tisonik does not publish them.'],
+  ['How does it fit with our PMS, booking and payment systems?', 'Tisonik is an experience layer, not a replacement for your systems. Inventory, availability, pricing, checkout and payment stay with the property. The pilot defines exactly what connects.'],
+  ['Who sells the offers and takes payment?', 'You do. Guests can hold a place and see how many are left. Tisonik counts the places and tells the desk. The property confirms and takes payment.'],
+  ['Can guests see or contact each other?', 'No. Guest-to-guest connection is off for hotels. Offers are anonymous, for example “5 places left”.'],
+  ['What guest data is held, and for how long?', 'A guest reference sent by UNIKMO, an optional room and first name, and what guests choose to write. Stays are deleted automatically 90 days after the after-checkout window closes.'],
+  ['Does staff recognition become an employee ranking?', 'No. Guests pick a team member from your list and up to two reasons, once per person per day. There is no public leaderboard.'],
+  ['Can we put our brand on it?', 'Yes. Tisonik is white-label, so the brand is yours. UNIKMO cards can be customised to your hotel’s brand. Talk to us.'],
+  ['How does a pilot work?', 'We start with one property. We agree the guest journeys and the success measures first, for example activation, recovery time, recognition volume, and offers viewed and places held. Then we scale, iterate or stop.'],
+  ['What does a pilot cost?', 'For the first one-property pilot we keep pricing deliberately simple and low ($8 per stay) so the focus stays on measuring real impact. After a successful pilot we move to standard commercial pricing.'],
+]
+
+const hotelFaqData = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: hotelFaqs.map(([question, answer]) => ({ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } })),
+})
+
+const HotelFaq = () => <section className="buyer-readiness" aria-labelledby="hotel-faq-title">
+  <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: hotelFaqData }} />
+  <p className="eyebrow">FAQs</p>
+  <h2 id="hotel-faq-title">Questions hotels ask.</h2>
+  <div className="buyer-readiness-grid">{hotelFaqs.map(([question, answer], index) => <details key={question} open={index === 0}><summary><span>{String(index + 1).padStart(2, '0')}</span><h3>{question}</h3><i aria-hidden="true">+</i></summary><p>{answer}</p></details>)}</div>
+</section>
+
 const ResortPillar = () => (
   <div className="tisonik-site resort-site">
     <Header />
@@ -342,6 +370,8 @@ const ResortPillar = () => (
           <a href="/hotel-ancillary-revenue-software/"><strong>Ancillary revenue</strong><span>Surface more bookable moments while commerce stays with the resort.</span></a>
         </div>
       </section>
+
+      <HotelFaq />
     </main>
     <Footer />
   </div>
