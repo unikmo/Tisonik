@@ -371,7 +371,7 @@ h1.film-tagline { font-weight: 400; }
 .paper-calc-note a { color: var(--accent); }
 
 /* Home: how it works + value list */
-.home-steps, .home-value { max-width: 1080px; margin: 0 auto; padding: 72px 24px; }
+.home-steps, .home-value { width: min(1240px,100%); margin: 0 auto; padding: clamp(62px,7.4vw,100px) clamp(22px,4.7vw,68px); }
 .home-steps h2, .home-value h2 { margin: 8px 0 28px; font-weight: 400; font-size: clamp(24px, 4vw, 38px); letter-spacing: -.04em; line-height: 1.12; }
 .home-steps-list, .home-value-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 .home-steps-list li, .home-value-list li { border-top: 1px solid var(--line); padding-top: 16px; }

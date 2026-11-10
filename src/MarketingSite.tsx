@@ -155,10 +155,10 @@ const Header = ({ page }: { page: PageKey }) => (
   </header>
 )
 
-const Footer = () => (
+const Footer = ({ cruiseOnly = false }: { cruiseOnly?: boolean }) => (
   <footer className="site-footer">
     <div><strong>TISONIK</strong><span>A product of TSquare Ventures LLC</span></div>
-    <p>Guest experience activation for cruise lines and premium hotels &amp; resorts: service recovery, recognition, engagement, discovery and ancillary revenue.</p>
+    <p>Guest experience activation for {cruiseOnly ? "cruise lines" : "cruise lines and premium hotels & resorts"}: service recovery, recognition, engagement, discovery and ancillary revenue.</p>
     <nav className="footer-links" aria-label="Footer navigation"><a href={contactHref}>Contact</a><a href="/imprint/">Imprint</a><a href="/security/">Security</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/cookies/">Cookies</a></nav>
   </footer>
 )
@@ -172,13 +172,13 @@ const Section = ({ id, eyebrow, title, children, crop, reverse = false, alt, sho
   </section>
 )
 
-const EntityDefinition = () => (
+const EntityDefinition = ({ cruiseOnly = false }: { cruiseOnly?: boolean }) => (
   <section className="entity-definition" aria-labelledby="what-is-tisonik">
     <p className="eyebrow">WHAT TISONIK IS</p>
     <h2 id="what-is-tisonik">Not another app. One experience layer inside the guest journey you already own.</h2>
-    <p>Tisonik is a white-label guest-experience interaction layer for cruise lines and premium hotels and resorts. It fits into the operator’s existing app or digital guest journey without replacing the booking, property-management or commerce stack. The operator retains control of its brand, inventory, pricing, checkout and payment.</p>
+    <p>Tisonik is a white-label guest-experience interaction layer for {cruiseOnly ? "cruise lines" : "cruise lines and premium hotels and resorts"}. It fits into the operator’s existing app or digital guest journey without replacing the booking, property-management or commerce stack. The operator retains control of its brand, inventory, pricing, checkout and payment.</p>
     <div className="entity-links" aria-label="Tisonik product areas">
-      <a href="/">Cruise lines</a><a href="/hotels/">Hotels &amp; resorts</a><a href="/service-recovery/">Service recovery</a><a href="/crew-recognition/">Recognition</a><a href="/ancillary-revenue/">Ancillary revenue</a><a href="/integration/">How it works</a><a href="/security/">Security</a>
+      <a href="/">Cruise lines</a>{!cruiseOnly && <a href="/hotels/">Hotels &amp; resorts</a>}<a href="/service-recovery/">Service recovery</a><a href="/crew-recognition/">Recognition</a><a href="/ancillary-revenue/">Ancillary revenue</a><a href="/integration/">How it works</a><a href="/security/">Security</a>
     </div>
   </section>
 )
@@ -346,7 +346,7 @@ const Home = () => (
       </ul>
     </section>
     <PaperCalculator />
-    <EntityDefinition />
+    <EntityDefinition cruiseOnly />
     <section className="quiet-proof"><p className="eyebrow">BUILT TO FIT THE CRUISE JOURNEY</p><div className="proof-grid"><article><strong>Inside the existing app</strong><span>No competing destination for the guest.</span></article><article><strong>Immediate operational feedback</strong><span>Structured event ratings reach leaders while they can still act.</span></article><article><strong>Revenue evidence without identity</strong><span>Confirmed booking value is attributed through opaque references and aggregated outcomes.</span></article></div></section>
     <BuyerReadiness />
     <section id="pilot" className="pilot-section"><p className="eyebrow">ONE SHIP. THE COMPLETE EXPERIENCE.</p><h2>See the product, then pilot it inside the cruise app guests already use.</h2><p>Walk through the connected passenger and management experience, then request a complete one-ship pilot.</p><div className="pilot-actions"><a className="pilot-button pilot-button--primary" href={pilotContactHref}>Request a pilot <Arrow /></a><a className="pilot-button pilot-button--secondary" href={demoHref}>View product demo <Arrow /></a></div></section>
@@ -462,5 +462,5 @@ const DetailPage = ({ page }: { page: Exclude<PageKey, 'home'> }) => {
 
 export default function MarketingSite() {
   const page = pageFromPath(window.location.pathname)
-  return <div className="tisonik-site" data-page={page}><Header page={page} /><main>{page === 'home' ? <Home /> : <DetailPage page={page} />}</main><Footer /></div>
+  return <div className="tisonik-site" data-page={page}><Header page={page} /><main>{page === 'home' ? <Home /> : <DetailPage page={page} />}</main><Footer cruiseOnly={page === 'home'} /></div>
 }
