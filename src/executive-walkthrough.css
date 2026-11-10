@@ -32,3 +32,38 @@
 .exec-voyage-foot{display:flex;align-items:center;gap:7px;margin:8px 13px;padding:10px;border-radius:9px;background:#e8f3ee;color:#306e67;font-size:9px;font-weight:700}
 .exec-voyage-foot svg{width:15px;height:15px}
 @media(max-width:680px){.exec-card-journey{grid-template-columns:1fr;gap:18px}.exec-card-journey .exec-card-photo img{aspect-ratio:1.45/1}.exec-card-journey .exec-phone-shell{max-width:290px}.exec-overview-journey span{font-size:8px;padding:7px 9px}.exec-overview-journey span+span:before{margin-right:6px}.exec-card-photo figcaption{font-size:8px}}
+
+
+/* Match the established Tisonik homepage: warm ivory, espresso ink and copper. */
+.exec-demo{--exec-ink:#171715;--exec-teal:#805331;--exec-paper:#faf8f4;background:#faf8f4;color:#171715}
+.exec-demo .exec-header{background:rgba(250,248,244,.97);border-color:rgba(23,23,21,.1)}
+.exec-demo .exec-brand small,.exec-demo .exec-step-count,.exec-demo .exec-story>p{color:#6c6861}
+.exec-demo .exec-story h1{color:#171715}
+.exec-demo .exec-story>div:first-child>small{color:#805331;border-left-color:#d9cbbd}
+.exec-demo .exec-header nav{background:#f0ebe3}
+.exec-demo .exec-header nav button{color:#685d53}
+.exec-demo .exec-header nav button.active{color:#805331}
+.exec-demo .cc-mark{background:linear-gradient(140deg,#352516,#805331);box-shadow:0 10px 24px rgba(53,37,22,.18)}
+.exec-demo .exec-header-cta,.exec-demo .exec-benefit,.exec-demo .exec-feature-shortcuts button.active{background:#171715;border-color:#171715}
+.exec-demo .exec-benefit{box-shadow:0 12px 28px rgba(34,25,17,.13)}
+.exec-demo .exec-benefit span{color:#f4ede5}
+.exec-demo .exec-visual{background:radial-gradient(circle at 20% 0,#fcf7ef,transparent 44%),linear-gradient(145deg,#f4f0e9,#dfd5c8);border-color:rgba(128,83,49,.13);box-shadow:0 38px 90px rgba(65,43,27,.12)}
+.exec-demo .exec-phone{border-color:#25201c;background:#fffdf9;box-shadow:0 30px 65px rgba(41,28,18,.23)}
+.exec-demo .exec-phone-status i{background:#25201c}
+.exec-demo .exec-phone-label{color:#805331}
+.exec-demo .exec-overview-screen,.exec-demo .exec-pilot-screen{background:#fffdfa;border-color:#e5d8c8}
+.exec-demo .exec-overview-journey span{color:#805331;background:#f4e9dd}
+.exec-demo .exec-overview-journey span+span:before{color:#805331}
+.exec-demo .exec-overview-screen>button,.exec-demo .exec-pilot-screen>a{background:#171715}
+.exec-demo .exec-voyage-message{color:#211d19}
+.exec-demo .exec-voyage-message small,.exec-demo .exec-voyage-message span{color:#805331}
+.exec-demo .exec-voyage-message p{color:#68615a}
+.exec-demo .exec-voyage-foot{background:#f4e9dd;color:#805331}
+.exec-demo .exec-card-photo{background:#e7e1d8}
+.exec-demo .exec-card-photo figcaption{background:rgba(31,25,20,.89)}
+.exec-demo .exec-controls{background:#faf8f4;border-top-color:#e8dfd6}
+.exec-demo .exec-controls>.next{background:#171715;border-color:#171715}
+.exec-demo .exec-controls [role=tab].active span{background:#805331}
+.exec-voyage-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:9px 0 13px}
+.exec-voyage-gallery img{display:block;width:100%;height:60px;object-fit:cover;border-radius:8px}
+@media(max-width:680px){.exec-voyage-gallery img{height:49px}}
