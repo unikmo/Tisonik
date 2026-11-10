@@ -369,3 +369,12 @@ h1.film-tagline { font-weight: 400; }
 .paper-calc-result p { margin: 6px 0; }
 .paper-calc-result strong { font-size: 1.4em; font-weight: 500; }
 .paper-calc-note a { color: var(--accent); }
+
+/* Home: how it works + value list */
+.home-steps, .home-value { max-width: 1080px; margin: 0 auto; padding: 72px 24px; }
+.home-steps h2, .home-value h2 { margin: 8px 0 28px; font-weight: 400; font-size: clamp(24px, 4vw, 38px); letter-spacing: -.04em; line-height: 1.12; }
+.home-steps-list, .home-value-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.home-steps-list li, .home-value-list li { border-top: 1px solid var(--line); padding-top: 16px; }
+.home-steps-list span { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.home-steps-list h3, .home-value-list h3 { margin: 8px 0; font-weight: 400; font-size: 22px; letter-spacing: -.02em; }
+.home-steps-list p, .home-value-list p { margin: 0; color: var(--muted); }

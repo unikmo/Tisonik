@@ -318,12 +318,35 @@ const Home = () => (
       </div>
     </section>
     <section className="manifesto" aria-label="Tisonik cruise promise"><p className="eyebrow">FOR THE CRUISE JOURNEY</p><h2>Built to feel natural onboard.</h2><p className="manifesto-copy">A quieter interaction layer for guests, crew and the moments between the itinerary.</p></section>
+    <section id="how-it-works" className="home-steps" aria-labelledby="home-steps-title">
+      <p className="eyebrow">HOW IT WORKS</p>
+      <h2 id="home-steps-title">One card. The whole voyage.</h2>
+      <ol className="home-steps-list">
+        <li><span>01 · On arrival</span><h3>A welcome waiting on the bed</h3><p>Guests scan the card, enter the welcome code for their trip and see a message from your cruise director, which also shows them how to use TISONIK in your app.</p></li>
+        <li><span>02 · Between</span><h3>TISONIK does the quiet work</h3><p>Guests recognise crew in the moment, flag friction while you can still fix it, give a quick answer instead of a long survey, and see offers that are relevant to them.</p></li>
+        <li><span>03 · On departure</span><h3>A keepsake that carries your brand home</h3><p>Your media team adds the voyage highlights to the same card. Guests take the keepsake home with them, and the card is the first thing they reach for when they think about the next sailing.</p></li>
+      </ol>
+    </section>
     <Section id="passenger-experience" eyebrow="PASSENGER EXPERIENCE" title="Make the app feel more alive." crop="passenger" alt="Multicultural cruise passengers of different ages relaxing together" shot="/media/portal-welcome.jpg" shotAlt="The guest page: a welcome from the Cruise Director, then a show the guest has just seen, ready to rate with one tap"><p>Give guests more relevant reasons to interact throughout the sailing—without making the experience feel busy, intrusive or transactional.</p></Section>
     <Section id="crew-recognition" eyebrow="CREW RECOGNITION" title="Let great service be seen." crop="crew" alt="Diverse cruise crew members sharing a candid end-of-shift moment" reverse shot="/media/portal-crew-recognition.jpg" shotAlt="The guest page: a crew member chosen, two preset reasons picked, ready to send"><p>A simple thank-you becomes visible, measurable and memorable for guest, crew and operator.</p></Section>
     <Section id="service-recovery" eyebrow="SERVICE RECOVERY" title="Fix it while it still matters." crop="recovery" alt="Cruise crew member returning a child’s toy beside their parent" shot="/media/portal-service-recovery.jpg" shotAlt="The guest page: a low stateroom score, answered with thanks and a promise that the team has been told"><p>Guests signal friction discreetly. You respond before the experience is over.</p></Section>
     <Section id="engagement" eyebrow="LIVE EXPERIENCE FEEDBACK" title="Improve events while the sailing is still underway." crop="engagement" alt="Multigenerational passengers enjoying an inclusive deck activity" reverse shot="/media/portal-live-rating.jpg" shotAlt="The guest page: Just finished, how was the evening show, five one-tap answers"><p>After a live event, ask three to five structured questions with prepared response blocks. Leaders see feedback immediately; the cruise line decides which aggregated ratings to publish.</p></Section>
     <Section id="ancillary-revenue" eyebrow="ANCILLARY REVENUE" title="Make relevance commercial." crop="revenue" alt="A multicultural family choosing an onboard experience together" shot="/media/portal-offers-keepsake.jpg" shotAlt="The guest page: Chef table dinner, your friend Dee is going, 3 places left, and a button to hold a place"><p>When guests are already engaged, the right experiences appear naturally. Checkout and payment stay with you.</p></Section>
     <Section id="keepsake" eyebrow="THE KEEPSAKE · LESS PAPER" title="Less disposable print. A keepsake that lasts." crop="keepsake" alt="A UNIKMO card standing on a made-up cabin bed" reverse><p>One card replaces the paper pile. Our cruise media team adds cruise highlights to the same welcome code. Curated moments are an optional extra.</p><p>UNIKMO cards can be customised to your cruise line’s brand. <a href="#pilot">Talk to us</a>.</p></Section>
+    <section id="where-value-comes-from" className="home-value" aria-labelledby="home-value-title">
+      <p className="eyebrow">WHERE THE VALUE COMES FROM</p>
+      <h2 id="home-value-title">What does it do for your ship?</h2>
+      <ul className="home-value-list">
+        <li><h3>More onboard revenue</h3><p>Relevant offers at the right moment. Checkout stays yours.</p></li>
+        <li><h3>Less printing</h3><p>The card and your app can replace part of the daily paper round.</p></li>
+        <li><h3>Problems fixed in time</h3><p>Guests tell you privately, before it reaches a review.</p></li>
+        <li><h3>Crew who feel seen</h3><p>Guests thank crew in the moment. Recognition starts on board.</p></li>
+        <li><h3>A keepsake that brings guests back</h3><p>The voyage stays in their home, with your brand on it.</p></li>
+        <li><h3>Feedback without the survey</h3><p>A quick answer on board beats a long form weeks later.</p></li>
+        <li><h3>Less disposable print</h3><p>Fewer printed pages, less ink, less to carry and dispose of.</p></li>
+        <li><h3>Guests share the voyage</h3><p>A shared keepsake can reach people you would otherwise pay to reach.</p></li>
+      </ul>
+    </section>
     <PaperCalculator />
     <EntityDefinition />
     <section className="quiet-proof"><p className="eyebrow">BUILT TO FIT THE CRUISE JOURNEY</p><div className="proof-grid"><article><strong>Inside the existing app</strong><span>No competing destination for the guest.</span></article><article><strong>Immediate operational feedback</strong><span>Structured event ratings reach leaders while they can still act.</span></article><article><strong>Revenue evidence without identity</strong><span>Confirmed booking value is attributed through opaque references and aggregated outcomes.</span></article></div></section>
