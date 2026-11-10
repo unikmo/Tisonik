@@ -358,23 +358,35 @@ h1.film-tagline { font-weight: 400; }
 @media (max-width: 760px) { .resort-why-grid, .resort-journey .resort-integration-grid { grid-template-columns: minmax(0, 1fr); } }
 
 /* Paper calculator (homepage) */
-.paper-calc { max-width: 880px; margin: 0 auto; padding: 72px 24px; }
-.paper-calc h2 { margin: 8px 0 12px; font-weight: 400; font-size: clamp(24px, 4vw, 38px); letter-spacing: -.04em; line-height: 1.12; }
-.paper-calc-intro, .paper-calc-note { color: var(--muted); max-width: 640px; }
-.paper-calc-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 28px 0; }
-.paper-calc-form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--ink); }
-.paper-calc-form input { font: inherit; padding: 10px 12px; min-height: 44px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); }
-.paper-calc-form input:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
-.paper-calc-result { border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; background: #fff; }
-.paper-calc-result p { margin: 6px 0; }
-.paper-calc-result strong { font-size: 1.4em; font-weight: 500; }
-.paper-calc-note a { color: var(--accent); }
 
-/* Home: how it works + value list */
-.home-steps, .home-value { width: min(1240px,100%); margin: 0 auto; padding: clamp(62px,7.4vw,100px) clamp(22px,4.7vw,68px); }
-.home-steps h2, .home-value h2 { margin: 8px 0 28px; font-weight: 400; font-size: clamp(24px, 4vw, 38px); letter-spacing: -.04em; line-height: 1.12; }
-.home-steps-list, .home-value-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-.home-steps-list li, .home-value-list li { border-top: 1px solid var(--line); padding-top: 16px; }
+/* Home: how it works (three steps) */
+.home-steps { width: min(1240px,100%); margin: 0 auto; padding: clamp(62px,7.4vw,100px) clamp(22px,4.7vw,68px); }
+.home-steps h2 { margin: 8px 0 28px; font-weight: 400; font-size: clamp(24px, 4vw, 38px); letter-spacing: -.04em; line-height: 1.12; }
+.home-steps-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.home-steps-list li { border-top: 1px solid var(--line); padding-top: 16px; }
 .home-steps-list span { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
-.home-steps-list h3, .home-value-list h3 { margin: 8px 0; font-weight: 400; font-size: 22px; letter-spacing: -.02em; }
-.home-steps-list p, .home-value-list p { margin: 0; color: var(--muted); }
+.home-steps-list h3 { margin: 8px 0; font-weight: 400; font-size: 22px; letter-spacing: -.02em; }
+.home-steps-list p { margin: 0; color: var(--muted); }
+
+/* Hero block above the film, and the hero image slide */
+.film-hero { margin: 8px auto 18px; max-width: 780px; }
+.film-hero .eyebrow { margin: 0 0 14px; }
+.film-hero h1 { margin: 0 auto clamp(14px,1.6vw,22px); font-weight: 400; font-size: clamp(30px,3vw,44px); line-height: 1.08; letter-spacing: -.046em; text-wrap: balance; }
+.film-hero h1 span { color: var(--accent); }
+.film-hero .hero-positioning { margin: 0 auto; }
+.film-top .film-frame img.film-hero-image { aspect-ratio: 2000 / 740; height: auto; object-fit: cover; }
+
+/* Two-card strip: centred, fills the width */
+.proof-grid--two { grid-template-columns: repeat(2, 1fr); max-width: 900px; text-align: center; }
+.proof-grid--two article { justify-items: center; align-content: start; text-align: center; }
+@media (max-width: 720px) { .proof-grid--two { grid-template-columns: 1fr; } }
+
+/* How it works: centred head and steps */
+.home-steps { text-align: center; }
+.home-steps-list li { text-align: center; }
+@media (max-width: 720px) { .film-top .film-frame img.film-hero-image { aspect-ratio: 4 / 3; object-position: 40% center; } }
+
+/* Light film frame: paper background, soft shadow, no dark surround */
+.film-top .film-frame { background: #f0ece5; box-shadow: 0 40px 80px -48px rgba(23,23,21,.28); }
+.film-toggle { backdrop-filter: blur(8px); }
+.film-top .film-toggle { background: rgba(250,248,244,.88); color: #171715; border-color: rgba(23,23,21,.14); }
