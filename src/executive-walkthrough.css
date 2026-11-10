@@ -74,3 +74,6 @@
 .exec-stage,.exec-visual{box-sizing:border-box}
 .exec-demo{grid-template-columns:minmax(0,1fr)}.exec-stage{min-width:0}
 .exec-controls{grid-template-columns:minmax(0,150px) minmax(0,1fr) minmax(0,150px)}.exec-controls>[role=tablist]{min-width:0}@media(min-width:681px) and (max-width:1050px){.exec-controls [role=tab]{width:22px}}
+
+/* Desktop: the whole step must be visible without scrolling (the component also zooms to fit short laptop screens). */
+@media(min-width:1051px){.exec-stage{padding-top:14px;padding-bottom:14px}.exec-visual{min-height:0}.exec-demo{height:100svh;min-height:0}.exec-demo>.exec-stage{align-self:center}}

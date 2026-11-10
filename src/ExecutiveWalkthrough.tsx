@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react'
 import { Icon } from './Icon'
 
 type DemoStep = {
@@ -76,11 +76,11 @@ const CardOnBed = () => <figure className="exec-card-photo"><img src="/media/uni
 
 const WelcomePhone = () => <DemoPhone label="UNIKMO · scan welcome"><div className="cc-app-head"><span className="cc-small-mark"><Icon name="ship"/></span><div><small>MEDITERRANEAN ESCAPE</small><b>Welcome aboard</b></div><span>MA</span></div><img className="exec-voyage-photo" src="/media/tisonik-hero-card.webp" alt="Tisonik homepage image showing a guest experience with the UNIKMO card" /><div className="exec-voyage-message"><small>A MESSAGE FROM YOUR CRUISE DIRECTOR</small><h3>Welcome to your voyage, Maria.</h3><p>We're delighted you're here. Discover your first-day orientation and settle into your sailing.</p><span>Day 1 · Welcome and orientation</span></div><div className="exec-voyage-foot"><Icon name="check"/> No new app required</div></DemoPhone>
 
-const KeepsakePhone = () => <DemoPhone label="UNIKMO · same QR at departure"><div className="cc-app-head"><span className="cc-small-mark gold"><Icon name="spark"/></span><div><small>YOUR VOYAGE TO KEEP</small><b>Mediterranean Escape</b></div><span>MA</span></div><img className="exec-voyage-photo" src="/media/tisonik-film-cruise-poster-v3.jpg" alt="Cruise journey highlights in the Tisonik homepage film" /><div className="exec-voyage-message"><small>CURATED VOYAGE HIGHLIGHTS</small><h3>The memories sail home with you.</h3><p>Favourite moments, curated sailing highlights and a farewell from your Cruise Director.</p><div className="exec-voyage-gallery" aria-label="Sample voyage highlights"><img src="/media/cruise-inclusive-activity.jpg" alt="Onboard deck activity"/><img src="/media/cruise-family-experience.jpg" alt="Guests enjoying a cruise experience"/><img src="/media/tisonik-hero-card.webp" alt="UNIKMO card, the voyage memento"/></div><span>Day 7 · Farewell keepsake</span></div><div className="exec-voyage-foot"><Icon name="check"/> Open again after disembarkation</div></DemoPhone>
+const KeepsakePhone = () => <DemoPhone label="UNIKMO · same QR at departure"><div className="cc-app-head"><span className="cc-small-mark gold"><Icon name="spark"/></span><div><small>YOUR VOYAGE TO KEEP</small><b>Mediterranean Escape</b></div><span>MA</span></div><img className="exec-voyage-photo" src="/media/hero-deck.jpg" alt="Sunset on the ship deck" /><div className="exec-voyage-message"><small>CURATED VOYAGE HIGHLIGHTS</small><h3>The memories sail home with you.</h3><p>Favourite moments, curated sailing highlights and a farewell from your Cruise Director.</p><div className="exec-voyage-gallery" aria-label="Sample voyage highlights"><img src="/media/cruise-inclusive-activity.jpg" alt="Onboard deck activity"/><img src="/media/cruise-family-experience.jpg" alt="Guests enjoying a cruise experience"/><img src="/media/tisonik-hero-card.webp" alt="UNIKMO card, the voyage memento"/></div><span>Day 7 · Farewell keepsake</span></div><div className="exec-voyage-foot"><Icon name="check"/> Open again after disembarkation</div></DemoPhone>
 
 const CardJourneyScreen = ({ kind }: { kind: 'arrival' | 'departure' }) => <div className="exec-card-journey"><CardOnBed/>{kind === 'arrival' ? <WelcomePhone/> : <KeepsakePhone/>}</div>
 
-const OverviewScreen = ({ start }: { start: () => void }) => <div className="exec-overview-screen"><div className="exec-overview-brand"><span className="cc-mark"><Icon name="spark"/></span><div><small>TISONIK + UNIKMO</small><b>One connected sailing</b></div></div><h3>One connected experience — from the card in the cabin to the full sailing.</h3><p>Guests begin with a physical UNIKMO card placed in the cabin. Scanning it opens the welcome experience. Everything else runs inside the cruise line’s existing app.</p><CardOnBed/><div className="exec-overview-journey"><span>Arrival welcome</span><span>Live onboard experience</span><span>Departure keepsake</span></div><button onClick={start}>Follow the guest journey <Icon name="arrow"/></button></div>
+const OverviewScreen = ({ start }: { start: () => void }) => <div className="exec-overview-screen"><div className="exec-overview-brand"><span className="cc-mark"><Icon name="spark"/></span><div><small>TISONIK + UNIKMO</small><b>One connected sailing</b></div></div><CardOnBed/><div className="exec-overview-journey"><span>Arrival welcome</span><span>Live onboard experience</span><span>Departure keepsake</span></div><button onClick={start}>Follow the guest journey <Icon name="arrow"/></button></div>
 
 const PilotScreen = () => <div className="exec-pilot-screen"><small>COMPLETE ONE-SHIP PILOT</small><h3>From the cabin card to a lasting keepsake.</h3><p>One physical card. One experience layer. Measured in a single-ship pilot.</p><div className="exec-pilot-steps"><article><span>01</span><b>Welcome</b><p>UNIKMO card on bed · scan · Cruise Director welcome.</p></article><article><span>02</span><b>Connect</b><p>Integrate Tisonik into the existing cruise app and onboard systems.</p></article><article><span>03</span><b>Engage</b><p>Activate passenger, crew, recovery, event and commerce workflows.</p></article><article><span>04</span><b>Keep & measure</b><p>Same QR, farewell highlights and agreed operational KPIs.</p></article></div><a href="/pilot/#contact">Request a pilot conversation <Icon name="arrow"/></a><p>The complete arrival → onboard → departure journey is evaluated together.</p></div>
 
@@ -114,6 +114,24 @@ export default function ExecutiveWalkthrough() {
     setStep(safe)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+  // Fit the whole step (story + visual) inside the viewport on desktop so nothing needs scrolling.
+  useLayoutEffect(() => {
+    const fit = () => {
+      const stage = document.querySelector<HTMLElement>('.exec-stage')
+      const header = document.querySelector<HTMLElement>('.exec-header')
+      const controls = document.querySelector<HTMLElement>('.exec-controls')
+      if (!stage || !header || !controls) return
+      stage.style.zoom = ''
+      if (window.innerWidth <= 1050) return
+      const avail = window.innerHeight - header.offsetHeight - controls.offsetHeight - 4
+      const natural = stage.scrollHeight
+      if (natural > avail) stage.style.zoom = String(Math.max(0.55, avail / natural))
+    }
+    fit()
+    const t = window.setTimeout(fit, 250)
+    window.addEventListener('resize', fit)
+    return () => { window.clearTimeout(t); window.removeEventListener('resize', fit) }
+  }, [step])
   useEffect(() => {
     const onPop = () => setStep(readStep())
     window.addEventListener('popstate', onPop)
