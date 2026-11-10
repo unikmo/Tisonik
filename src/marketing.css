@@ -416,3 +416,8 @@ h1.film-tagline { font-weight: 400; }
 .home-steps { text-align: center; }
 .home-steps-list li { text-align: center; }
 @media (max-width: 720px) { .film-top .film-frame img.film-hero-image { aspect-ratio: 4 / 3; object-position: 40% center; } }
+
+/* Light film frame: paper background, soft shadow, no dark surround */
+.film-top .film-frame { background: #f0ece5; box-shadow: 0 40px 80px -48px rgba(23,23,21,.28); }
+.film-toggle { backdrop-filter: blur(8px); }
+.film-top .film-toggle { background: rgba(250,248,244,.88); color: #171715; border-color: rgba(23,23,21,.14); }

@@ -246,8 +246,8 @@ const HomeFilm = () => {
     </div>
     <figure className="film-frame">
       {slide === 'film'
-        ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-cruise-poster-v2.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
-          <source src="/media/tisonik-film-cruise-v2.webm" type="video/webm" />
+        ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-cruise-poster-v3.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
+          <source src="/media/tisonik-film-cruise-v3.webm" type="video/webm" />
         </video>
         : <img className="film-hero-image" src="/media/tisonik-hero-card.webp" width="2000" height="740" alt="A crew member on a ship's observation deck holds up the UNIKMO card" />}
       {slide === 'film' && <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>}
