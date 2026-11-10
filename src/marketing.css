@@ -396,3 +396,8 @@ h1.film-tagline { font-weight: 400; }
 .quiet-proof .pilot-link { color: #e6c3a0; border-bottom-color: #c79b72; }
 .resort-pilot-hero .film-quiet { color: #e8eef6; }
 .resort-pilot-hero .film-quiet:hover { color: #fff; }
+
+/* Hero copy and demo link sit directly under the film ticks, inside the same block. */
+.film-top .hero-after { padding: 30px 0 0; }
+.film-top .hero-after-copy { margin-bottom: 16px; }
+@media (max-width: 960px) { .film-top .hero-after { padding: 24px 0 0; } }
