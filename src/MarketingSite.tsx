@@ -253,6 +253,47 @@ const HomeFilm = () => {
   </section>
 }
 
+const fmtNum = (n: number) => Math.round(n).toLocaleString('en-US')
+const toNum = (v: string) => { const n = parseFloat(v.replace(',', '.')); return Number.isFinite(n) && n >= 0 ? n : NaN }
+
+// Paper calculator. The visitor enters every number; nothing here is a preset saving, price or commission.
+const PaperCalculator = () => {
+  const [guests, setGuests] = useState('')
+  const [voyages, setVoyages] = useState('')
+  const [nights, setNights] = useState('')
+  const [sheets, setSheets] = useState('')
+  const [share, setShare] = useState('')
+  const [sheetCost, setSheetCost] = useState('')
+  const g = toNum(guests), v = toNum(voyages), n = toNum(nights), s = toNum(sheets), p = toNum(share), c = toNum(sheetCost)
+  const ready = [g, v, n, s].every(x => !Number.isNaN(x))
+  const printed = ready ? g * v * n * s : 0
+  const shareOk = !Number.isNaN(p) && p <= 100
+  const avoided = ready && shareOk ? printed * (p / 100) : NaN
+  return <section id="paper-calculator" className="paper-calc" aria-labelledby="paper-calc-title">
+    <p className="eyebrow">PAPER CALCULATOR</p>
+    <h2 id="paper-calc-title">See what the paper pile adds up to on your ship.</h2>
+    <p className="paper-calc-intro">Enter your own volumes. The calculator uses only the numbers you type. It does not assume a saving for you, and nothing you enter leaves your browser.</p>
+    <form className="paper-calc-form" onSubmit={(e) => e.preventDefault()} noValidate>
+      <label>Guests per voyage<input inputMode="numeric" value={guests} onChange={e => setGuests(e.target.value)} /></label>
+      <label>Voyages per year, per ship<input inputMode="numeric" value={voyages} onChange={e => setVoyages(e.target.value)} /></label>
+      <label>Average nights per voyage<input inputMode="numeric" value={nights} onChange={e => setNights(e.target.value)} /></label>
+      <label>Printed sheets per guest, per night<input inputMode="decimal" value={sheets} onChange={e => setSheets(e.target.value)} /></label>
+      <label>Share of those sheets one card could replace (%)<input inputMode="decimal" value={share} onChange={e => setShare(e.target.value)} /></label>
+      <label>Your cost per printed sheet (optional)<input inputMode="decimal" value={sheetCost} onChange={e => setSheetCost(e.target.value)} /></label>
+    </form>
+    <div className="paper-calc-result" aria-live="polite">
+      {!ready ? <p>Fill in the first four fields to see your yearly print volume.</p> : <>
+        <p><strong>{fmtNum(printed)}</strong> printed sheets per ship, per year.</p>
+        {Number.isNaN(avoided) ? <p>Add the share one card could replace to see the sheets avoided.</p> : <>
+          <p><strong>{fmtNum(avoided)}</strong> fewer printed sheets per ship, per year, at your {fmtNum(p)}%.</p>
+          {!Number.isNaN(c) && <p>About <strong>{fmtNum(avoided * c)}</strong> in print cost at your cost per sheet.</p>}
+        </>}
+      </>}
+    </div>
+    <p className="paper-calc-note">The result is arithmetic on your inputs, not a forecast or a guarantee. Want it worked through with your own data? <a href="#pilot">Talk to us</a>.</p>
+  </section>
+}
+
 const Home = () => (
   <>
     <HomeFilm />
@@ -283,6 +324,7 @@ const Home = () => (
     <Section id="engagement" eyebrow="LIVE EXPERIENCE FEEDBACK" title="Improve events while the sailing is still underway." crop="engagement" alt="Multigenerational passengers enjoying an inclusive deck activity" reverse shot="/media/portal-live-rating.jpg" shotAlt="The guest page: Just finished, how was the evening show, five one-tap answers"><p>After a live event, ask three to five structured questions with prepared response blocks. Leaders see feedback immediately; the cruise line decides which aggregated ratings to publish.</p></Section>
     <Section id="ancillary-revenue" eyebrow="ANCILLARY REVENUE" title="Make relevance commercial." crop="revenue" alt="A multicultural family choosing an onboard experience together" shot="/media/portal-offers-keepsake.jpg" shotAlt="The guest page: Chef table dinner, your friend Dee is going, 3 places left, and a button to hold a place"><p>When guests are already engaged, the right experiences appear naturally. Checkout and payment stay with you.</p></Section>
     <Section id="keepsake" eyebrow="THE KEEPSAKE · LESS PAPER" title="Less disposable print. A keepsake that lasts." crop="keepsake" alt="A UNIKMO card standing on a made-up cabin bed" reverse><p>One card replaces the paper pile. Our cruise media team adds cruise highlights to the same welcome code. Curated moments are an optional extra.</p><p>UNIKMO cards can be customised to your cruise line’s brand. <a href="#pilot">Talk to us</a>.</p></Section>
+    <PaperCalculator />
     <EntityDefinition />
     <section className="quiet-proof"><p className="eyebrow">BUILT TO FIT THE CRUISE JOURNEY</p><div className="proof-grid"><article><strong>Inside the existing app</strong><span>No competing destination for the guest.</span></article><article><strong>Immediate operational feedback</strong><span>Structured event ratings reach leaders while they can still act.</span></article><article><strong>Revenue evidence without identity</strong><span>Confirmed booking value is attributed through opaque references and aggregated outcomes.</span></article></div></section>
     <BuyerReadiness />
