@@ -47,7 +47,7 @@
   function build() {
     F.forEach(function (f) {
       document.getElementById('g-' + f[0]).appendChild(field(f[1], f[2], f[5],
-        '<input type="number" inputmode="decimal" id="' + f[1] + '" value="' + f[3] + '" step="' + f[4] + '" min="0">'));
+        '<input type="number" inputmode="decimal" id="' + f[1] + '" value="' + f[3] + '" step="' + f[4] + '" min="' + (f[1] === 'priceIn' ? 5 : 0) + '">'));
     });
     document.getElementById('g-ship').appendChild(field('cur', 'Currency', '', '<select id="cur"><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select>'));
     var gx = document.getElementById('g-fixed');
@@ -56,6 +56,7 @@
     gx.appendChild(field('basket', 'Average basket at list price', '', '<input type="number" id="basket" value="40" step="1" min="0">'));
     gx.appendChild(field('disc', 'Guest discount on cards', '%', '<input type="number" id="disc" value="10" step="1" min="0" max="10">'));
     document.getElementById('form').addEventListener('input', calc);
+    document.getElementById('priceIn').addEventListener('change', function () { if (!(parseFloat(this.value) >= 5)) { this.value = 5; calc(); } });
   }
   function v(id) { var n = parseFloat(document.getElementById(id).value); return isFinite(n) && n > 0 ? n : 0; }
   function pc(id) { return Math.min(v(id), 100) / 100; }
@@ -91,7 +92,7 @@
     var co2 = kgNet * v('co2');
 
     // bundle and card sales
-    var listPrice = v('priceIn');
+    var listPrice = Math.max(v('priceIn'), 5);
     var annualList = listPrice * guests * voy * ships;
     var cap = 0;
     var annualFee = cap > 0 ? Math.min(annualList, cap) : annualList;
@@ -226,7 +227,13 @@
       ['', 'Estimated guest value', money(value * mult)],
       ['total', 'Net benefit after the bundle fee', signed(all * mult)],
       ['', 'With card sales on top', signed(withSales * mult)]
-    ]; }    document.getElementById('rows').innerHTML = rowList().map(function (r) {
+    ]; }    function shortRows() { return [
+      ['', 'Printing removed, per voyage', money(saved)],
+      ['', 'TISONIK / UNIKMO bundle fee, per voyage (' + money(price, 2) + ' per guest)', minus() + money(fee)],
+      ['total', 'Net per voyage, with estimates', signed(all)],
+      ['total', 'Net benefit over one year, after the bundle fee', signed(all * mult)]
+    ]; }
+    document.getElementById('rows').innerHTML = shortRows().map(function (r) {
       return '<tr class="' + r[0] + '"><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>';
     }).join('');
 
@@ -362,12 +369,19 @@
         : 'Printing saved covers ' + pct + '% of the fee. At these figures the estimates do not close the gap.';
       y = P(headline, L, y, CW - 6, { s: 17, b: 1, lh: 8 });
       y += 4;
-      var body = 'At ' + num(m.guests) + ' guests per voyage and ' + num(m.mult) + ' voyages a year across ' + m.ships + (m.ships === 1 ? ' ship' : ' ships') +
-        ', printing saved is ' + money(m.saved) + ' per voyage against a bundle fee of ' + money(m.fee) + '. Estimated guest experience value adds ' + money(m.value) +
-        ', which takes the net to ' + signed(m.all) + ' per voyage and ' + signed(m.all * m.mult) + ' over one year.' +
-        (m.comm > 0 ? ' If guests also buy cards in your shop, your commission adds ' + money(m.comm * m.mult) + ' over the year on top.' : '');
-      y = P(body, L, y, CW - 6, { s: 10.2, c: C.ink2, lh: 5.3 });
-      y += 9;
+      var bullets = [
+        'At ' + num(m.guests) + ' guests per voyage and ' + num(m.mult) + ' voyages a year across ' + m.ships + (m.ships === 1 ? ' ship' : ' ships'),
+        'Printing saved is ' + money(m.saved) + ' per voyage',
+        'Bundle fee of ' + money(m.fee) + ' per voyage',
+        'Estimated guest experience value adds ' + money(m.value) + ' per voyage',
+        'Net with estimates: ' + signed(m.all) + ' per voyage and ' + signed(m.all * m.mult) + ' over one year'
+      ];
+      if (m.comm > 0) bullets.push('If guests also buy cards in your shop, your commission adds ' + money(m.comm * m.mult) + ' over the year on top');
+      bullets.forEach(function (b) {
+        fillC(C.teal); doc.circle(L + 1.3, y - 1.3, 0.75, 'F');
+        y = P(b, L + 6, y, CW - 12, { s: 10, c: C.ink2, lh: 4.8 }) + 1;
+      });
+      y += 5;
 
       var tw = (CW - 12) / 3, tiles = [
         ['Net per year', 'with estimates', signed(m.all * m.mult), 'After the bundle fee, with guest value'],
@@ -383,7 +397,7 @@
         T(t[2], x + 6, y + 22, { s: 17, b: 1, c: sign(t[2]) });
         T(t[3], x + 6, y + 28, { s: 6.8, c: C.muted });
       });
-      y += 46;
+      y += 42;
 
       LABEL('Fee against what comes back, per voyage', L, y);
       y += 7;
@@ -520,8 +534,8 @@
         T('Page ' + p + ' of ' + total, R, H - 9, { s: 7.2, c: C.muted, a: 'right' });
       }
 
-      doc.setProperties({ title: 'UNIKMO Cruise Value Assessment' + (who ? ' - ' + who : ''), author: by || 'UNIKMO', creator: 'UNIKMO calculator' });
-      doc.save('UNIKMO Cruise Value Assessment' + (who ? ' - ' + who.replace(/[\\/:*?"<>|]/g, '') : '') + '.pdf');
+      doc.setProperties({ title: 'Tisonik Unikmo Cruise Assessment' + (who ? ' - ' + who : ''), author: by || 'UNIKMO', creator: 'UNIKMO calculator' });
+      doc.save('Tisonik_Unikmo_Cruise_Assessment.pdf');
     } finally {
       pdfMode = false;
     }
