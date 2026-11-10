@@ -222,14 +222,13 @@ const filmHooks: [string, string][] = [
 const filmAlt = 'A card on the bed, a welcome from the Cruise Director, a friend going to dinner with three places left, a show rated as it ends, crew thanked by name, and a low score reaching the desk.'
 
 const HomeFilm = () => {
-  const [slide, setSlide] = useState<'film' | 'crew'>('film')
   const [playing, setPlaying] = useState(false)
   const video = useRef<HTMLVideoElement>(null)
   useEffect(() => {
     const element = video.current
-    if (slide !== 'film' || !element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (!element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     element.play().catch(() => {})
-  }, [slide])
+  }, [])
   const toggle = () => {
     const element = video.current
     if (!element) return
@@ -239,23 +238,22 @@ const HomeFilm = () => {
   return <section className="film-top" aria-label="What Tisonik does">
     <p className="film-wordmark">Tisonik<span>.</span></p>
     <div className="film-hero">
-      <p className="eyebrow">GUEST EXPERIENCE FOR CRUISE LINES</p>
       <h1>Transform guest experiences. <span>Grow ancillary revenue.</span></h1>
       <p className="hero-positioning">A white-label experience layer inside the digital journey you already own—not another app for guests to download.</p>
     </div>
-    <div className="film-tabs" role="group" aria-label="Choose what to show">
-      {([['film', 'The film'], ['crew', 'Your crew']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={slide === key} onClick={() => setSlide(key)}>{label}</button>)}
-    </div>
     <figure className="film-frame">
-      {slide === 'film'
-        ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-cruise-poster-v3.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
-          <source src="/media/tisonik-film-cruise-v3.webm" type="video/webm" />
-        </video>
-        : <img className="film-hero-image" src="/media/tisonik-hero-card.webp" width="2000" height="740" alt="A crew member on a ship's observation deck holds up the UNIKMO card" />}
-      {slide === 'film' && <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>}
+      <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-cruise-poster-v3.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
+        <source src="/media/tisonik-film-cruise-v4.webm" type="video/webm" />
+      </video>
+      <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>
     </figure>
     <ul className="film-hooks">{filmHooks.map(([line]) => <li key={line}><i aria-hidden="true" /><strong>{line}</strong></li>)}</ul>
-    <div className="film-cta"><a className="pilot-button pilot-button--primary" href="#pilot">See the one-ship pilot <Arrow /></a></div>
+    <section className="hero-after" aria-labelledby="hero-after-title">
+      <p id="hero-after-title" className="hero-after-copy">Tisonik helps cruise lines personalise interactions, recognise excellence, recover service issues earlier and surface more relevant experiences.</p>
+      <div className="pilot-actions">
+        <a className="pilot-link" href={demoHref}>VIEW CRUISE PRODUCT DEMO <Arrow /></a>
+      </div>
+    </section>
   </section>
 }
 
@@ -273,12 +271,6 @@ const SavingsCalculator = () => {
 const Home = () => (
   <>
     <HomeFilm />
-    <section className="hero-after" aria-labelledby="hero-after-title">
-      <p id="hero-after-title" className="hero-after-copy">Tisonik helps cruise lines personalise interactions, recognise excellence, recover service issues earlier and surface more relevant experiences.</p>
-      <div className="pilot-actions">
-        <a className="pilot-link" href={demoHref}>VIEW CRUISE PRODUCT DEMO <Arrow /></a>
-      </div>
-    </section>
     <section className="quiet-proof" aria-label="Tisonik for cruise lines">
       <p className="eyebrow">ONE EXPERIENCE LAYER · BUILT FOR CRUISE</p>
       <div className="proof-grid proof-grid--two">
