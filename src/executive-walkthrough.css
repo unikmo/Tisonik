@@ -10,3 +10,67 @@
 @media(max-width:680px){.exec-header{min-height:64px;padding:9px 13px}.exec-brand small{display:none}.exec-brand .cc-mark{width:32px;height:32px}.exec-header-cta{padding:10px;font-size:8px}.exec-stage{padding:25px 14px 95px}.exec-story h1{font-size:34px;margin:15px 0}.exec-story>p{font-size:12px}.exec-benefit{padding:13px}.exec-visual{min-height:570px;border-radius:22px;padding:15px}.exec-feature-shortcuts{grid-template-columns:1fr 1fr}.exec-feature-shortcuts span{display:block}.exec-overview-screen,.exec-pilot-screen,.exec-integration{padding:24px 18px}.exec-overview-screen h3{font-size:31px}.exec-value-grid{grid-template-columns:1fr 1fr}.exec-value-grid article{min-height:70px}.exec-system-flow{grid-template-columns:1fr}.exec-flow-arrow{transform:rotate(90deg);height:24px}.exec-flow-arrow small{display:none}.exec-connector-grid{grid-template-columns:1fr}.exec-pilot-steps{grid-template-columns:1fr 1fr}.exec-dashboard{border-radius:18px}.exec-dash-main{grid-template-columns:1fr}.exec-mini-kpis{grid-template-columns:1fr 1fr}.exec-chart,.exec-action-list{grid-column:1}.exec-controls{position:fixed;left:0;right:0;bottom:0;grid-template-columns:88px 1fr 88px;padding:8px 12px;gap:8px;min-height:64px}.exec-controls>[role=tablist]{gap:1px}.exec-controls [role=tab]{width:12px;padding:7px 1px}.exec-controls>button,.exec-controls>a{padding:10px 8px;font-size:8px}.exec-controls>.next svg{display:none}.exec-phone{min-height:530px}}
 @media(prefers-reduced-motion:reduce){.exec-demo *{scroll-behavior:auto!important}}
 .exec-badge-camera{height:112px;margin:5px 13px 6px;border-radius:13px;overflow:hidden;position:relative;background:#17343c}.exec-badge-camera img{width:100%;height:100%;object-fit:cover;object-position:center 44%;filter:saturate(.82) brightness(.86)}.exec-badge-camera:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,31,40,.7),transparent 64%)}.exec-badge-frame{position:absolute;right:22%;top:42%;width:30%;height:25%;border:1px solid #fff;border-radius:4px;box-shadow:0 0 0 999px rgba(4,25,32,.14);z-index:2}.exec-badge-frame span{position:absolute;top:-12px;left:0;color:#fff;font-size:4px;letter-spacing:.13em;font-weight:800}.exec-badge-camera>small{position:absolute;z-index:3;left:9px;right:9px;bottom:7px;color:#fff;font-size:4px;display:flex;align-items:center;gap:4px}.exec-badge-camera>small svg{width:10px}.exec-photo-rule{display:block;margin:0 14px;text-align:center;color:#627f82;font-size:4.5px;line-height:1.4}
+
+
+/* UNIKMO arrival and departure: same physical card, distinct digital moments. */
+.exec-card-photo{position:relative;margin:0;overflow:hidden;border-radius:18px;box-shadow:0 18px 38px rgba(7,35,42,.16);background:#e6ddd0}
+.exec-card-photo img{display:block;width:100%;aspect-ratio:1.38/1;object-fit:cover;object-position:center}
+.exec-card-photo figcaption{position:absolute;bottom:12px;left:12px;right:12px;background:rgba(10,39,45,.86);color:#fff;padding:9px 12px;border-radius:8px;font-size:10px;letter-spacing:.02em}
+.exec-overview-screen .exec-card-photo{margin:22px auto 0;max-width:420px}
+.exec-overview-journey{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin:17px auto 21px}
+.exec-overview-journey span{font-size:10px;font-weight:700;color:#26585b;background:#e5f1ec;padding:9px 12px;border-radius:999px}
+.exec-overview-journey span+span:before{content:'→';margin-right:10px;color:#418b84}
+.exec-card-journey{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);align-items:center;gap:18px;width:100%;max-width:700px}
+.exec-card-journey .exec-card-photo img{aspect-ratio:3/4;object-position:center}
+.exec-card-journey .exec-phone-shell{max-width:295px;width:100%;justify-self:center}
+.exec-voyage-photo{display:block;width:calc(100% - 26px);height:165px;margin:10px 13px;border-radius:12px;object-fit:cover}
+.exec-voyage-message{padding:10px 18px;color:#173d42}
+.exec-voyage-message small{font-size:7px;color:#7c9154;font-weight:800;letter-spacing:.08em}
+.exec-voyage-message h3{font-size:18px;line-height:1.15;margin:9px 0}
+.exec-voyage-message p{font-size:10px;line-height:1.55;color:#607a80;margin:0 0 12px}
+.exec-voyage-message span{font-size:9px;color:#2c7d75;font-weight:700}
+.exec-voyage-foot{display:flex;align-items:center;gap:7px;margin:8px 13px;padding:10px;border-radius:9px;background:#e8f3ee;color:#306e67;font-size:9px;font-weight:700}
+.exec-voyage-foot svg{width:15px;height:15px}
+@media(max-width:680px){.exec-card-journey{grid-template-columns:1fr;gap:18px}.exec-card-journey .exec-card-photo img{aspect-ratio:1.45/1}.exec-card-journey .exec-phone-shell{max-width:290px}.exec-overview-journey span{font-size:8px;padding:7px 9px}.exec-overview-journey span+span:before{margin-right:6px}.exec-card-photo figcaption{font-size:8px}}
+
+
+/* Match the established Tisonik homepage: warm ivory, espresso ink and copper. */
+.exec-demo{--exec-ink:#171715;--exec-teal:#805331;--exec-paper:#faf8f4;background:#faf8f4;color:#171715}
+.exec-demo .exec-header{background:rgba(250,248,244,.97);border-color:rgba(23,23,21,.1)}
+.exec-demo .exec-brand small,.exec-demo .exec-step-count,.exec-demo .exec-story>p{color:#6c6861}
+.exec-demo .exec-story h1{color:#171715}
+.exec-demo .exec-story>div:first-child>small{color:#805331;border-left-color:#d9cbbd}
+.exec-demo .exec-header nav{background:#f0ebe3}
+.exec-demo .exec-header nav button{color:#685d53}
+.exec-demo .exec-header nav button.active{color:#805331}
+.exec-demo .cc-mark{background:linear-gradient(140deg,#352516,#805331);box-shadow:0 10px 24px rgba(53,37,22,.18)}
+.exec-demo .exec-header-cta,.exec-demo .exec-benefit,.exec-demo .exec-feature-shortcuts button.active{background:#171715;border-color:#171715}
+.exec-demo .exec-benefit{box-shadow:0 12px 28px rgba(34,25,17,.13)}
+.exec-demo .exec-benefit span{color:#f4ede5}
+.exec-demo .exec-visual{background:radial-gradient(circle at 20% 0,#fcf7ef,transparent 44%),linear-gradient(145deg,#f4f0e9,#dfd5c8);border-color:rgba(128,83,49,.13);box-shadow:0 38px 90px rgba(65,43,27,.12)}
+.exec-demo .exec-phone{border-color:#25201c;background:#fffdf9;box-shadow:0 30px 65px rgba(41,28,18,.23)}
+.exec-demo .exec-phone-status i{background:#25201c}
+.exec-demo .exec-phone-label{color:#805331}
+.exec-demo .exec-overview-screen,.exec-demo .exec-pilot-screen{background:#fffdfa;border-color:#e5d8c8}
+.exec-demo .exec-overview-journey span{color:#805331;background:#f4e9dd}
+.exec-demo .exec-overview-journey span+span:before{color:#805331}
+.exec-demo .exec-overview-screen>button,.exec-demo .exec-pilot-screen>a{background:#171715}
+.exec-demo .exec-voyage-message{color:#211d19}
+.exec-demo .exec-voyage-message small,.exec-demo .exec-voyage-message span{color:#805331}
+.exec-demo .exec-voyage-message p{color:#68615a}
+.exec-demo .exec-voyage-foot{background:#f4e9dd;color:#805331}
+.exec-demo .exec-card-photo{background:#e7e1d8}
+.exec-demo .exec-card-photo figcaption{background:rgba(31,25,20,.89)}
+.exec-demo .exec-controls{background:#faf8f4;border-top-color:#e8dfd6}
+.exec-demo .exec-controls>.next{background:#171715;border-color:#171715}
+.exec-demo .exec-controls [role=tab].active span{background:#805331}
+.exec-voyage-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:9px 0 13px}
+.exec-voyage-gallery img{display:block;width:100%;height:60px;object-fit:cover;border-radius:8px}
+@media(max-width:680px){.exec-voyage-gallery img{height:49px}}
+
+/* Consistent mono-black Tisonik brand mark in the tour navigation. */
+.exec-brand-mark{width:36px;height:36px;object-fit:contain;flex:0 0 auto}
+@media(max-width:1050px){.exec-stage{grid-template-columns:minmax(0,1fr)}.exec-story,.exec-visual{min-width:0;max-width:100%}.exec-story>p{overflow-wrap:anywhere}}
+.exec-stage,.exec-visual{box-sizing:border-box}
+.exec-demo{grid-template-columns:minmax(0,1fr)}.exec-stage{min-width:0}
+.exec-controls{grid-template-columns:minmax(0,150px) minmax(0,1fr) minmax(0,150px)}.exec-controls>[role=tablist]{min-width:0}@media(min-width:681px) and (max-width:1050px){.exec-controls [role=tab]{width:22px}}

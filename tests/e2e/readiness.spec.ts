@@ -33,11 +33,14 @@ for (const route of publicRoutes) test(`${route} has no serious accessibility or
 test('executive carousel exposes all product steps and one pilot destination', async ({ page }) => {
   await page.goto('/product-app/')
   const tabs = page.getByRole('tab')
-  await expect(tabs).toHaveCount(12)
-  for (let index = 0; index < 12; index++) {
+  await expect(tabs).toHaveCount(14)
+  for (let index = 0; index < 14; index++) {
     await tabs.nth(index).click({ force: true })
     await expect(tabs.nth(index)).toHaveAttribute('aria-selected', 'true')
   }
+  await expect(page.getByRole('heading', { name: /Departure – The Keepsake/i })).toHaveCount(0)
+  await tabs.nth(10).click({ force: true })
+  await expect(page.getByRole('heading', { name: /Departure – The Keepsake/i })).toBeVisible()
   await expect(page.getByRole('link', { name: /request a pilot/i }).first()).toHaveAttribute('href', '/pilot/#contact')
 })
 

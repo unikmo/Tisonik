@@ -40,7 +40,7 @@ const resortPageFromPath = (path: string): ResortPageKey => {
 
 const Header = ({ compact = false }: { compact?: boolean }) => (
   <header className="site-header resort-header">
-    <a className="brand" href="/hotels/" aria-label="Tisonik resorts home">TISONIK</a>
+    <a className="brand" href="/hotels/" aria-label="Tisonik resorts home"><img className="brand-mark" src="/tisonik-mark.svg" width="29" height="29" alt="" aria-hidden="true" /><span>TISONIK</span></a>
     {!compact && <nav className="resort-header-nav" aria-label="Resort navigation">
       <a href="/hotels/#experience">Experience</a>
       <a href="/hotels/#revenue">Revenue</a>
