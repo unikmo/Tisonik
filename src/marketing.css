@@ -358,15 +358,6 @@ h1.film-tagline { font-weight: 400; }
 @media (max-width: 760px) { .resort-why-grid, .resort-journey .resort-integration-grid { grid-template-columns: minmax(0, 1fr); } }
 
 /* Paper calculator (homepage) */
-.paper-calc-intro, .paper-calc-note { color: var(--muted); max-width: 640px; }
-.paper-calc-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 28px 0; }
-.paper-calc-form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--ink); }
-.paper-calc-form input { font: inherit; padding: 10px 12px; min-height: 44px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); }
-.paper-calc-form input:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
-.paper-calc-result { border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; background: #fff; }
-.paper-calc-result p { margin: 6px 0; }
-.paper-calc-result strong { font-size: 1.4em; font-weight: 500; }
-.paper-calc-note a { color: var(--accent); }
 
 /* Home: how it works (three steps) */
 .home-steps { width: min(1240px,100%); margin: 0 auto; padding: clamp(62px,7.4vw,100px) clamp(22px,4.7vw,68px); }
@@ -376,23 +367,6 @@ h1.film-tagline { font-weight: 400; }
 .home-steps-list span { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
 .home-steps-list h3 { margin: 8px 0; font-weight: 400; font-size: 22px; letter-spacing: -.02em; }
 .home-steps-list p { margin: 0; color: var(--muted); }
-
-/* Home: savings calculator band, same design as the newhp page */
-.savings-band { background: #f0ece5; }
-.savings-inner { max-width: 1080px; margin: 0 auto; padding: 72px max(22px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 28px; }
-.calc-head { max-width: 62ch; }
-.calc-head h2, .sub-h { font-weight: 400; letter-spacing: -.04em; line-height: 1.1; margin: 0; }
-.calc-head h2 { font-size: clamp(26px, 3.6vw, 40px); }
-.sub-h { font-size: 24px; margin: 0 0 14px; }
-.calc-head .eyebrow { margin: 0 0 14px; }
-.advgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
-.adv { display: flex; gap: 12px; background: #fffdf9; border: 1px solid rgba(23,23,21,.12); border-radius: 14px; padding: 16px; min-width: 0; }
-.adv h3 { margin: 0; font-size: 15px; font-weight: 500; letter-spacing: -.01em; }
-.adv .why { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
-.tick { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); position: relative; margin-top: 2px; }
-.tick::after { content: ""; position: absolute; left: 7px; top: 3px; width: 6px; height: 11px; border: solid #fffdf9; border-width: 0 2px 2px 0; transform: rotate(45deg); }
-.paper-calc { margin: 12px 0 0; }
-.paper-calc-form { margin: 18px 0; }
 
 /* Hero block above the film, and the hero image slide */
 .film-hero { margin: 8px auto 18px; max-width: 780px; }
@@ -406,11 +380,6 @@ h1.film-tagline { font-weight: 400; }
 .proof-grid--two { grid-template-columns: repeat(2, 1fr); max-width: 900px; text-align: center; }
 .proof-grid--two article { justify-items: center; align-content: start; text-align: center; }
 @media (max-width: 720px) { .proof-grid--two { grid-template-columns: 1fr; } }
-
-/* Value cards: 8 cards fill 4x2, 2x4 or 1 column, never an orphan row */
-.advgrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-@media (max-width: 1000px) { .advgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 560px) { .advgrid { grid-template-columns: minmax(0, 1fr); } }
 
 /* How it works: centred head and steps */
 .home-steps { text-align: center; }

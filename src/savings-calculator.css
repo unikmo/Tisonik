@@ -1,0 +1,120 @@
+/* Savings calculator, ported from tisonik-newhp. Every rule is scoped to #calculator. */
+@font-face{font-family:'Plex Calc';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/plexmono-400.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Plex Calc';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/plexmono-500.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Inter Calc';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/inter-var.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Inter Calc';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/inter-var.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Inter Calc';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/inter-var.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+#calculator{--font:'Inter Calc',Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-num:'Plex Calc','IBM Plex Mono',ui-monospace,Consolas,monospace}
+#calculator{--paper: #FAF8F4; --stone: #F0ECE5; --stone2: #F4F0E9; --surface: #FFFDF9; --ink: #171715; --ink2: #292724; --muted: #6C6861; --line: rgba(23, 23, 21, 0.12); --accent: #805331; --accent-soft: #C8AB92; --dark: #1D1C1A; --on-dark: #F3EFE8; --good: #46644A; --bad: #9C3D2A; --font: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --font-num: "IBM Plex Mono", ui-monospace, Consolas, monospace;}
+#calculator, #calculator *{box-sizing: border-box;}
+#calculator{scroll-behavior: smooth;}
+#calculator{margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased;}
+#calculator a{color: inherit;}
+#calculator .container{max-width: 1080px; margin: 0 auto; padding-left: max(22px, env(safe-area-inset-left, 0px)); padding-right: max(22px, env(safe-area-inset-right, 0px));}
+#calculator .eyebrow{font-size: 9px; font-weight: 600; letter-spacing: 0.29em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px;}
+#calculator h1,
+#calculator h2,
+#calculator h3{font-weight: 400; margin: 0; text-wrap: balance;}
+#calculator h1{font-size: clamp(32px, 3.65vw, 55px); line-height: 1.055; letter-spacing: -0.046em;}
+#calculator h2{font-size: clamp(26px, 3.6vw, 40px); line-height: 1.1; letter-spacing: -0.04em;}
+#calculator h3{font-size: 22px; line-height: 1.2; letter-spacing: -0.03em;}
+#calculator .accent{color: var(--accent);}
+#calculator .lede{color: var(--muted); font-size: clamp(14px, 1vw, 17px); max-width: 54ch; margin: 18px 0 0;}
+#calculator .ps-grid{display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; text-align: center;}
+@media (max-width: 700px){#calculator .ps-grid{grid-template-columns: minmax(0, 1fr); gap: 22px;}}
+#calculator .ps-fig{margin: 0; font-size: clamp(38px, 4.6vw, 58px); line-height: 1; letter-spacing: -0.045em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere;}
+#calculator .ps-fig.acc{color: var(--accent);}
+#calculator .ps-cap{margin: 10px auto 0; color: var(--muted); font-size: 14px; max-width: 28ch;}
+@media (max-width: 860px){}
+#calculator .card-only{display: block; width: min(100%, 960px); height: auto; border-radius: 16px; box-shadow: 0 24px 34px rgba(23,23,21,0.22); margin: 40px auto 0;}
+@media (max-width: 820px){}
+#calculator .cardwrap{display: flex; flex-direction: column; align-items: center; gap: 18px;}
+#calculator .cardwrap svg{width: min(100%, 440px); border-radius: 10px; height: auto; filter: drop-shadow(0 28px 34px rgba(23, 23, 21, 0.22)); transform: rotate(2.5deg);}
+#calculator .cardwrap figcaption{color: var(--muted); font-size: 12px; text-align: center; max-width: 34ch;}
+#calculator .cardwrap{margin: 0;}
+#calculator.band{padding-block: 72px;}
+#calculator.band.stone{background: var(--stone);}
+#calculator.band.dark{background: var(--dark); color: var(--on-dark);}
+#calculator.band.dark .eyebrow{color: var(--accent-soft);}
+#calculator.band.dark .lede{color: #b9b2a7;}
+#calculator .sec-head{max-width: 62ch; margin-bottom: 40px;}
+#calculator .steps{display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px;}
+@media (max-width: 820px){#calculator .steps{grid-template-columns: minmax(0, 1fr); gap: 32px;}}
+#calculator .step{border-top: 1px solid var(--ink); padding-top: 18px;}
+#calculator .step p{color: var(--muted); margin: 10px 0 0;}
+#calculator .gets{display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 28px 40px;}
+#calculator .gets div{border-top: 1px solid var(--line); padding-top: 14px;}
+#calculator .gets h3{font-size: 18px;}
+#calculator .gets p{color: var(--muted); font-size: 14px; margin: 6px 0 0;}
+#calculator .note-line{color: var(--muted); font-size: 14px; margin: 28px 0 0;}
+#calculator .calc-head{margin-bottom: 28px; max-width: 62ch;}
+#calculator .calc-head p{color: var(--muted); margin: 14px 0 0;}
+#calculator .wrap{display: flex; flex-direction: column; gap: 28px;}
+#calculator h2.sub-h{font-size: 24px; margin: 0 0 14px;}
+#calculator .advgrid{display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px;}
+#calculator .a{display: flex; gap: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0;}
+#calculator .tick{flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); position: relative; margin-top: 2px;}
+#calculator .tick::after{content: ""; position: absolute; left: 7px; top: 3px; width: 6px; height: 11px; border: solid var(--surface); border-width: 0 2px 2px 0; transform: rotate(45deg);}
+#calculator .a h3{font-size: 15px; font-weight: 500; letter-spacing: -0.01em;}
+#calculator .a .fig{font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 17px; margin: 4px 0; overflow-wrap: anywhere;}
+#calculator .a .why{color: var(--muted); font-size: 13px; margin: 0;}
+#calculator .tag{font-size: 10px; font-weight: 500; letter-spacing: 0.02em; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; margin-left: 8px; white-space: nowrap;}
+#calculator .grid{display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 28px; align-items: start;}
+@media (max-width: 900px){#calculator .grid{grid-template-columns: minmax(0, 1fr);}}
+#calculator .inputs{display: flex; flex-direction: column; gap: 16px; min-width: 0;}
+#calculator fieldset{border: 1px solid var(--line); border-radius: 14px; background: var(--surface); margin: 0; padding: 18px; min-width: 0;}
+#calculator legend{float: left; width: 100%; font-size: 15px; font-weight: 500; padding: 0 0 12px; margin: 0; letter-spacing: -0.01em;}
+#calculator legend + *{clear: both;}
+#calculator [hidden]{display: none !important;}
+#calculator .hint{color: var(--muted); font-size: 13px; margin: 0 0 12px;}
+#calculator .fields{display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px 16px;}
+#calculator .field{display: flex; flex-direction: column; gap: 4px; min-width: 0;}
+#calculator .field label{font-size: 13px; color: var(--ink2);}
+#calculator .field .unit{color: var(--muted); font-size: 12px;}
+#calculator input[type="number"],
+#calculator input[type="text"],
+#calculator select{width: 100%; font: 500 15px var(--font-num); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-height: 42px;}
+#calculator input[type="text"]{font-family: var(--font);}
+#calculator select{font-family: var(--font);}
+#calculator input:focus-visible,
+#calculator select:focus-visible{outline: 2px solid var(--accent); outline-offset: 1px;}
+#calculator .result{position: sticky; top: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0;}
+@media (max-width: 900px){#calculator .result{position: static;}}
+#calculator .card{background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0;}
+#calculator .kicker{font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin: 0;}
+#calculator .big{font-family: var(--font); font-weight: 400; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; font-size: clamp(32px, 6vw, 44px); line-height: 1.05; margin: 0; overflow-wrap: anywhere;}
+#calculator .pos{color: var(--good);}
+#calculator .neg{color: var(--bad);}
+#calculator .sub{color: var(--muted); font-size: 13px; margin: 0;}
+#calculator .track{position: relative; height: 16px; border-radius: 999px; background: var(--stone); display: flex; overflow: hidden;}
+#calculator .seg{height: 100%;}
+#calculator .seg.paper{background: var(--accent);}
+#calculator .seg.comm{background: var(--good);}
+#calculator .seg.value{background: var(--accent-soft);}
+#calculator .mark{position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink);}
+#calculator .legend{display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted);}
+#calculator .legend span::before{content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; background: var(--accent);}
+#calculator .legend .l-comm::before{background: var(--good);}
+#calculator .legend .l-value::before{background: var(--accent-soft);}
+#calculator .legend .l-fee::before{background: var(--ink); width: 2px; border-radius: 0; margin-right: 7px;}
+#calculator table{width: 100%; border-collapse: collapse; font-size: 14px;}
+#calculator td{padding: 7px 0; border-bottom: 1px solid var(--line); vertical-align: top;}
+#calculator td:last-child{text-align: right; font-family: var(--font-num); font-variant-numeric: tabular-nums; white-space: nowrap; padding-left: 12px;}
+#calculator tr.total td{font-weight: 600; border-bottom: 0;}
+#calculator tr.head td{color: var(--accent); font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; padding-top: 14px;}
+#calculator .notes{color: var(--muted); font-size: 13px;}
+#calculator .notes ul{margin: 6px 0 0; padding-left: 18px;}
+#calculator button.primary{font: 500 14px var(--font); color: var(--paper); background: var(--ink); border: 0; border-radius: 999px; padding: 12px 24px; min-height: 46px; cursor: pointer;}
+#calculator button.primary:hover{background: var(--accent);}
+#calculator button.primary:focus-visible{outline: 2px solid var(--accent); outline-offset: 3px;}
+#calculator button.primary[disabled]{opacity: 0.6; cursor: progress;}
+#calculator .actions{display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px;}
+#calculator .report p.hint{margin: 0;}
+#calculator .report h2{font-size: 24px; margin: 0;}
+#calculator details.code{border: 1px solid var(--line); border-radius: 14px; background: var(--surface); padding: 14px 18px;}
+#calculator details.code summary{cursor: pointer; font-weight: 500;}
+#calculator details.code p{color: var(--muted); font-size: 13px; margin: 10px 0;}
+#calculator details.code pre{margin: 0; padding: 12px; border-radius: 8px; background: var(--stone); color: var(--ink); font: 12px/1.5 var(--font-num); overflow: auto; max-height: 420px; white-space: pre; tab-size: 2;}
+#calculator details.code button{font: 500 13px var(--font); color: var(--paper); background: var(--ink); border: 0; border-radius: 999px; padding: 8px 16px; min-height: 36px; cursor: pointer; margin-bottom: 10px;}
+#calculator details.code button:focus-visible{outline: 2px solid var(--accent); outline-offset: 2px;}
+#calculator{--font:'Inter Calc',Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-num:'Plex Calc','IBM Plex Mono',ui-monospace,Consolas,monospace}

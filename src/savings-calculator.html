@@ -1,0 +1,76 @@
+
+  <div class="container wrap">
+    <div class="calc-head">
+      <p class="eyebrow">Savings calculator</p>
+      <h2>What does it cost your ship, and what comes back?</h2>
+    </div>
+
+    <section>
+      <h2 class="sub-h">Where the value comes from</h2>
+      <div class="advgrid" id="adv"></div>
+    </section>
+
+  <div class="grid">
+    <form class="inputs" id="form" onsubmit="return false">
+      <fieldset><legend>Your ship</legend>
+        <div class="fields" id="g-ship"></div>
+      </fieldset>
+      <fieldset><legend>Your costs and value</legend>
+        <div class="fields" id="g-print"></div>
+      </fieldset>
+      <div hidden id="g-fixed"></div>
+    </form>
+
+    <aside class="result" aria-live="polite">
+      <div class="card">
+        <p class="kicker">Your benefit over one year</p>
+        <p class="big" id="r-all">0</p>
+        <p class="sub" id="r-all-sub"></p>
+        <p class="sub" id="r-be"></p>
+        <p class="sub" id="r-sales"></p>
+        <div class="track" id="bar" role="img" aria-label="What comes back compared with the bundle fee"></div>
+        <div class="legend"><span class="l-paper">Printing saved</span><span class="l-value">Estimated value</span><span class="l-comm">Card sales (optional)</span><span class="l-fee">TISONIK / UNIKMO bundle fee</span></div>
+      </div>
+      <div class="card">
+        <table><tbody id="rows"></tbody></table>
+      </div>
+    </aside>
+  </div>
+
+  <section class="card report" id="report">
+    <h2>Take it with you</h2>
+    <p class="hint">Download your figures as a PDF assessment to share with finance and guest experience teams. It is built in your browser from the numbers above. The names you add here appear on the cover only.</p>
+    <div class="fields">
+      <div class="field"><label for="org">Ship or company name</label><input type="text" id="org" maxlength="80" autocomplete="organization"></div>
+      <div class="field"><label for="by">Prepared by</label><input type="text" id="by" maxlength="80" autocomplete="name"></div>
+    </div>
+    <div class="actions">
+      <button type="button" class="primary pdf-trigger">Download PDF report</button>
+      <span class="sub pdf-status" role="status"></span>
+    </div>
+  </section>
+
+  <div class="notes">
+    <strong>How this is worked out</strong>
+    <ul>
+      <li>Figures are per voyage unless marked per year. Annual figures multiply by voyages per ship and number of ships.</li>
+      <li>Printing saved is your all-in printing cost per voyage multiplied by the share the card replaces. That covers your cruise app as well as the card.</li>
+      <li>The results lead with the ship's own benefits. Card sales are optional and are shown on top, never mixed into the first two results.</li>
+      <li>Card commission uses fixed defaults for the share of guests who buy, the basket and the discount, and is shown on top. Taxes are excluded.</li>
+      <li>The standard price per guest falls as more ships join. The prices are proposals for discussion.</li>
+      <li>The $5 per guest in the calculator is pilot pricing only. After a successful pilot we move to standard commercial pricing.</li>
+      <li>Paper avoided is net of the card and envelope UNIKMO adds. Carbon uses our default factors, so treat it as a rough guide, not a certified figure.</li>
+      <li>Rows marked as estimates depend on your inputs. UNIKMO has not verified any default shown here, and a pilot is how these get measured.</li>
+    </ul>
+  </div>
+
+  <details class="code" id="code">
+    <summary>View the code</summary>
+    <p>This calculator runs entirely in your browser. What you type is not sent anywhere: the page has no forms that submit, no tracking and no database. It makes two kinds of outside request: one to load its fonts, and, only if you press Download PDF report, one to load the open source jsPDF library that draws the PDF. Nothing you type is part of either request. The full source is below, so you can read it yourself. To check, open your browser's developer tools, go to the Network tab, and change any number.</p>
+    <button type="button" id="code-copy">Copy the code</button>
+    <pre id="code-src" tabindex="0"></pre>
+  </details>
+
+  </div>
+
+<div hidden aria-hidden="true"><span id="s-price"></span><span id="s-frac"></span><span id="s-frac-cap"></span><span id="s-benefit"></span></div>
