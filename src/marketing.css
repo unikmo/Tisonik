@@ -391,3 +391,8 @@ h1.film-tagline { font-weight: 400; }
 .film-top .film-frame { background: #f0ece5; box-shadow: 0 40px 80px -48px rgba(23,23,21,.28); }
 .film-toggle { backdrop-filter: blur(8px); }
 .film-top .film-toggle { background: rgba(250,248,244,.88); color: #171715; border-color: rgba(23,23,21,.14); }
+
+/* Contrast fixes: links on dark backgrounds */
+.quiet-proof .pilot-link { color: #e6c3a0; border-bottom-color: #c79b72; }
+.resort-pilot-hero .film-quiet { color: #e8eef6; }
+.resort-pilot-hero .film-quiet:hover { color: #fff; }
