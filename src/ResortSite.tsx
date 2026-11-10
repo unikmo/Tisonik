@@ -169,14 +169,13 @@ const filmHooks: [string, string][] = [
 const filmAlt = 'A card on the bed, a welcome from the General Manager, a tasting menu with five places left, an event rated as it ends, a team member recognised, and a low score reaching reception.'
 
 const HotelFilm = () => {
-  const [slide, setSlide] = useState<'film' | 'card'>('film')
   const [playing, setPlaying] = useState(false)
   const video = useRef<HTMLVideoElement>(null)
   useEffect(() => {
     const element = video.current
-    if (slide !== 'film' || !element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (!element || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     element.play().catch(() => {})
-  }, [slide])
+  }, [])
   const toggle = () => {
     const element = video.current
     if (!element) return
@@ -185,21 +184,21 @@ const HotelFilm = () => {
   }
   return <section className="film-top" aria-label="What Tisonik does">
     <p className="film-wordmark">Tisonik<span>.</span></p>
-    <h1 className="film-tagline">The guest experience layer for hotels.</h1>
-    <div className="film-tabs" role="group" aria-label="Choose what to show">
-      {([['film', 'The film'], ['card', 'The card']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={slide === key} onClick={() => setSlide(key)}>{label}</button>)}
+    <div className="film-hero">
+      <h1>Transform guest experiences. <span>Grow ancillary revenue.</span></h1>
+      <p className="hero-positioning">A white-label experience layer inside the digital journey you already own—not another app for guests to download.</p>
     </div>
     <figure className="film-frame">
-      {slide === 'film'
-        ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-hotel-poster-v2.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
-          <source src="/media/tisonik-film-hotel-v2.webm" type="video/webm" />
-        </video>
-        : <img src="/media/unikmo-card-on-bed-hotel.webp" alt="A UNIKMO welcome card resting on a hotel bed" />}
-      {slide === 'film' && <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>}
+      <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-hotel-poster-v3.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
+        <source src="/media/tisonik-film-hotel-v3.webm" type="video/webm" />
+      </video>
+      <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>
     </figure>
     <ul className="film-hooks">{filmHooks.map(([line]) => <li key={line}><i aria-hidden="true" /><strong>{line}</strong></li>)}</ul>
-    <div className="film-cta"><a className="resort-primary-button" href="#pilot">Start with one property <Arrow /></a></div>
-    <a className="film-quiet" href="https://www.unikmo.com/hotels">See the physical welcome card <Arrow /></a>
+    <section className="hero-after" aria-labelledby="hero-after-title">
+      <p id="hero-after-title" className="hero-after-copy">Tisonik helps hotels personalise interactions, recognise excellence, recover service issues earlier and surface more relevant experiences.</p>
+      <div className="pilot-actions"><a className="pilot-link" href={liveDemoHref}>VIEW HOTEL PRODUCT DEMO <Arrow /></a></div>
+    </section>
   </section>
 }
 

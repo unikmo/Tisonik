@@ -82,7 +82,7 @@ test('hotel pages open the hotel site with or without the trailing slash', async
   for (const route of ['/hotels', '/hotels/', '/hotel-guest-rating-software']) {
     await page.goto(route)
     await expect(page.getByRole('link', { name: 'Tisonik resorts home' }).or(page.getByRole('link', { name: /TISONIK/ })).first()).toBeVisible()
-    await expect(page.getByText('Transform guest experiences. Grow ancillary revenue.')).toHaveCount(0)
+    await expect(page.getByText('Tisonik helps cruise lines')).toHaveCount(0)
   }
 })
 
