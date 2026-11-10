@@ -110,7 +110,7 @@ export function HowItWorksPage({ cruiseDetail }: { cruiseDetail: ReactNode }) {
     </Block>
 
     <Block id="who" eyebrow="WHO SEES WHAT" title="Every message goes to someone who can act on it." lead="Access is set per person and enforced in the database, not just hidden on screen.">
-      <div className="trust-table-wrap">
+      <div className="trust-table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
         <table className="trust-table">
           <thead><tr><th scope="col">Who</th><th scope="col">What they see</th><th scope="col">Notes</th></tr></thead>
           <tbody>
@@ -247,7 +247,7 @@ export function SecurityPage() {
 
     <Block id="data" eyebrow="WHAT WE HOLD" title="Two products, two data designs. We keep them apart." lead="The cruise in-app product and the hotel and ship guest page store different things. A reviewer should read both.">
       <h3 className="trust-sub">Hotel and ship guest page (stay records)</h3>
-      <div className="trust-table-wrap">
+      <div className="trust-table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
         <table className="trust-table">
           <thead><tr><th scope="col">Item</th><th scope="col">What it is</th><th scope="col">Why we need it</th></tr></thead>
           <tbody>{dataRows.map(([item, what, why]) => <tr key={item}><th scope="row">{item}</th><td>{what}</td><td>{why}</td></tr>)}</tbody>
@@ -316,7 +316,7 @@ export function SecurityPage() {
     </Block>
 
     <Block id="hosting" eyebrow="HOSTING AND SERVICE PROVIDERS" title="Three providers, each with one job." lead="We name them so your data-protection team can review them.">
-      <div className="trust-table-wrap">
+      <div className="trust-table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
         <table className="trust-table">
           <thead><tr><th scope="col">Provider</th><th scope="col">Job</th><th scope="col">Region</th><th scope="col">What passes through it</th></tr></thead>
           <tbody>
@@ -338,7 +338,7 @@ export function SecurityPage() {
     </Block>
 
     <Block id="status" eyebrow="STATUS AND ROADMAP" title="What is in place, and how we are closing the rest." lead="Until a formal certification is in place, you get what a reviewer actually needs: this page, a completed questionnaire, the independent test summary once it exists, the data-processing agreement and the provider list.">
-      <div className="trust-table-wrap">
+      <div className="trust-table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
         <table className="trust-table">
           <thead><tr><th scope="col">Item</th><th scope="col">Status</th><th scope="col">Next step</th></tr></thead>
           <tbody>
