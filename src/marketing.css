@@ -359,7 +359,7 @@ h1.film-tagline { font-weight: 400; }
 
 /* Paper calculator (homepage) */
 .paper-calc { max-width: 880px; margin: 0 auto; padding: 72px 24px; }
-.paper-calc h2 { margin: 8px 0 12px; }
+.paper-calc h2 { margin: 8px 0 12px; font-weight: 400; font-size: clamp(24px, 4vw, 38px); letter-spacing: -.04em; line-height: 1.12; }
 .paper-calc-intro, .paper-calc-note { color: var(--muted); max-width: 640px; }
 .paper-calc-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 28px 0; }
 .paper-calc-form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--ink); }

@@ -290,7 +290,7 @@ const PaperCalculator = () => {
         </>}
       </>}
     </div>
-    <p className="paper-calc-note">The result is arithmetic on your inputs, not a forecast or a guarantee. Want it worked through with your own data? <a href="#pilot">Talk to us</a>.</p>
+    <p className="paper-calc-note">Want it worked through with your own data? <a href="#pilot">Talk to us</a>.</p>
   </section>
 }
 
