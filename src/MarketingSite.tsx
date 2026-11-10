@@ -236,7 +236,11 @@ const HomeFilm = () => {
   }
   return <section className="film-top" aria-label="What Tisonik does">
     <p className="film-wordmark">Tisonik<span>.</span></p>
-    <p className="film-tagline">The guest experience layer for cruise lines.</p>
+    <div className="film-hero">
+      <p className="eyebrow">GUEST EXPERIENCE FOR CRUISE LINES</p>
+      <h1>Transform guest experiences. <span>Grow ancillary revenue.</span></h1>
+      <p className="hero-positioning">A white-label experience layer inside the digital journey you already own—not another app for guests to download.</p>
+    </div>
     <div className="film-tabs" role="group" aria-label="Choose what to show">
       {([['film', 'The film'], ['crew', 'Your crew']] as const).map(([key, label]) => <button key={key} type="button" aria-pressed={slide === key} onClick={() => setSlide(key)}>{label}</button>)}
     </div>
@@ -245,7 +249,7 @@ const HomeFilm = () => {
         ? <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-cruise-poster-v2.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
           <source src="/media/tisonik-film-cruise-v2.webm" type="video/webm" />
         </video>
-        : <img src="/media/hero-centered-black-crew-amara.jpg" alt="Black cruise crew member welcoming guests onboard" />}
+        : <img className="film-hero-image" src="/media/tisonik-hero-card.webp" width="2000" height="740" alt="A crew member on a ship's observation deck holds up the UNIKMO card" />}
       {slide === 'film' && <button type="button" className="film-toggle" onClick={toggle}>{playing ? 'Pause film' : 'Play film'}</button>}
     </figure>
     <ul className="film-hooks">{filmHooks.map(([line]) => <li key={line}><i aria-hidden="true" /><strong>{line}</strong></li>)}</ul>
@@ -269,9 +273,8 @@ const PaperCalculator = () => {
   const printed = ready ? g * v * n * s : 0
   const shareOk = !Number.isNaN(p) && p <= 100
   const avoided = ready && shareOk ? printed * (p / 100) : NaN
-  return <section id="paper-calculator" className="paper-calc" aria-labelledby="paper-calc-title">
-    <p className="eyebrow">PAPER CALCULATOR</p>
-    <h2 id="paper-calc-title">See what the paper pile adds up to on your ship.</h2>
+  return <div id="paper-calculator" className="paper-calc" role="group" aria-labelledby="paper-calc-title">
+    <h2 className="sub-h" id="paper-calc-title">See what the paper pile adds up to on your ship.</h2>
     <p className="paper-calc-intro">Enter your own volumes. The calculator uses only the numbers you type. It does not assume a saving for you, and nothing you enter leaves your browser.</p>
     <form className="paper-calc-form" onSubmit={(e) => e.preventDefault()} noValidate>
       <label>Guests per voyage<input inputMode="numeric" value={guests} onChange={e => setGuests(e.target.value)} /></label>
@@ -291,17 +294,12 @@ const PaperCalculator = () => {
       </>}
     </div>
     <p className="paper-calc-note">Want it worked through with your own data? <a href="#pilot">Talk to us</a>.</p>
-  </section>
+  </div>
 }
 
 const Home = () => (
   <>
     <HomeFilm />
-    <section id="top" className="hero">
-      <p className="eyebrow hero-eyebrow">GUEST EXPERIENCE FOR CRUISE LINES</p>
-      <h1>Transform guest experiences. <span>Grow ancillary revenue.</span></h1>
-      <p className="hero-positioning">A white-label experience layer inside the digital journey you already own—not another app for guests to download.</p>
-    </section>
     <section className="hero-after" aria-labelledby="hero-after-title">
       <p id="hero-after-title" className="hero-after-copy">Tisonik helps cruise lines personalise interactions, recognise excellence, recover service issues earlier and surface more relevant experiences.</p>
       <div className="pilot-actions">
@@ -310,7 +308,7 @@ const Home = () => (
     </section>
     <section className="quiet-proof" aria-label="Tisonik for cruise lines">
       <p className="eyebrow">ONE EXPERIENCE LAYER · BUILT FOR CRUISE</p>
-      <div className="proof-grid">
+      <div className="proof-grid proof-grid--two">
         <article><strong>Cruise lines</strong><span>Passenger experience, crew recognition, service recovery, engagement and onboard revenue discovery.</span><a className="pilot-link" href="#passenger-experience">Explore cruise <Arrow /></a></article>
         <article><strong>Controlled pilots</strong><span>Start with one ship, define success measures first, then scale, iterate or stop on evidence.</span></article>
       </div>
@@ -331,21 +329,29 @@ const Home = () => (
     <Section id="engagement" eyebrow="LIVE EXPERIENCE FEEDBACK" title="Improve events while the sailing is still underway." crop="engagement" alt="Multigenerational passengers enjoying an inclusive deck activity" reverse shot="/media/portal-live-rating.jpg" shotAlt="The guest page: Just finished, how was the evening show, five one-tap answers"><p>After a live event, ask three to five structured questions with prepared response blocks. Leaders see feedback immediately; the cruise line decides which aggregated ratings to publish.</p></Section>
     <Section id="ancillary-revenue" eyebrow="ANCILLARY REVENUE" title="Make relevance commercial." crop="revenue" alt="A multicultural family choosing an onboard experience together" shot="/media/portal-offers-keepsake.jpg" shotAlt="The guest page: Chef table dinner, your friend Dee is going, 3 places left, and a button to hold a place"><p>When guests are already engaged, the right experiences appear naturally. Checkout and payment stay with you.</p></Section>
     <Section id="keepsake" eyebrow="THE KEEPSAKE · LESS PAPER" title="Less disposable print. A keepsake that lasts." crop="keepsake" alt="A UNIKMO card standing on a made-up cabin bed" reverse><p>One card replaces the paper pile. Our cruise media team adds cruise highlights to the same welcome code. Curated moments are an optional extra.</p><p>UNIKMO cards can be customised to your cruise line’s brand. <a href="#pilot">Talk to us</a>.</p></Section>
-    <section id="where-value-comes-from" className="home-value" aria-labelledby="home-value-title">
-      <p className="eyebrow">WHERE THE VALUE COMES FROM</p>
-      <h2 id="home-value-title">What does it do for your ship?</h2>
-      <ul className="home-value-list">
-        <li><h3>More onboard revenue</h3><p>Relevant offers at the right moment. Checkout stays yours.</p></li>
-        <li><h3>Less printing</h3><p>The card and your app can replace part of the daily paper round.</p></li>
-        <li><h3>Problems fixed in time</h3><p>Guests tell you privately, before it reaches a review.</p></li>
-        <li><h3>Crew who feel seen</h3><p>Guests thank crew in the moment. Recognition starts on board.</p></li>
-        <li><h3>A keepsake that brings guests back</h3><p>The voyage stays in their home, with your brand on it.</p></li>
-        <li><h3>Feedback without the survey</h3><p>A quick answer on board beats a long form weeks later.</p></li>
-        <li><h3>Less disposable print</h3><p>Fewer printed pages, less ink, less to carry and dispose of.</p></li>
-        <li><h3>Guests share the voyage</h3><p>A shared keepsake can reach people you would otherwise pay to reach.</p></li>
-      </ul>
+    <section id="savings-calculator" className="savings-band" aria-labelledby="savings-title">
+      <div className="savings-inner">
+        <div className="calc-head">
+          <p className="eyebrow">Savings calculator</p>
+          <h2 id="savings-title">What does it cost your ship, and what comes back?</h2>
+        </div>
+        <section id="where-value-comes-from" aria-labelledby="value-title">
+          <h2 className="sub-h" id="value-title">Where the value comes from</h2>
+          <div className="advgrid">
+            <div className="adv"><span className="tick" aria-hidden="true" /><div><h3>More onboard revenue</h3><p className="why">Relevant offers at the right moment. Checkout stays yours.</p></div></div>
+            <div className="adv"><span className="tick" aria-hidden="true" /><div><h3>Less printing</h3><p className="why">The card and your app can replace part of the daily paper round.</p></div></div>
+            <div className="adv"><span className="tick" aria-hidden="true" /><div><h3>Problems fixed in time</h3><p className="why">Guests tell you privately, before it reaches a review.</p></div></div>
+            <div className="adv"><span className="tick" aria-hidden="true" /><div><h3>Crew who feel seen</h3><p className="why">Guests thank crew in the moment. Recognition starts on board.</p></div></div>
+            <div className="adv"><span className="tick" aria-hidden="true" /><div><h3>A keepsake that brings guests back</h3><p className="why">The voyage stays in their home, with your brand on it.</p></div></div>
+            <div className="adv"><span className="tick" aria-hidden="true" /><div><h3>Feedback without the survey</h3><p className="why">A quick answer on board beats a long form weeks later.</p></div></div>
+            <div className="adv"><span className="tick" aria-hidden="true" /><div><h3>Less disposable print</h3><p className="why">Fewer printed pages, less ink, less to carry and dispose of.</p></div></div>
+            <div className="adv"><span className="tick" aria-hidden="true" /><div><h3>Guests share the voyage</h3><p className="why">A shared keepsake can reach people you would otherwise pay to reach.</p></div></div>
+          </div>
+        </section>
+        <PaperCalculator />
+      </div>
     </section>
-    <PaperCalculator />
+
     <EntityDefinition cruiseOnly />
     <section className="quiet-proof"><p className="eyebrow">BUILT TO FIT THE CRUISE JOURNEY</p><div className="proof-grid"><article><strong>Inside the existing app</strong><span>No competing destination for the guest.</span></article><article><strong>Immediate operational feedback</strong><span>Structured event ratings reach leaders while they can still act.</span></article><article><strong>Revenue evidence without identity</strong><span>Confirmed booking value is attributed through opaque references and aggregated outcomes.</span></article></div></section>
     <BuyerReadiness />
