@@ -21,7 +21,8 @@ img { display: block; width: 100%; }
   align-items: center; padding: 0 clamp(22px,4vw,64px); border-bottom: 1px solid rgba(23,23,21,.035);
   position: relative; z-index: 5;
 }
-.brand { justify-self: start; letter-spacing: .29em; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.brand { justify-self: start; display:inline-flex; align-items:center; gap:10px; letter-spacing:.22em; font-size:12px; font-weight:600; white-space:nowrap; color:#171715; }
+.brand-mark { display:block; width:29px; height:29px; flex:0 0 auto; object-fit:contain; }
 .desktop-nav { display: flex; gap: clamp(15px,1.75vw,28px); justify-content: center; align-items: center; }
 .desktop-nav a,.menu-link { font-size: 10px; color: #292724; transition: opacity .2s ease; }
 .desktop-nav a:hover,.menu-link:hover { opacity: .55; }
@@ -390,7 +391,3 @@ h1.film-tagline { font-weight: 400; }
 .film-top .film-frame { background: #f0ece5; box-shadow: 0 40px 80px -48px rgba(23,23,21,.28); }
 .film-toggle { backdrop-filter: blur(8px); }
 .film-top .film-toggle { background: rgba(250,248,244,.88); color: #171715; border-color: rgba(23,23,21,.14); }
-/* Hero copy and demo link sit directly under the film ticks, inside the same block. */
-.film-top .hero-after { padding: 30px 0 0; }
-.film-top .hero-after-copy { margin-bottom: 16px; }
-@media (max-width: 960px) { .film-top .hero-after { padding: 24px 0 0; } }
