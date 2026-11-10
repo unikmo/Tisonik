@@ -67,3 +67,6 @@
 .exec-voyage-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:9px 0 13px}
 .exec-voyage-gallery img{display:block;width:100%;height:60px;object-fit:cover;border-radius:8px}
 @media(max-width:680px){.exec-voyage-gallery img{height:49px}}
+
+/* Consistent mono-black Tisonik brand mark in the tour navigation. */
+.exec-brand-mark{width:36px;height:36px;object-fit:contain;flex:0 0 auto}
