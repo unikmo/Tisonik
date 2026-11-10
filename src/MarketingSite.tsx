@@ -298,23 +298,21 @@ const Home = () => (
   <>
     <HomeFilm />
     <section id="top" className="hero">
-      <p className="eyebrow hero-eyebrow">GUEST EXPERIENCE FOR CRUISE LINES &amp; HOTELS</p>
+      <p className="eyebrow hero-eyebrow">GUEST EXPERIENCE FOR CRUISE LINES</p>
       <h1>Transform guest experiences. <span>Grow ancillary revenue.</span></h1>
       <p className="hero-positioning">A white-label experience layer inside the digital journey you already own—not another app for guests to download.</p>
     </section>
     <section className="hero-after" aria-labelledby="hero-after-title">
-      <p id="hero-after-title" className="hero-after-copy">Tisonik helps cruise lines and resort operators personalise interactions, recognise excellence, recover service issues earlier and surface more relevant experiences.</p>
+      <p id="hero-after-title" className="hero-after-copy">Tisonik helps cruise lines personalise interactions, recognise excellence, recover service issues earlier and surface more relevant experiences.</p>
       <div className="pilot-actions">
         <a className="pilot-link" href={demoHref}>VIEW CRUISE PRODUCT DEMO <Arrow /></a>
-        <a className="pilot-link" href="/hotels/">EXPLORE HOTELS &amp; RESORTS <Arrow /></a>
       </div>
     </section>
-    <section className="quiet-proof" aria-label="Tisonik hospitality environments">
-      <p className="eyebrow">ONE EXPERIENCE LAYER · TWO HOSPITALITY ENVIRONMENTS</p>
+    <section className="quiet-proof" aria-label="Tisonik for cruise lines">
+      <p className="eyebrow">ONE EXPERIENCE LAYER · BUILT FOR CRUISE</p>
       <div className="proof-grid">
         <article><strong>Cruise lines</strong><span>Passenger experience, crew recognition, service recovery, engagement and onboard revenue discovery.</span><a className="pilot-link" href="#passenger-experience">Explore cruise <Arrow /></a></article>
-        <article><strong>Hotels &amp; resorts</strong><span>Guest discovery, in-stay service recovery, staff recognition, ratings and ancillary-revenue activation.</span><a className="pilot-link" href="/hotels/">Explore resorts <Arrow /></a></article>
-        <article><strong>Controlled pilots</strong><span>Start with one ship or one property, define success measures first, then scale, iterate or stop on evidence.</span></article>
+        <article><strong>Controlled pilots</strong><span>Start with one ship, define success measures first, then scale, iterate or stop on evidence.</span></article>
       </div>
     </section>
     <section className="manifesto" aria-label="Tisonik cruise promise"><p className="eyebrow">FOR THE CRUISE JOURNEY</p><h2>Built to feel natural onboard.</h2><p className="manifesto-copy">A quieter interaction layer for guests, crew and the moments between the itinerary.</p></section>
