@@ -236,7 +236,6 @@ const HomeFilm = () => {
     else element.pause()
   }
   return <section className="film-top" aria-label="What Tisonik does">
-    <p className="film-wordmark">Tisonik<span>.</span></p>
     <div className="film-hero">
       <h1>Transform guest experiences. <span>Grow ancillary revenue.</span></h1>
       <p className="hero-positioning">A white-label experience layer inside the digital journey you already own—not another app for guests to download.</p>
@@ -271,12 +270,6 @@ const SavingsCalculator = () => {
 const Home = () => (
   <>
     <HomeFilm />
-    <section className="hero-after" aria-labelledby="hero-after-title">
-      <p id="hero-after-title" className="hero-after-copy">Tisonik helps cruise lines personalise interactions, recognise excellence, recover service issues earlier and surface more relevant experiences.</p>
-      <div className="pilot-actions">
-        <a className="pilot-link" href={demoHref}>VIEW CRUISE PRODUCT DEMO <Arrow /></a>
-      </div>
-    </section>
     <section className="quiet-proof" aria-label="Tisonik for cruise lines">
       <p className="eyebrow">ONE EXPERIENCE LAYER · BUILT FOR CRUISE</p>
       <div className="proof-grid proof-grid--two">
