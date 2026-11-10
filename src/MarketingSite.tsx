@@ -145,7 +145,7 @@ const pageFromPath = (path: string): PageKey => {
 
 const Header = ({ page }: { page: PageKey }) => (
   <header className="site-header">
-    <a className="brand" href="/" aria-label="Tisonik home">TISONIK</a>
+    <a className="brand" href="/" aria-label="Tisonik home"><img className="brand-mark" src="/tisonik-mark.svg" width="29" height="29" alt="" aria-hidden="true" /><span>TISONIK</span></a>
     <nav className="desktop-nav" aria-label="Primary navigation">
       <a href="/">Cruise Lines</a>
       <a href="/hotels/">Hotels &amp; Resorts</a>
