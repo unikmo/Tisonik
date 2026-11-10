@@ -70,3 +70,7 @@
 
 /* Consistent mono-black Tisonik brand mark in the tour navigation. */
 .exec-brand-mark{width:36px;height:36px;object-fit:contain;flex:0 0 auto}
+@media(max-width:1050px){.exec-stage{grid-template-columns:minmax(0,1fr)}.exec-story,.exec-visual{min-width:0;max-width:100%}.exec-story>p{overflow-wrap:anywhere}}
+.exec-stage,.exec-visual{box-sizing:border-box}
+.exec-demo{grid-template-columns:minmax(0,1fr)}.exec-stage{min-width:0}
+.exec-controls{grid-template-columns:minmax(0,150px) minmax(0,1fr) minmax(0,150px)}.exec-controls>[role=tablist]{min-width:0}@media(min-width:681px) and (max-width:1050px){.exec-controls [role=tab]{width:22px}}
