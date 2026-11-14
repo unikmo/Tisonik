@@ -186,12 +186,14 @@ const EntityDefinition = ({ cruiseOnly = false }: { cruiseOnly?: boolean }) => (
 )
 
 const buyerFaqs = [
+  ['What is Tisonik?', 'A white-label guest-experience layer for cruise lines. It sits inside your existing cruise app or guest journey and does not replace your booking or commerce systems. You keep your brand, inventory, pricing, checkout and payment.'],
   ['Where does Tisonik run?', 'The passenger experience runs inside the cruise line’s existing app as a white-label SDK or embedded module. Identity resolution and source actions run on-device, ship-local or in the operator’s systems. Tisonik cloud receives only aggregate KPI reports and non-identifying service-health telemetry.'],
   ['How do passenger privacy and data residency work?', 'Passenger and crew records stay in your environment and your region. Tisonik receives no names, photos, biometric templates or person-level identifiers, and any group under 20 is suppressed.'],
   ['How much IT integration is required?', 'One embedded feature connects to scoped host interfaces for launch context, operator-side identity, ship operations, booking outcomes and aggregate reporting. The pilot defines each interface before deployment.'],
-  ['What does a pilot cost?', 'For the first one-ship pilot we keep pricing deliberately simple and low ($5 per guest) so the focus stays on measuring real impact. The $5 is pilot pricing only. After a successful pilot we move to standard commercial pricing.'],
+  ['Is it live on any ship yet?', 'Not yet. Tisonik is still in test on one test ship and no cruise line is live. The first pilot is one ship.'],
+  ['What does a pilot cost?', 'Pilot price: $5 per guest per voyage, onboarding included. Pilot only, excluding taxes. Not an offer; terms are agreed in a written pilot agreement. Pricing after the pilot is agreed with each ship.'],
   ['What happens when ship connectivity is limited?', 'Core actions run on the device and ship-local services, so the public internet is not needed for every interaction. Approved aggregate reports sync when the link returns.'],
-  ['How does Tisonik pass cybersecurity and vendor review?', 'Production requirements: signed requests, tenant separation, role-based access, replay protection, allow-listed aggregate schemas, body-free analytics logs and independent security testing.'],
+  ['How does Tisonik pass cybersecurity and vendor review?', 'Production requirements: signed requests, tenant separation, role-based access, replay protection, allow-listed aggregate schemas and body-free analytics logs. Independent security testing is planned, not yet done.'],
   ['How are anonymous passenger vibes, safety and minors handled?', 'Adults only. Children cannot send, receive or be matched. The operator resolves the receiver and returns no name, each sender is capped at five a sailing day, the capture is discarded after matching, and compliments arrive without the sender’s identity or exact time.'],
   ['Can passengers choose to connect?', 'Yes, through the separate VConnect flow—not by replying to an Anonymous Vibe. An adult may send one predefined connection request per sailing day. The recipient can accept, decline, block or report; the requester receives an update only after acceptance. Thereafter, both passengers can use prepared public-venue, activity and time options. Free text, cabins, room numbers, live location and dating-oriented prompts are excluded.'],
   ['Does Anonymous Vibe require a second consent screen?', 'No. The cruise line can include Tisonik recognition as a clearly stated purpose in its adult boarding imaging enrolment. Adults who accept are enrolled once for that sailing and are not interrupted again when using Anonymous Vibe; those who decline or opt out are excluded from matching.'],
@@ -216,7 +218,7 @@ const BuyerReadiness = ({ schema = true }: { schema?: boolean }) => <section cla
 const filmHooks: [string, string][] = [
   ['No new app required.', 'Works inside the app you already have, or from the card on any phone.'],
   ['A welcome that becomes a keepsake.', 'Cruise Director greeting on day one. Cruise highlights are added to the same welcome code.'],
-  ['Offers that sell themselves.', '“Your friend Dee is going. 3 places left.”'],
+  ['Offers at the right moment.', 'For example: “Your friend Dee is going. 3 places left.”'],
   ['Hear it before the review.', 'Five short questions the day before guests leave, pushed by your Cruise Director and animation team. You can still fix it.'],
 ]
 const filmAlt = 'A card on the bed, a welcome from the Cruise Director, a friend going to dinner with three places left, a show rated as it ends, crew thanked by name, and a low score reaching the desk.'
@@ -248,7 +250,7 @@ const HomeFilm = () => {
     </figure>
     <ul className="film-hooks">{filmHooks.map(([line]) => <li key={line}><i aria-hidden="true" /><strong>{line}</strong></li>)}</ul>
     <section className="hero-after" aria-labelledby="hero-after-title">
-      <p id="hero-after-title" className="hero-after-copy">Tisonik helps cruise lines personalise interactions, recognise excellence, recover service issues earlier and surface more relevant experiences.</p>
+      <p id="hero-after-title" className="hero-after-copy">Personalise interactions. Recognise excellence. Recover issues earlier. Surface relevant experiences.</p>
       <div className="pilot-actions">
         <a className="pilot-link" href={demoHref}>VIEW CRUISE PRODUCT DEMO <Arrow /></a>
       </div>
@@ -273,32 +275,30 @@ const Home = () => (
     <section className="quiet-proof" aria-label="Tisonik for cruise lines">
       <p className="eyebrow">ONE EXPERIENCE LAYER · BUILT FOR CRUISE</p>
       <div className="proof-grid proof-grid--two">
-        <article><strong>Cruise lines</strong><span>Passenger experience, crew recognition, service recovery, engagement and onboard revenue discovery.</span><a className="pilot-link" href="#passenger-experience">Explore cruise <Arrow /></a></article>
-        <article><strong>Controlled pilots</strong><span>Start with one ship, define success measures first, then scale, iterate or stop on evidence.</span></article>
+        <article><strong>Cruise lines</strong><span>Experience, recognition, recovery, engagement, onboard revenue.</span><a className="pilot-link" href="#passenger-experience">Explore cruise <Arrow /></a></article>
+        <article><strong>Controlled pilots</strong><span>One ship. Measures agreed first. Then scale, iterate or stop.</span></article>
       </div>
     </section>
-    <section className="manifesto" aria-label="Tisonik cruise promise"><p className="eyebrow">FOR THE CRUISE JOURNEY</p><h2>Built to feel natural onboard.</h2><p className="manifesto-copy">A quieter interaction layer for guests, crew and the moments between the itinerary.</p></section>
     <section id="how-it-works" className="home-steps" aria-labelledby="home-steps-title">
       <p className="eyebrow">HOW IT WORKS</p>
       <h2 id="home-steps-title">One card. The whole voyage.</h2>
       <ol className="home-steps-list">
-        <li><span>01 · On arrival</span><h3>A welcome waiting on the bed</h3><p>Guests scan the card, enter the welcome code for their trip and see a message from your cruise director, which also shows them how to use TISONIK in your app.</p></li>
-        <li><span>02 · Between</span><h3>TISONIK does the quiet work</h3><p>Guests recognise crew in the moment, flag friction while you can still fix it, give a quick answer instead of a long survey, and see offers that are relevant to them.</p></li>
-        <li><span>03 · On departure</span><h3>A keepsake that carries your brand home</h3><p>Your media team adds the voyage highlights to the same card. Guests take the keepsake home with them, and the card is the first thing they reach for when they think about the next sailing.</p></li>
+        <li><span>01 · On arrival</span><h3>A welcome on the bed</h3><p>Guests scan the card and see a message from your Cruise Director.</p></li>
+        <li><span>02 · Between</span><h3>Thank, flag, discover</h3><p>Guests thank crew, flag issues, answer a quick question and see relevant offers.</p></li>
+        <li><span>03 · On departure</span><h3>A keepsake in your brand</h3><p>Voyage highlights are added to the same card.</p></li>
       </ol>
     </section>
-    <Section id="passenger-experience" eyebrow="PASSENGER EXPERIENCE" title="Make the app feel more alive." crop="passenger" alt="Multicultural cruise passengers of different ages relaxing together" shot="/media/portal-welcome.jpg" shotAlt="The guest page: a welcome from the Cruise Director, then a show the guest has just seen, ready to rate with one tap"><p>Give guests more relevant reasons to interact throughout the sailing—without making the experience feel busy, intrusive or transactional.</p></Section>
-    <Section id="crew-recognition" eyebrow="CREW RECOGNITION" title="Let great service be seen." crop="crew" alt="Diverse cruise crew members sharing a candid end-of-shift moment" reverse shot="/media/portal-crew-recognition.jpg" shotAlt="The guest page: a crew member chosen, two preset reasons picked, ready to send"><p>A simple thank-you becomes visible, measurable and memorable for guest, crew and operator.</p></Section>
-    <Section id="service-recovery" eyebrow="SERVICE RECOVERY" title="Fix it while it still matters." crop="recovery" alt="Cruise crew member returning a child’s toy beside their parent" shot="/media/portal-service-recovery.jpg" shotAlt="The guest page: a low stateroom score, answered with thanks and a promise that the team has been told"><p>Guests signal friction discreetly. You respond before the experience is over.</p></Section>
-    <Section id="engagement" eyebrow="LIVE EXPERIENCE FEEDBACK" title="Improve events while the sailing is still underway." crop="engagement" alt="Multigenerational passengers enjoying an inclusive deck activity" reverse shot="/media/portal-live-rating.jpg" shotAlt="The guest page: Just finished, how was the evening show, five one-tap answers"><p>After a live event, ask three to five structured questions with prepared response blocks. Leaders see feedback immediately; the cruise line decides which aggregated ratings to publish.</p></Section>
-    <Section id="ancillary-revenue" eyebrow="ANCILLARY REVENUE" title="Make relevance commercial." crop="revenue" alt="A multicultural family choosing an onboard experience together" shot="/media/portal-offers-keepsake.jpg" shotAlt="The guest page: Chef table dinner, your friend Dee is going, 3 places left, and a button to hold a place"><p>When guests are already engaged, the right experiences appear naturally. Checkout and payment stay with you.</p></Section>
-    <Section id="keepsake" eyebrow="THE KEEPSAKE · LESS PAPER" title="Less disposable print. A keepsake that lasts." crop="keepsake" alt="A UNIKMO card standing on a made-up cabin bed" reverse><p>One card replaces the paper pile. Our cruise media team adds cruise highlights to the same welcome code. Curated moments are an optional extra.</p><p>UNIKMO cards can be customised to your cruise line’s brand. <a href="#pilot">Talk to us</a>.</p></Section>
+    <Section id="passenger-experience" eyebrow="PASSENGER EXPERIENCE" title="Make the app feel more alive." crop="passenger" alt="Multicultural cruise passengers of different ages relaxing together" shot="/media/portal-welcome.jpg" shotAlt="The guest page: a welcome from the Cruise Director, then a show the guest has just seen, ready to rate with one tap"><p>Relevant reasons to interact, without feeling busy or pushy.</p></Section>
+    <Section id="crew-recognition" eyebrow="CREW RECOGNITION" title="Let great service be seen." crop="crew" alt="Diverse cruise crew members sharing a candid end-of-shift moment" reverse shot="/media/portal-crew-recognition.jpg" shotAlt="The guest page: a crew member chosen, two preset reasons picked, ready to send"><p>A thank-you the crew member and the operator can see.</p></Section>
+    <Section id="service-recovery" eyebrow="SERVICE RECOVERY" title="Fix it while it still matters." crop="recovery" alt="Cruise crew member returning a child’s toy beside their parent" shot="/media/portal-service-recovery.jpg" shotAlt="The guest page: a low stateroom score, answered with thanks and a promise that the team has been told"><p>Guests flag a problem privately. You respond before the sailing ends.</p></Section>
+    <Section id="engagement" eyebrow="LIVE EXPERIENCE FEEDBACK" title="Improve events while the sailing is still underway." crop="engagement" alt="Multigenerational passengers enjoying an inclusive deck activity" reverse shot="/media/portal-live-rating.jpg" shotAlt="The guest page: Just finished, how was the evening show, five one-tap answers"><p>Three to five quick questions after a live event. The cruise line decides what is published.</p></Section>
+    <Section id="ancillary-revenue" eyebrow="ANCILLARY REVENUE" title="Make relevance commercial." crop="revenue" alt="A multicultural family choosing an onboard experience together" shot="/media/portal-offers-keepsake.jpg" shotAlt="The guest page: Chef table dinner, your friend Dee is going, 3 places left, and a button to hold a place"><p>Relevant offers, in the guest&apos;s flow. Checkout and payment stay with you.</p></Section>
+    <Section id="keepsake" eyebrow="THE KEEPSAKE · LESS PAPER" title="Less disposable print. A keepsake that lasts." crop="keepsake" alt="A UNIKMO card standing on a made-up cabin bed" reverse><p>One card can take the place of much of the printed material. Highlights go onto the same code. Branded to your line. <a href="#pilot">Talk to us</a>.</p></Section>
     <SavingsCalculator />
 
-    <EntityDefinition cruiseOnly />
-    <section className="quiet-proof"><p className="eyebrow">BUILT TO FIT THE CRUISE JOURNEY</p><div className="proof-grid"><article><strong>Inside the existing app</strong><span>No competing destination for the guest.</span></article><article><strong>Immediate operational feedback</strong><span>Structured event ratings reach leaders while they can still act.</span></article><article><strong>Revenue evidence without identity</strong><span>Confirmed booking value is attributed through opaque references and aggregated outcomes.</span></article></div></section>
+    <section className="quiet-proof"><p className="eyebrow">BUILT TO FIT THE CRUISE JOURNEY</p><div className="proof-grid"><article><strong>Inside your app</strong><span>No new destination for the guest.</span></article><article><strong>Feedback while you can act</strong><span>Event ratings reach leaders during the sailing.</span></article><article><strong>Revenue without identity</strong><span>Booking value is attributed without passenger names.</span></article></div></section>
     <BuyerReadiness />
-    <section id="pilot" className="pilot-section"><p className="eyebrow">ONE SHIP. THE COMPLETE EXPERIENCE.</p><h2>See the product, then pilot it inside the cruise app guests already use.</h2><p>Walk through the connected passenger and management experience, then request a complete one-ship pilot.</p><div className="pilot-actions"><a className="pilot-button pilot-button--primary" href={pilotContactHref}>Request a pilot <Arrow /></a><a className="pilot-button pilot-button--secondary" href={demoHref}>View product demo <Arrow /></a></div></section>
+    <section id="pilot" className="pilot-section"><p className="eyebrow">ONE SHIP. THE COMPLETE EXPERIENCE.</p><h2>Pilot it inside the cruise app guests already use.</h2><p>Still in test: no cruise line is live yet. We agree the measures up front, then scale, iterate or stop.</p><p><strong>Pilot price: $5 per guest per voyage, onboarding included.</strong> Pilot only, excluding taxes. Not an offer; terms are agreed in a written pilot agreement.</p><div className="pilot-actions"><a className="pilot-button pilot-button--primary" href={pilotContactHref}>Request a pilot <Arrow /></a><a className="pilot-button pilot-button--secondary" href={demoHref}>View product demo <Arrow /></a></div></section>
   </>
 )
 

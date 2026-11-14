@@ -136,7 +136,7 @@ const RatingPreview = ({ compact = false }: { compact?: boolean }) => (
     <p>Only rate what you used. If something is not right, the team hears about it today.</p>
     <div className="rating-scale rating-scale--words" aria-hidden="true">{ratingWords.map(word => <span key={word}>{word}</span>)}</div>
     {!compact && <div className="rating-roundup-preview">
-      <span>A low score reaches the team at once</span>
+      <span>A low score is emailed to the desk</span>
       <span>Private to the hotel team. Not published by Tisonik.</span>
     </div>}
   </div>
@@ -163,8 +163,8 @@ const StayRatingDemo = () => {
 const filmHooks: [string, string][] = [
   ['No new app required.', 'Works inside the app you already have, or from the card on any phone.'],
   ['A welcome that becomes a keepsake.', 'A greeting from your General Manager on day one, on a card guests take home.'],
-  ['Offers that sell themselves.', '“Tonight’s tasting menu. 5 places left.”'],
-  ['Fix it before the review.', 'A low score reaches reception straight away, while the guest is still in the building.'],
+  ['Offers at the right moment.', 'For example: “Tonight’s tasting menu. 5 places left.”'],
+  ['Fix it before the review.', 'A low score is emailed to the desk address you set, while the guest is still in the building.'],
 ]
 const filmAlt = 'A card on the bed, a welcome from the General Manager, a tasting menu with five places left, an event rated as it ends, a team member recognised, and a low score reaching reception.'
 
@@ -195,7 +195,7 @@ const HotelFilm = () => {
     </figure>
     <ul className="film-hooks">{filmHooks.map(([line]) => <li key={line}><i aria-hidden="true" /><strong>{line}</strong></li>)}</ul>
     <section className="hero-after" aria-labelledby="hero-after-title">
-      <p id="hero-after-title" className="hero-after-copy">Tisonik helps hotels personalise interactions, recognise excellence, recover service issues earlier and surface more relevant experiences.</p>
+      <p id="hero-after-title" className="hero-after-copy">Personalise interactions. Recognise excellence. Recover issues earlier. Surface relevant experiences.</p>
       <div className="pilot-actions"><a className="pilot-link" href={liveDemoHref}>VIEW HOTEL PRODUCT DEMO <Arrow /></a></div>
     </section>
   </section>
@@ -204,16 +204,17 @@ const HotelFilm = () => {
 const hotelFaqs: [string, string][] = [
   ['Do guests need to download an app?', 'No. A UNIKMO card in the room opens the guest page on any phone, or Tisonik runs inside the guest app you already have. No new app required.'],
   ['What do guests see?', 'A welcome from your General Manager, a one-tap way to rate their day (Poor to Superb), a way to thank a team member by name, a private way to ask for help, relevant offers, and a card they keep.'],
-  ['What happens when a guest rates something low?', 'A Poor or Fair score reaches your hotel team at once and the guest is thanked. If a guest asks for help, it goes straight to reception. Once the desk marks it resolved, the guest is asked whether it was fixed.'],
+  ['What happens when a guest rates something low?', 'A Poor or Fair score is emailed to the desk address you set, and the guest is thanked. If a guest asks for help, it goes to the same desk. Once the desk marks it resolved, the guest is asked whether it was fixed. Before departure, guests can answer five short questions and add an optional comment, which go to the manager.'],
   ['Are ratings published?', 'No. Ratings are private to your team. Reception receives everything, and the manager can receive the ratings. Tisonik does not publish them.'],
   ['How does it fit with our PMS, booking and payment systems?', 'Tisonik is an experience layer, not a replacement for your systems. Inventory, availability, pricing, checkout and payment stay with the property. The pilot defines exactly what connects.'],
-  ['Who sells the offers and takes payment?', 'You do. Guests can hold a place and see how many are left. Tisonik counts the places and tells the desk. The property confirms and takes payment.'],
+  ['Who sells the offers and takes payment?', 'You do. Guests can ask to hold a place, and the desk confirms. Tisonik counts the places and tells the desk. The property confirms and takes payment.'],
   ['Can guests see or contact each other?', 'No. Guest-to-guest connection is off for hotels. Offers are anonymous, for example “5 places left”.'],
-  ['What guest data is held, and for how long?', 'A guest reference sent by UNIKMO, an optional room and first name, and what guests choose to write. Stays are deleted automatically 90 days after the after-checkout window closes.'],
+  ['What guest data is held, and for how long?', 'A guest reference sent by UNIKMO, an optional room and first name, and what guests choose to write. Stays are deleted automatically after the after-checkout window closes, following a retention period proposed at 90 days and agreed per hotel.'],
   ['Does staff recognition become an employee ranking?', 'No. Guests pick a team member from your list and up to two reasons, once per person per day. There is no public leaderboard.'],
   ['Can we put our brand on it?', 'Yes. Tisonik is white-label, so the brand is yours. UNIKMO cards can be customised to your hotel’s brand. Talk to us.'],
   ['How does a pilot work?', 'We start with one property. We agree the guest journeys and the success measures first, for example activation, recovery time, recognition volume, and offers viewed and places held. Then we scale, iterate or stop.'],
-  ['What does a pilot cost?', 'For the first one-property pilot we keep pricing deliberately simple and low ($8 per stay) so the focus stays on measuring real impact. After a successful pilot we move to standard commercial pricing.'],
+  ['Is it live at any hotel yet?', 'Not yet. Tisonik is still in test and no hotel is live. The first pilot is one property.'],
+  ['What does a pilot cost?', 'Pilot price: $8 per stay, onboarding included. Pilot only, excluding taxes. Not an offer; terms are agreed in a written pilot agreement. Pricing after the pilot is agreed with each property.'],
 ]
 
 const hotelFaqData = JSON.stringify({
@@ -236,20 +237,20 @@ const ResortPillar = () => (
       <HotelFilm />
 
       <section className="resort-neutral-proof">
-        <span>ENGINEERED FOR PREMIUM & LUXURY HOSPITALITY</span>
-        <strong>More guest participation.</strong>
+        <span>BUILT FOR PREMIUM & LUXURY HOSPITALITY</span>
+        <strong>Guest participation.</strong>
         <strong>Earlier service recovery.</strong>
-        <strong>More visible staff recognition.</strong>
-        <strong>More ancillary revenue moments.</strong>
+        <strong>Visible staff recognition.</strong>
+        <strong>Ancillary revenue moments.</strong>
       </section>
 
       <section className="resort-why" aria-labelledby="resort-why-title">
         <p className="eyebrow">WHY IT EXISTS</p>
         <h2 id="resort-why-title">Guests stay quiet, then say it online.</h2>
         <div className="resort-why-grid">
-          <p>Guests often stay quiet during the stay, then share problems online when it is too late.</p>
+          <p>Problems surface online, too late.</p>
           <p>Great service goes unnoticed.</p>
-          <p>Relevant experiences stay undiscovered.</p>
+          <p>Good experiences stay undiscovered.</p>
         </div>
         <strong className="resort-why-line">Tisonik changes the timing.</strong>
       </section>
@@ -257,24 +258,24 @@ const ResortPillar = () => (
       <section className="resort-intro">
         <p className="eyebrow">A MORE CONNECTED RESORT EXPERIENCE</p>
         <h2>Everything guests love.<br />Easier to discover.</h2>
-        <p>Dining, activities, entertainment, wellness and resort moments are easier to find. Tisonik also creates room for relevant paid experiences without taking over the resort&apos;s inventory, pricing, checkout or payment.</p>
+        <p>Dining, activities, wellness and extras are easier to find. The resort keeps inventory, pricing, checkout and payment.</p>
       </section>
 
       <section id="experience" className="resort-feature-wrap">
         <Feature number="01" eyebrow="DISCOVER & PARTICIPATE" title="Make the resort feel alive." image={resortImages.pool} alt="Guest enjoying a landscaped resort pool">
-          <p>Help guests move naturally from poolside to activities, dining, entertainment and shared experiences. Less “we didn&apos;t know that was happening.” More of the stay actually experienced.</p>
+          <p>Guests find what is on, from poolside to dining and entertainment.</p>
         </Feature>
 
         <Feature number="02" eyebrow="SERVICE RECOVERY" title="Fix the moment before it becomes the review." image={resortImages.staff} alt="Guest-service team member assisting at a hotel reception" reverse>
-          <p>Give guests a private path to say when something is wrong while they are still on property. Route the signal, acknowledge it, resolve it and follow up before departure.</p>
+          <p>A private way to say something is wrong. The desk resolves it and follows up before departure.</p>
         </Feature>
 
         <Feature number="03" eyebrow="STAFF RECOGNITION" title="Celebrate the people who make the difference." image={resortImages.dining} alt="Guests enjoying a premium dining experience at a tropical resort">
-          <p>Let guests recognize the waiter, housekeeper, bartender, kids-club host, concierge or activity team member who made the stay better—without turning hospitality into a public employee leaderboard.</p>
+          <p>Guests thank the waiter, housekeeper or concierge by name. No public leaderboard.</p>
         </Feature>
 
         <Feature id="revenue" number="04" eyebrow="ANCILLARY REVENUE" title="More of the stay can become bookable." image={resortImages.spa} alt="Guest receiving a relaxing spa treatment" reverse>
-          <p>The opportunity extends well beyond one spa offer. Tisonik can surface paid experiences at relevant moments while the resort keeps inventory, pricing, checkout and payment.</p>
+          <p>Relevant paid experiences at the right moment. The resort keeps inventory, pricing, checkout and payment.</p>
           <div className="resort-opportunity-list" aria-label="Illustrative ancillary revenue opportunities">
             <span>Spa &amp; wellness</span>
             <span>Speciality dining</span>
@@ -292,11 +293,11 @@ const ResortPillar = () => (
         <div className="resort-ratings-copy">
           <p className="eyebrow">IN-STAY RATINGS</p>
           <h2>Ask while there is still time to make it right.</h2>
-          <p>Guests rate their day with one tap per area, from Poor to Superb. A low score reaches the team at once, while the guest is still on property. Before they leave, five short questions and an optional comment go to the manager.</p>
+          <p>One tap per area, Poor to Superb. A low score is emailed to the desk address you set, while the guest is still here.</p>
           <div className="resort-rating-benefits">
-            <article><strong>One tap, not a survey</strong><span>Reception, room, dining, spa and pool, bar and lounge. Guests rate only what they used.</span></article>
-            <article><strong>Recovery while it matters</strong><span>The resort receives the signal while the guest is still there and has a real chance to respond before checkout.</span></article>
-            <article><strong>Private to the hotel team</strong><span>Ratings go to the property&apos;s team. Tisonik does not publish them.</span></article>
+            <article><strong>One tap, not a survey</strong><span>Guests rate only what they used.</span></article>
+            <article><strong>Fix it before checkout</strong><span>The desk can respond while the guest is still here.</span></article>
+            <article><strong>Private to the hotel team</strong><span>Tisonik does not publish ratings.</span></article>
           </div>
           <a className="resort-text-link" href="/hotel-guest-rating-software/">See the resort rating workflow <Arrow /></a>
         </div>
@@ -310,7 +311,7 @@ const ResortPillar = () => (
         <div>
           <p className="eyebrow">LIVE PRODUCT DEMO</p>
           <h2>See the guest journey in action.</h2>
-          <p>Explore discovery, relevant paid experiences, the in-stay rating and the hotel-team response flow in one self-serve demo.</p>
+          <p>Guest journey, rating and team response in one self-serve demo. Example data, not real results.</p>
         </div>
         <a className="resort-primary-button" href={liveDemoHref}>Open live demo <Arrow /></a>
       </section>
@@ -321,10 +322,10 @@ const ResortPillar = () => (
           <h2>An experience layer—not another destination.</h2>
         </div>
         <div className="resort-integration-grid">
-          <article><span>01</span><strong>Inside the existing journey</strong><p>White-label inside your existing guest app, or opened from a UNIKMO card in the room. Not another app to download.</p></article>
-          <article><span>02</span><strong>Resort-owned commerce</strong><p>Inventory, availability, pricing, checkout and payment stay with the property.</p></article>
-          <article><span>03</span><strong>Actionable signals</strong><p>Discovery, ratings, recovery and recognition are structured for resort teams to act on.</p></article>
-          <article><span>04</span><strong>One-property start</strong><p>Define scope and measures before wider rollout.</p></article>
+          <article><span>01</span><strong>Inside your journey</strong><p>In your guest app, or from a UNIKMO card in the room.</p></article>
+          <article><span>02</span><strong>Resort-owned commerce</strong><p>Inventory, pricing, checkout and payment stay with you.</p></article>
+          <article><span>03</span><strong>Signals to act on</strong><p>Ratings, recovery and recognition for your team.</p></article>
+          <article><span>04</span><strong>One-property start</strong><p>Scope and measures agreed first.</p></article>
         </div>
       </section>
 
@@ -334,9 +335,9 @@ const ResortPillar = () => (
           <h2 id="resort-journey-title">One connected guest journey. Two complementary products.</h2>
         </div>
         <div className="resort-integration-grid">
-          <article><span>ARRIVAL</span><strong>A premium physical welcome</strong><p>A UNIKMO card is waiting in the room. Scanning it opens a personal welcome.</p></article>
-          <article><span>DURING THE STAY</span><strong>Engagement, recovery and discovery</strong><p>Tisonik lets guests flag issues while you can still fix them, thank great staff and find relevant offers.</p></article>
-          <article><span>DEPARTURE</span><strong>A lasting digital keepsake</strong><p>The same card stays with the guest after checkout.</p></article>
+          <article><span>ARRIVAL</span><strong>A welcome in the room</strong><p>A UNIKMO card can be placed in the room. Scanning it opens a personal welcome.</p></article>
+          <article><span>DURING THE STAY</span><strong>Rate, thank, discover</strong><p>Guests flag issues, thank staff and find offers.</p></article>
+          <article><span>DEPARTURE</span><strong>A keepsake</strong><p>The same card stays with the guest.</p></article>
         </div>
         <p className="resort-journey-link"><a className="resort-text-link" href="https://www.unikmo.com/hotels">Explore UNIKMO for Hotels <Arrow /></a></p>
       </section>
@@ -346,8 +347,8 @@ const ResortPillar = () => (
         <div>
           <p className="eyebrow">PILOT TISONIK AT YOUR RESORT</p>
           <h2>Start with one property.</h2>
-          <p>Define success together. Scale only when the numbers prove it.</p>
-          <p>We agree the measures up front, for example activation, recovery time, recognition volume, and offers viewed and places held.</p>
+          <p>Still in test: no hotel is live yet. We agree the measures up front, then scale, iterate or stop.</p>
+          <p><strong>Pilot price: $8 per stay, onboarding included.</strong> Pilot only, excluding taxes. Not an offer; terms are agreed in a written pilot agreement.</p>
           <div className="resort-pilot-checks">
             <span>Defined use cases</span><span>Resort-owned data and brand</span><span>Measurable pilot outcomes</span><span>Scale, iterate or stop</span>
           </div>
@@ -413,7 +414,7 @@ const ResortLiveDemo = () => {
             {mode === 'team' && <div className="demo-team-view">
               <p className="eyebrow">ILLUSTRATIVE RESORT VIEW</p>
               <h3>Act before checkout.</h3>
-              <div className="demo-team-row"><strong>Rating format</strong><span>One tap per area, from Poor to Superb. A low score reaches the hotel team at once.</span></div>
+              <div className="demo-team-row"><strong>Rating format</strong><span>One tap per area, from Poor to Superb. A low score is emailed to the desk address you set.</span></div>
               <div className="demo-team-row"><strong>In-stay signal</strong><span>The guest is still on property, so the team can respond while the stay is still happening.</span></div>
               <div className="demo-team-row"><strong>Recovery</strong><span>Route → acknowledge → resolve → follow up.</span></div>
               <div className="demo-team-row"><strong>Ancillary revenue</strong><span>Surface relevant spa, dining, excursion, cabana, transfer and celebration opportunities while the resort keeps commerce.</span></div>
@@ -490,7 +491,7 @@ const ResortPilot = () => (
           <p>Start with selected guest journeys, a defined integration boundary and success measures agreed before launch.</p>
           <div className="resort-pilot-checks">
             <span>Discovery &amp; participation</span>
-            <span>Public in-stay ratings &amp; recovery</span>
+            <span>In-stay ratings &amp; recovery</span>
             <span>Staff recognition</span>
             <span>Ancillary revenue opportunities</span>
           </div>
@@ -530,7 +531,7 @@ const seoPages: Record<Exclude<ResortPageKey, 'pillar' | 'demo' | 'pilot'>, {
   'guest-engagement': {
     eyebrow: 'RESORT GUEST ENGAGEMENT SOFTWARE',
     title: 'Make the resort easier to experience.',
-    intro: 'Tisonik connects discovery, participation, public in-stay ratings, service recovery, recognition and ancillary-revenue discovery in one resort-focused experience layer.',
+    intro: 'Tisonik connects discovery, participation, in-stay ratings, service recovery, recognition and ancillary-revenue discovery in one resort-focused experience layer.',
     image: resortImages.hero,
     alt: 'Guests enjoying a resort pool',
     points: [
@@ -590,12 +591,12 @@ const seoPages: Record<Exclude<ResortPageKey, 'pillar' | 'demo' | 'pilot'>, {
   'ratings': {
     eyebrow: 'HOTEL GUEST RATING SOFTWARE',
     title: 'One tap per area, while the guest is still there.',
-    intro: 'Guests rate their day from Poor to Superb, one tap per area. A low score reaches the hotel team at once, so it can be put right before the guest leaves.',
+    intro: 'Guests rate their day from Poor to Superb, one tap per area. A low score is emailed to the desk address you set, so it can be put right before the guest leaves.',
     image: resortImages.sunset,
     alt: 'Couple enjoying a resort pool at sunset',
     points: [
       { title: 'One tap, not a survey', body: 'Reception, room, dining, spa and pool, bar and lounge. Guests rate only what they used, from Poor to Superb.' },
-      { title: 'Low scores reach the team at once', body: 'A Poor or Fair score alerts the hotel team and thanks the guest. Staff can put it right while the guest is still on property.' },
+      { title: 'Low scores go to the desk', body: 'A Poor or Fair score is emailed to the desk address you set and the guest is thanked. Staff can put it right while the guest is still on property.' },
       { title: 'Before they leave', body: 'A short rating before departure asks five questions and one optional comment. It goes to the manager.' },
       { title: 'Private to the hotel team', body: 'Ratings go to the property’s team. Tisonik does not publish them.' },
     ],
