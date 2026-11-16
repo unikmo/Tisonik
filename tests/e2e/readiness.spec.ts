@@ -59,7 +59,7 @@ test('resort pillar contains no unapproved hotel-chain logos or affiliations', a
   await page.goto('/hotels/')
   const body = await page.locator('body').innerText()
   for (const unapprovedBrand of ['Atlantis', 'RIU', 'Barceló', 'Iberostar', 'Secrets']) expect(body).not.toContain(unapprovedBrand)
-  await expect(page.getByText('ENGINEERED FOR PREMIUM & LUXURY HOSPITALITY')).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: /Transform guest experiences/i })).toBeVisible()
 })
 
 test('resort pillar makes ancillary revenue opportunity explicit', async ({ page }) => {
