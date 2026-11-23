@@ -21,7 +21,7 @@
     "test:enquiry-validation": "node scripts/test-enquiry-validation.mjs",
     "test:hotel-stays": "node scripts/test-hotel-stays.mjs && node scripts/test-guest-connect.mjs",
     "test:load": "node --experimental-strip-types scripts/test-sdk-load.ts",
-    "test": "npm run test:privacy && npm run test:sdk && npm run test:sdk-security && npm run test:native-contracts && npm run test:deployment-security && npm run test:operator-edge && npm run test:recovery && npm run test:readiness-config && npm run test:enquiry-notification && npm run test:enquiry-validation && npm run test:hotel-stays && npm run test:ui && npm run test:load",
+    "test": "npm run test:privacy && npm run test:sdk && npm run test:sdk-security && npm run test:native-contracts && npm run test:deployment-security && npm run test:operator-edge && npm run test:recovery && npm run test:readiness-config && npm run test:enquiry-notification && npm run test:enquiry-smtp && npm run test:enquiry-validation && npm run test:hotel-stays && npm run test:ui && npm run test:load",
     "build:sdk": "tsc -p packages/sdk/tsconfig.json",
     "release:sdk": "npm run build:sdk && npm pack ./packages/sdk --pack-destination releases",
     "release:edge": "npm pack ./packages/operator-edge --pack-destination releases",
@@ -35,7 +35,8 @@
     "sbom": "node scripts/generate-sbom.mjs",
     "qa:site": "node scripts/qa-site.mjs",
     "preview": "vite preview",
-    "seo:generate": "node scripts/generate-sitemap.mjs"
+    "seo:generate": "node scripts/generate-sitemap.mjs",
+    "test:enquiry-smtp": "node scripts/test-enquiry-smtp.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.4",
