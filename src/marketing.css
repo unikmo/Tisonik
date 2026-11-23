@@ -161,6 +161,10 @@ img { display: block; width: 100%; }
 .contact-submit:hover { background: white; color: #1d1c1a; }
 .contact-submit:disabled { cursor: wait; opacity: .62; }
 .form-success { margin: 0; padding: 13px 15px; border-radius: 10px; background: rgba(91,190,152,.16); color: #bdebd7; font-size: 13px; }
+/* Confirmation-only state: centered, readable, and clearly separate from a form. */
+.contact-form-section .pilot-contact-form[role="status"] { display: flex; align-items: center; justify-content: center; align-self: center; width: 100%; min-height: 120px; }
+.contact-form-section .pilot-contact-form[role="status"] .form-success { width: min(100%, 680px); padding: 24px 28px; font-size: clamp(17px, 1.4vw, 21px); line-height: 1.5; text-align: center; }
+
 .form-error { margin: 0; padding: 13px 15px; border-radius: 10px; background: rgba(207,95,84,.17); color: #ffd8d3; font-size: 13px; }
 .form-error a { color: inherit; text-decoration: underline; }
 @media (max-width: 1030px) {
