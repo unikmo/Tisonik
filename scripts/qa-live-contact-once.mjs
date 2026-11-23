@@ -13,6 +13,8 @@ for (const width of [390,1440]) {
  await form.locator('[name=message]').fill('I would like information about a Tisonik hotel pilot and your guest experience software.');
  await form.locator('[name=privacy_consent]').check();
  await form.locator('button[type=submit]').click();
+ await page.waitForTimeout(500);
+ console.log('FORM_DIAG',JSON.stringify({width,formText:(await form.innerText()).slice(-400),statusText:await form.locator('[role=status]').allTextContents(),errorText:await form.locator('[role=alert]').allTextContents(),buttonText:await form.locator('button[type=submit]').innerText(),errors}));
  await form.getByRole('status').getByText('safely recorded',{exact:false}).waitFor({timeout:8000});
  assert.equal(await form.locator('[name=email]').inputValue(),'');
  assert.deepEqual(errors,[]);
