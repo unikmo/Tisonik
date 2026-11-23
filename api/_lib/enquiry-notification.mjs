@@ -21,7 +21,10 @@ export const copyRecipient = () => {
 }
 
 export async function deliverEnquiryNotification(database, pilotRequestId) {
-  if (!notificationConfigured()) return { configured: false }
+  if (!notificationConfigured()) {
+    console.error('pilot-request-notification-not-configured')
+    return { configured: false }
+  }
   try {
     const { data: enquiry, error: enquiryError } = await database
       .from('pilot_requests')
@@ -86,6 +89,20 @@ export async function deliverEnquiryNotification(database, pilotRequestId) {
     await database.from('pilot_request_notifications').update({ status:'sent', attempts:1, sent_at:new Date().toISOString(), last_error_hash:null }).eq('pilot_request_id',pilotRequestId)
     return { configured:true, sent:true }
   } catch (error) {
+    // Log only a bounded error category, never the SMTP response, credentials or enquiry data.
+    const code = String(error?.code || '')
+    const responseCode = Number(error?.responseCode) || 0
+    const category =
+      code === 'EAUTH' || responseCode === 535 || responseCode === 534 ? 'smtp_auth' :
+      ['ECONNECTION','ETIMEDOUT','ESOCKET','EDNS','ECONNRESET','ENOTFOUND','ECONNREFUSED'].includes(code) ? 'smtp_connection' :
+      code === 'EENVELOPE' || code === 'EMESSAGE' || responseCode >= 400 ? 'smtp_rejected' :
+      /^notification_provider_[45][0-9]{2}$/.test(String(error?.message || '')) ? 'resend_rejected' :
+      String(error?.message || '') === 'enquiry_lookup_failed' ? 'enquiry_lookup' : 'other'
+    console.error('pilot-request-notification-delivery-failed', {
+      channel: smtpConfigured() ? 'smtp' : 'resend',
+      category,
+      responseCode: responseCode >= 400 && responseCode <= 599 ? responseCode : undefined,
+    })
     const hash=createHash('sha256').update(String(error?.message||'notification_failed')).digest('hex')
     await database.from('pilot_request_notifications').update({ status:'failed', attempts:1, next_attempt_at:new Date(Date.now()+15*60_000).toISOString(), last_error_hash:hash }).eq('pilot_request_id',pilotRequestId)
     return { configured:true, sent:false }
