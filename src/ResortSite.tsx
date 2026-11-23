@@ -470,7 +470,7 @@ const ResortPilotForm = () => {
       <label>Role<input name="role" autoComplete="organization-title" placeholder="Guest Experience, Digital…" /></label>
     </div>
     <label>Property or hotel group<input required name="company" autoComplete="organization" placeholder="Organisation" /></label>
-    <label>What should we know?<textarea required name="message" rows={5} minLength={10} placeholder="Target property, current guest app, priorities, timing…" /></label>
+    <label>What should we know?<textarea required name="message" rows={5} maxLength={4000} placeholder="Target property, current guest app, priorities, timing…" /></label>
     <label className="resort-form-consent"><input required type="checkbox" name="privacy_consent" value="yes" /><span>I agree that TSquare Ventures LLC may use these details to respond to my enquiry, as described in the <a href="/privacy/">privacy policy</a>.</span></label>
     <label className="resort-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
     <button className="resort-primary-button" type="submit" disabled={status === 'sending' || status === 'sent'}>
