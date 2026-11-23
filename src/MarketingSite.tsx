@@ -357,7 +357,7 @@ const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) =>
       <label>{isGeneral ? 'Company or organisation' : 'Cruise line or company'}<input required name="company" autoComplete="organization" placeholder="Organisation" /></label>
       <label>{isGeneral ? 'How can we help?' : 'What should we know about your current app or pilot?'}<textarea required name="message" rows={5} maxLength={4000} placeholder={isGeneral ? 'Product, partnership, privacy or enterprise enquiry…' : 'Current cruise app, target ship or sailing, integration priorities, timing…'} /></label>
       <label className="form-consent"><input required type="checkbox" name="privacy_consent" value="yes" /><span>I agree that TSquare Ventures LLC may use these details to respond to my enquiry, as described in the <a href="/privacy/">privacy policy</a>.</span></label>
-      <button className="pilot-button contact-submit" type="submit" disabled={status === 'sending' || status === 'sent'}>{status === 'sending' ? 'Sending securely…' : status === 'sent' ? 'Enquiry received' : isGeneral ? <>Send enquiry <Arrow /></> : <>Request a pilot conversation <Arrow /></>}</button>
+      <button className="pilot-button contact-submit" type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'Sending securely…' : isGeneral ? <>Send enquiry <Arrow /></> : <>Request a pilot conversation <Arrow /></>}</button>
     </form>}
   </section>
 }
