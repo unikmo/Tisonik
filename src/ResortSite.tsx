@@ -475,8 +475,8 @@ const ResortPilotForm = () => {
     <label>What should we know?<textarea required name="message" rows={5} maxLength={4000} placeholder="Target property, current guest app, priorities, timing…" /></label>
     <label className="resort-form-consent"><input required type="checkbox" name="privacy_consent" value="yes" /><span>I agree that TSquare Ventures LLC may use these details to respond to my enquiry, as described in the <a href="/privacy/">privacy policy</a>.</span></label>
     <label className="resort-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
-    <button className="resort-primary-button" type="submit" disabled={status === 'sending' || status === 'sent'}>
-      {status === 'sending' ? 'Sending…' : status === 'sent' ? 'Enquiry received' : <>Request a live demo or pilot <Arrow /></>}
+    <button className="resort-primary-button" type="submit" disabled={status === 'sending'}>
+      {status === 'sending' ? 'Sending…' : <>Request a live demo or pilot <Arrow /></>}
     </button>
     {status === 'error' && <p className="resort-form-status">The form could not be sent. Please try again later.</p>}
   </form>
