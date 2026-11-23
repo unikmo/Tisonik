@@ -30,7 +30,8 @@ const result=await deliverEnquiryNotification(database,'11111111-1111-1111-1111-
 
 assert.deepEqual(result,{configured:true,sent:true})
 assert.equal(update.status,'sent')
-assert.equal(requestBody.to[0],'private-recipient@example.test')
+assert.equal(requestBody.to[0],'hello@tisonik.com')
+assert.equal(requestBody.cc[0],'private-recipient@example.test')
 assert.equal(requestBody.reply_to,'alex@hotelgroup.example')
 assert.match(requestBody.subject,/resort pilot/i)
 assert.match(requestBody.text,/Example Resort Group/)
