@@ -3,6 +3,15 @@ import { createHash } from 'node:crypto'
 const dashboardUrl = 'https://tisonik.com/portal/'
 export const smtpConfigured = () => Boolean(process.env.TISONIK_SMTP_HOST && process.env.TISONIK_SMTP_USER && process.env.TISONIK_SMTP_PASSWORD)
 export const notificationConfigured = () => Boolean(smtpConfigured() || (process.env.RESEND_API_KEY && process.env.TISONIK_ENQUIRY_TO && process.env.TISONIK_ENQUIRY_FROM))
+export const smtpOptions = () => ({
+  host: process.env.TISONIK_SMTP_HOST,
+  port: 465,
+  secure: true,
+  auth: { user: process.env.TISONIK_SMTP_USER, pass: process.env.TISONIK_SMTP_PASSWORD },
+  connectionTimeout: 8000,
+  greetingTimeout: 8000,
+  socketTimeout: 10000,
+})
 
 const cleanHeader = value => String(value || '').replace(/[\r\n]+/g, ' ').trim()
 
@@ -44,15 +53,7 @@ export async function deliverEnquiryNotification(database, pilotRequestId) {
     if (smtpConfigured()) {
       // Same secure SMTP pattern as PlanetHike: implicit TLS on port 465.
       const { default: nodemailer } = await import('nodemailer')
-      const transport = nodemailer.createTransport({
-        host: process.env.TISONIK_SMTP_HOST,
-        port: 465,
-        secure: true,
-        auth: { user: process.env.TISONIK_SMTP_USER, pass: process.env.TISONIK_SMTP_PASSWORD },
-        connectionTimeout: 8000,
-        greetingTimeout: 8000,
-        socketTimeout: 10000,
-      })
+      const transport = nodemailer.createTransport(smtpOptions())
       await transport.sendMail({
         from: { name: 'Tisonik', address: process.env.TISONIK_SMTP_USER },
         to: process.env.TISONIK_ENQUIRY_TO || process.env.TISONIK_SMTP_USER,
