@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 
 const dashboardUrl = 'https://tisonik.com/portal/'
 export const smtpConfigured = () => Boolean(process.env.TISONIK_SMTP_HOST && process.env.TISONIK_SMTP_USER && process.env.TISONIK_SMTP_PASSWORD)
-export const notificationConfigured = () => Boolean(smtpConfigured() || (process.env.RESEND_API_KEY && process.env.TISONIK_ENQUIRY_TO && process.env.TISONIK_ENQUIRY_FROM))
+export const notificationConfigured = () => Boolean(smtpConfigured() || (process.env.RESEND_API_KEY && process.env.TISONIK_ENQUIRY_FROM))
 export const smtpOptions = () => ({
   host: process.env.TISONIK_SMTP_HOST,
   port: 465,
@@ -14,6 +14,11 @@ export const smtpOptions = () => ({
 })
 
 const cleanHeader = value => String(value || '').replace(/[\r\n]+/g, ' ').trim()
+const mainRecipient = 'hello@tisonik.com'
+export const copyRecipient = () => {
+  const value = cleanHeader(process.env.TISONIK_ENQUIRY_TO).toLowerCase()
+  return value && value !== mainRecipient ? value : undefined
+}
 
 export async function deliverEnquiryNotification(database, pilotRequestId) {
   if (!notificationConfigured()) return { configured: false }
@@ -56,7 +61,8 @@ export async function deliverEnquiryNotification(database, pilotRequestId) {
       const transport = nodemailer.createTransport(smtpOptions())
       await transport.sendMail({
         from: { name: 'Tisonik', address: process.env.TISONIK_SMTP_USER },
-        to: process.env.TISONIK_ENQUIRY_TO || process.env.TISONIK_SMTP_USER,
+        to: mainRecipient,
+        ...(copyRecipient() ? { cc: copyRecipient() } : {}),
         replyTo: { name: cleanHeader(enquiry.name), address: enquiry.work_email },
         subject,
         text,
@@ -68,7 +74,8 @@ export async function deliverEnquiryNotification(database, pilotRequestId) {
         headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           from: process.env.TISONIK_ENQUIRY_FROM,
-          to: [process.env.TISONIK_ENQUIRY_TO],
+          to: [mainRecipient],
+          ...(copyRecipient() ? { cc: [copyRecipient()] } : {}),
           reply_to: enquiry.work_email,
           subject,
           text,
