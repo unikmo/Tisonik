@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { notificationConfigured, smtpConfigured, smtpOptions } from '../api/_lib/enquiry-notification.mjs'
+import { notificationConfigured, smtpConfigured, smtpOptions, copyRecipient } from '../api/_lib/enquiry-notification.mjs'
 
 process.env.RESEND_API_KEY = ''
 process.env.TISONIK_ENQUIRY_TO = ''
@@ -22,4 +22,8 @@ assert.deepEqual(options.auth, {
   pass: 'test-only-password',
 })
 assert.equal(options.connectionTimeout, 8000)
+process.env.TISONIK_ENQUIRY_TO = 'mbanwie@googlemail.com'
+assert.equal(copyRecipient(), 'mbanwie@googlemail.com')
+process.env.TISONIK_ENQUIRY_TO = 'hello@tisonik.com'
+assert.equal(copyRecipient(), undefined)
 console.log('Tisonik SSL/TLS SMTP configuration contract passed.')
