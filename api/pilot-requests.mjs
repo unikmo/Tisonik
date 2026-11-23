@@ -40,7 +40,10 @@ export default async function handler(request, response) {
       return sendJson(response, 400, { error: 'invalid_enquiry', invalidFields })
     }
     const { website, privacyConsent, workEmail, roleTitle, sourcePath, ...rest } = parsed.data
-    if (website) return sendJson(response, 202, { accepted: true })
+    if (website) {
+      console.info('pilot-request-honeypot-suppressed')
+      return sendJson(response, 202, { accepted: true })
+    }
 
     const database = adminDatabase()
     const { data: enquiry, error } = await database.from('pilot_requests').insert({
@@ -51,13 +54,18 @@ export default async function handler(request, response) {
       source_path: sourcePath,
     }).select('id').single()
     if (error) throw error
+    console.info('pilot-request-stored', { sourcePath })
     const { error: outboxError } = await database.from('pilot_request_notifications').insert({ pilot_request_id: enquiry.id })
     if (outboxError) {
       // The enquiry is already durably stored. Notification infrastructure must
       // never turn a successful conversion into a customer-visible failure.
       console.error('pilot-request-notification-queue-failed', outboxError.message)
     } else {
-      await deliverEnquiryNotification(database, enquiry.id)
+      const delivery = await deliverEnquiryNotification(database, enquiry.id)
+      console.info('pilot-request-delivery-result', {
+        configured: delivery.configured,
+        sent: Boolean(delivery.sent),
+      })
     }
     return sendJson(response, 201, { accepted: true })
   } catch (error) {
