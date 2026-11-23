@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 for (const path of ['/contact/', '/pilot/']) {
-  test(`enquiry submission shows success and clears fields on ${path}`, async ({ page }) => {
+  test(`enquiry submission replaces the form with confirmation on ${path}`, async ({ page }) => {
     await page.route('**/api/pilot-requests', async route => {
       await new Promise(resolve => setTimeout(resolve, 100))
       await route.fulfill({ status: 201, contentType: 'application/json', body: JSON.stringify({ accepted: true }) })
@@ -14,9 +14,9 @@ for (const path of ['/contact/', '/pilot/']) {
     await form.locator('[name=message]').fill('We would like to discuss the Tisonik experience for our hotel.')
     await form.locator('[name=privacy_consent]').check()
     await form.locator('button[type=submit]').click()
-    await expect(form.getByRole('status')).toContainText('safely recorded')
-    await expect(form.locator('[name=email]')).toHaveValue('')
-    await expect(form.locator('button[type=submit]')).toBeDisabled()
+    await expect(page.locator('.pilot-contact-form[role=status]')).toContainText('safely recorded')
+    await expect(form).toHaveCount(0)
+    await expect(page.locator('.pilot-contact-form input, .pilot-contact-form textarea, .pilot-contact-form button')).toHaveCount(0)
   })
 
   test(`enquiry submission reports provider error on ${path}`, async ({ page }) => {
