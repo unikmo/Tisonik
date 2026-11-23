@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto'
 
 const dashboardUrl = 'https://tisonik.com/portal/'
-export const notificationConfigured = () => Boolean(process.env.RESEND_API_KEY && process.env.TISONIK_ENQUIRY_TO && process.env.TISONIK_ENQUIRY_FROM)
+export const smtpConfigured = () => Boolean(process.env.TISONIK_SMTP_HOST && process.env.TISONIK_SMTP_USER && process.env.TISONIK_SMTP_PASSWORD)
+export const notificationConfigured = () => Boolean(smtpConfigured() || (process.env.RESEND_API_KEY && process.env.TISONIK_ENQUIRY_TO && process.env.TISONIK_ENQUIRY_FROM))
 
 const cleanHeader = value => String(value || '').replace(/[\r\n]+/g, ' ').trim()
 
@@ -40,18 +41,40 @@ export async function deliverEnquiryNotification(database, pilotRequestId) {
       `Portal: ${dashboardUrl}`,
     ].join('\n')
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: process.env.TISONIK_ENQUIRY_FROM,
-        to: [process.env.TISONIK_ENQUIRY_TO],
-        reply_to: enquiry.work_email,
+    if (smtpConfigured()) {
+      // Same secure SMTP pattern as PlanetHike: implicit TLS on port 465.
+      const { default: nodemailer } = await import('nodemailer')
+      const transport = nodemailer.createTransport({
+        host: process.env.TISONIK_SMTP_HOST,
+        port: 465,
+        secure: true,
+        auth: { user: process.env.TISONIK_SMTP_USER, pass: process.env.TISONIK_SMTP_PASSWORD },
+        connectionTimeout: 8000,
+        greetingTimeout: 8000,
+        socketTimeout: 10000,
+      })
+      await transport.sendMail({
+        from: { name: 'Tisonik', address: process.env.TISONIK_SMTP_USER },
+        to: process.env.TISONIK_ENQUIRY_TO || process.env.TISONIK_SMTP_USER,
+        replyTo: { name: cleanHeader(enquiry.name), address: enquiry.work_email },
         subject,
         text,
-      }),
-    })
-    if (!response.ok) throw new Error(`notification_provider_${response.status}`)
+      })
+    } else {
+      // Preserve Resend delivery until the SMTP mailbox is configured.
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: process.env.TISONIK_ENQUIRY_FROM,
+          to: [process.env.TISONIK_ENQUIRY_TO],
+          reply_to: enquiry.work_email,
+          subject,
+          text,
+        }),
+      })
+      if (!response.ok) throw new Error(`notification_provider_${response.status}`)
+    }
     await database.from('pilot_request_notifications').update({ status:'sent', attempts:1, sent_at:new Date().toISOString(), last_error_hash:null }).eq('pilot_request_id',pilotRequestId)
     return { configured:true, sent:true }
   } catch (error) {
