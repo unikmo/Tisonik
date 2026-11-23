@@ -330,7 +330,7 @@ const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) =>
       if (!response.ok) {
         const problem = await response.json().catch(() => ({})) as { error?: string, invalidFields?: string[] }
         if (response.status === 400 && problem.error === 'invalid_enquiry') {
-          const labels: Record<string,string> = { workEmail:'work email', name:'name', company:'company', roleTitle:'role', message:'pilot details', privacyConsent:'privacy consent' }
+          const labels: Record<string,string> = { workEmail:'work email', name:'name', company:'company', roleTitle:'role', message:'message (please enter some text)', privacyConsent:'privacy consent' }
           const fields = (problem.invalidFields || []).map(field => labels[field] || field).join(', ')
           setErrorMessage(fields ? `Please check: ${fields}.` : 'Please check the form details and try again.')
         } else setErrorMessage('The secure form is temporarily unavailable. Please try again later.')
@@ -354,7 +354,7 @@ const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) =>
       <label>Work email<input required name="email" type="email" autoComplete="email" placeholder="name@cruiseline.com" /></label>
       <div className="contact-form-row"><label>Name<input required name="name" autoComplete="name" placeholder="Your name" /></label><label>Role<input name="role" autoComplete="organization-title" placeholder="Guest Experience, Digital…" /></label></div>
       <label>{isGeneral ? 'Company or organisation' : 'Cruise line or company'}<input required name="company" autoComplete="organization" placeholder="Organisation" /></label>
-      <label>{isGeneral ? 'How can we help?' : 'What should we know about your current app or pilot?'}<textarea required name="message" rows={5} placeholder={isGeneral ? 'Product, partnership, privacy or enterprise enquiry…' : 'Current cruise app, target ship or sailing, integration priorities, timing…'} /></label>
+      <label>{isGeneral ? 'How can we help?' : 'What should we know about your current app or pilot?'}<textarea required name="message" rows={5} maxLength={4000} placeholder={isGeneral ? 'Product, partnership, privacy or enterprise enquiry…' : 'Current cruise app, target ship or sailing, integration priorities, timing…'} /></label>
       <label className="form-consent"><input required type="checkbox" name="privacy_consent" value="yes" /><span>I agree that TSquare Ventures LLC may use these details to respond to my enquiry, as described in the <a href="/privacy/">privacy policy</a>.</span></label>
       <button className="pilot-button contact-submit" type="submit" disabled={status === 'sending' || status === 'sent'}>{status === 'sending' ? 'Sending securely…' : status === 'sent' ? 'Enquiry received' : isGeneral ? <>Send enquiry <Arrow /></> : <>Request a pilot conversation <Arrow /></>}</button>
     </form>
