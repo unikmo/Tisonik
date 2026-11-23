@@ -161,6 +161,17 @@ img { display: block; width: 100%; }
 .contact-submit:hover { background: white; color: #1d1c1a; }
 .contact-submit:disabled { cursor: wait; opacity: .62; }
 .form-success { margin: 0; padding: 13px 15px; border-radius: 10px; background: rgba(91,190,152,.16); color: #bdebd7; font-size: 13px; }
+/* Compact desktop enquiry form so the submit action fits above the fold. */
+@media (min-width: 721px) {
+  .contact-form-section { padding-top: clamp(26px, 3.5vh, 44px); padding-bottom: 34px; gap: clamp(28px, 4vw, 64px); }
+  .contact-form-section .pilot-contact-form:not([role="status"]) { gap: 11px; }
+  .contact-form-section .pilot-contact-form label { gap: 5px; }
+  .contact-form-section .pilot-contact-form input:not([type="checkbox"]), .contact-form-section .pilot-contact-form textarea { padding: 10px 13px; }
+  .contact-form-section .pilot-contact-form textarea { min-height: 80px; height: 90px; resize: vertical; }
+  .contact-form-section .contact-form-row { gap: 12px; }
+  .contact-form-section .contact-submit { margin-top: 0; }
+}
+
 /* Confirmation-only state: centered, readable, and clearly separate from a form. */
 .contact-form-section .pilot-contact-form[role="status"] { display: flex; align-items: center; justify-content: center; align-self: center; width: 100%; min-height: 120px; }
 .contact-form-section .pilot-contact-form[role="status"] .form-success { width: min(100%, 680px); padding: 24px 28px; font-size: clamp(17px, 1.4vw, 21px); line-height: 1.5; text-align: center; }
