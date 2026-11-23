@@ -307,9 +307,11 @@ const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) =>
   const [errorMessage, setErrorMessage] = useState('')
   const submitEnquiry = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    const formElement = event.currentTarget
+    if (!formElement) return
     setStatus('sending')
     setErrorMessage('')
-    const form = new FormData(event.currentTarget)
+    const form = new FormData(formElement)
     try {
       const response = await fetch('/api/pilot-requests', {
         method: 'POST',
@@ -336,7 +338,7 @@ const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) =>
         return
       }
       setStatus('sent')
-      event.currentTarget.reset()
+      formElement.reset()
     } catch {
       setErrorMessage('The secure form is temporarily unavailable. Please try again later.')
       setStatus('error')
