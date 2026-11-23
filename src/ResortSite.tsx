@@ -463,6 +463,8 @@ const ResortPilotForm = () => {
     }
   }
 
+  if (status === 'sent') return <div className="resort-contact-form" role="status" aria-live="polite"><p className="resort-form-status">Thank you. Your Tisonik enquiry is safely recorded. We’ll reply personally.</p></div>
+
   return <form className="resort-contact-form" onSubmit={submit}>
     <label>Work email<input required name="email" type="email" autoComplete="email" placeholder="name@hotelgroup.com" /></label>
     <div className="resort-form-row">

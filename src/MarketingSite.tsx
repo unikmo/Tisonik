@@ -347,9 +347,10 @@ const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) =>
   const isGeneral = mode === 'contact'
   return <section id="contact" className="contact-form-section" aria-labelledby="pilot-contact-title">
     <div className="contact-form-copy"><p className="eyebrow">{isGeneral ? 'CONTACT TISONIK' : 'REQUEST A PILOT'}</p><h1 id="pilot-contact-title">{isGeneral ? 'Tell us what you need.' : 'Plan a complete one-ship Tisonik pilot.'}</h1><p>{isGeneral ? 'Use the secure form for product, partnership, privacy or enterprise enquiries. We’ll respond directly to the work email you provide.' : 'You have seen the product. Tell us about your existing app, target ship and timing, and we’ll respond personally about a complete one-ship pilot.'}</p><div className="contact-confidence"><span>Secure contact form</span><span>Direct response from TSquare Ventures LLC</span><span>No mailing list</span></div></div>
-    <form className="pilot-contact-form" onSubmit={submitEnquiry}>
+    {status === 'sent'
+      ? <div className="pilot-contact-form" role="status" aria-live="polite"><p className="form-success">Thank you. Your Tisonik enquiry is safely recorded. We’ll reply personally.</p></div>
+      : <form className="pilot-contact-form" onSubmit={submitEnquiry}>
       <input className="form-honeypot" type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-      {status === 'sent' && <p className="form-success" role="status">Thank you. Your Tisonik enquiry is safely recorded. We’ll reply personally.</p>}
       {status === 'error' && <p className="form-error" role="alert">{errorMessage || 'The secure form is temporarily unavailable. Please try again later.'}</p>}
       <label>Work email<input required name="email" type="email" autoComplete="email" placeholder="name@cruiseline.com" /></label>
       <div className="contact-form-row"><label>Name<input required name="name" autoComplete="name" placeholder="Your name" /></label><label>Role<input name="role" autoComplete="organization-title" placeholder="Guest Experience, Digital…" /></label></div>
@@ -357,7 +358,7 @@ const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) =>
       <label>{isGeneral ? 'How can we help?' : 'What should we know about your current app or pilot?'}<textarea required name="message" rows={5} maxLength={4000} placeholder={isGeneral ? 'Product, partnership, privacy or enterprise enquiry…' : 'Current cruise app, target ship or sailing, integration priorities, timing…'} /></label>
       <label className="form-consent"><input required type="checkbox" name="privacy_consent" value="yes" /><span>I agree that TSquare Ventures LLC may use these details to respond to my enquiry, as described in the <a href="/privacy/">privacy policy</a>.</span></label>
       <button className="pilot-button contact-submit" type="submit" disabled={status === 'sending' || status === 'sent'}>{status === 'sending' ? 'Sending securely…' : status === 'sent' ? 'Enquiry received' : isGeneral ? <>Send enquiry <Arrow /></> : <>Request a pilot conversation <Arrow /></>}</button>
-    </form>
+    </form>}
   </section>
 }
 
