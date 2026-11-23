@@ -13,6 +13,7 @@ const required = [
   [marketing.includes("status === 'sent'\n      ? <div className=\"pilot-contact-form\""), 'contact confirmation replaces the entire form'],
   [resort.includes("if (status === 'sent') return <div className=\"resort-contact-form\""), 'resort confirmation replaces the entire form'],
   [marketingCss.includes('.pilot-contact-form[role="status"] .form-success') && marketingCss.includes('text-align: center'), 'centered enlarged contact confirmation'],
+  [marketing.includes('name="message" rows={3}') && marketingCss.includes('.contact-form-section .pilot-contact-form:not([role="status"]) { gap: 11px; }'), 'compact contact form'],
   [styles.includes('@media (prefers-reduced-motion: reduce)'), 'reduced-motion support'],
   [styles.includes(':focus-visible'), 'keyboard focus indicator'],
   [edge.includes("daily_vibe_limit"), 'server-side abuse state'],
