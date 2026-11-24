@@ -214,7 +214,7 @@ const hotelFaqs: [string, string][] = [
   ['Can we put our brand on it?', 'Yes. Tisonik is white-label, so the brand is yours. UNIKMO cards can be customised to your hotel’s brand. Talk to us.'],
   ['How does a pilot work?', 'We start with one property. We agree the guest journeys and the success measures first, for example activation, recovery time, recognition volume, and offers viewed and places held. Then we scale, iterate or stop.'],
   ['Is it live at any hotel yet?', 'Not yet. Tisonik is still in test and no hotel is live. The first pilot is one property.'],
-  ['What does a pilot cost?', 'Pilot price: $8 per stay, onboarding included. Pilot only, excluding taxes. Not an offer; terms are agreed in a written pilot agreement. Pricing after the pilot is agreed with each property.'],
+  ['What does a pilot cost?', 'Pilot usage is $8 per stay, excluding taxes. Onboarding is scoped and charged separately, never included in the per-stay rate. Pilot terms are agreed in a written agreement; pricing after the pilot is agreed with each property.'],
 ]
 
 const hotelFaqData = JSON.stringify({
@@ -347,8 +347,7 @@ const ResortPillar = () => (
         <div>
           <p className="eyebrow">PILOT TISONIK AT YOUR RESORT</p>
           <h2>Start with one property.</h2>
-          <p>Still in test: no hotel is live yet. We agree the measures up front, then scale, iterate or stop.</p>
-          <p><strong>Pilot price: $8 per stay, onboarding included.</strong> Pilot only, excluding taxes. Not an offer; terms are agreed in a written pilot agreement.</p>
+          
           <div className="resort-pilot-checks">
             <span>Defined use cases</span><span>Resort-owned data and brand</span><span>Measurable pilot outcomes</span><span>Scale, iterate or stop</span>
           </div>
