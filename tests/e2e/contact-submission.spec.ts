@@ -20,7 +20,7 @@ for (const path of ['/contact/', '/pilot/']) {
   })
 
   test(`browser autofill cannot populate hidden spam field on ${path}`, async ({ page }) => {
-    let payload
+    let payload: { website?: string } | undefined
     await page.route('**/api/pilot-requests', async route => {
       payload = route.request().postDataJSON()
       await route.fulfill({ status: 201, contentType: 'application/json', body: '{"accepted":true}' })
