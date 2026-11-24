@@ -185,7 +185,7 @@ const HotelFilm = () => {
   return <section className="film-top" aria-label="What Tisonik does">
     <div className="film-hero">
       <h1>Transform guest experiences. <span>Grow ancillary revenue.</span></h1>
-      <p className="hero-positioning">A white-label experience layer inside the digital journey you already own—not another app for guests to download.</p>
+      <p className="hero-positioning">Not another app for guests to download.</p>
     </div>
     <figure className="film-frame">
       <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-hotel-poster-v3.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
