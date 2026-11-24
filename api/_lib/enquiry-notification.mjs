@@ -62,7 +62,7 @@ export async function deliverEnquiryNotification(database, pilotRequestId) {
       // Same secure SMTP pattern as PlanetHike: implicit TLS on port 465.
       const { default: nodemailer } = await import('nodemailer')
       const transport = nodemailer.createTransport(smtpOptions())
-      await transport.sendMail({
+      const delivery = await transport.sendMail({
         from: { name: 'Tisonik', address: process.env.TISONIK_SMTP_USER },
         to: mainRecipient,
         ...(copyRecipient() ? { cc: copyRecipient() } : {}),
@@ -70,6 +70,14 @@ export async function deliverEnquiryNotification(database, pilotRequestId) {
         subject,
         text,
       })
+      console.info('pilot-request-smtp-handoff', {
+        acceptedCount: delivery.accepted?.length || 0,
+        rejectedCount: delivery.rejected?.length || 0,
+        pendingCount: delivery.pending?.length || 0,
+      })
+      if (!delivery.accepted?.length || delivery.rejected?.length || delivery.pending?.length) {
+        throw new Error('smtp_partial_or_unaccepted')
+      }
     } else {
       // Preserve Resend delivery until the SMTP mailbox is configured.
       const response = await fetch('https://api.resend.com/emails', {
@@ -85,8 +93,10 @@ export async function deliverEnquiryNotification(database, pilotRequestId) {
         }),
       })
       if (!response.ok) throw new Error(`notification_provider_${response.status}`)
+      console.info('pilot-request-resend-accepted')
     }
-    await database.from('pilot_request_notifications').update({ status:'sent', attempts:1, sent_at:new Date().toISOString(), last_error_hash:null }).eq('pilot_request_id',pilotRequestId)
+    const { error: statusError } = await database.from('pilot_request_notifications').update({ status:'sent', attempts:1, sent_at:new Date().toISOString(), last_error_hash:null }).eq('pilot_request_id',pilotRequestId)
+    if (statusError) console.error('pilot-request-notification-status-update-failed')
     return { configured:true, sent:true }
   } catch (error) {
     // Log only a bounded error category, never the SMTP response, credentials or enquiry data.
