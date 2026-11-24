@@ -49,3 +49,23 @@
 .rating-demo-words button.is-selected { background: #173f47; color: #fff; }
 .rating-demo-words button:disabled:not(.is-selected) { opacity: .45; cursor: default; }
 .rating-demo-note { margin: 14px 0 0; font-weight: 600; }
+
+/* Match the shared marketing rhythm; keep card interiors and horizontal layout intact. */
+.resort-intro, .resort-integration, .resort-related-pages, .resort-contact-section,
+.resort-hero, .resort-route-hero, .resort-pilot-page-hero, .resort-seo-hero {
+  padding-block: var(--section-inset);
+}
+.resort-feature-wrap { padding-block: 0; }
+.resort-feature { padding-block: var(--section-inset); }
+.resort-ratings-section, .resort-live-demo-callout, .resort-pilot-hero,
+.resort-demo-shell, .resort-route-next, .resort-pilot-steps,
+.resort-seo-points, .resort-seo-rating-demo {
+  margin-block: var(--section-inset);
+}
+/* Adjacent inset panels must not lose half the intended spacing to margin collapse. */
+.resort-seo-points + .resort-seo-rating-demo,
+.resort-ratings-section + .resort-live-demo-callout,
+.resort-demo-shell + .resort-route-next {
+  margin-block-start: var(--section-gap);
+}
+.resort-integration-grid, .resort-related-grid { margin-block-start: var(--section-inset); }
