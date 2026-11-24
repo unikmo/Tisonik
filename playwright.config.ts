@@ -14,6 +14,9 @@ export default defineConfig({
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile-chromium', use: { ...devices['Pixel 7'] } },
     { name: 'tablet-chromium', use: { ...devices['iPad (gen 7)'], browserName: 'chromium' } },
+    { name: 'desktop-firefox', use: { ...devices['Desktop Firefox'] }, testIgnore: /readiness\.spec\.ts/ },
+    { name: 'desktop-webkit', use: { ...devices['Desktop Safari'] }, testIgnore: /readiness\.spec\.ts/ },
+    { name: 'mobile-webkit', use: { ...devices['iPhone 13'] }, testIgnore: /readiness\.spec\.ts/ },
   ],
   webServer: { command: 'node ./node_modules/vite/bin/vite.js --host 127.0.0.1 --port 4174', url: 'http://127.0.0.1:4174', reuseExistingServer: false },
 })
