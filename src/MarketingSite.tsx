@@ -147,8 +147,7 @@ const Header = ({ page }: { page: PageKey }) => (
   <header className="site-header">
     <a className="brand" href="/" aria-label="Tisonik home"><img className="brand-mark" src="/tisonik-mark.svg" width="29" height="29" alt="" aria-hidden="true" /><span>TISONIK</span></a>
     <nav className="desktop-nav" aria-label="Primary navigation">
-      <a href="/">Cruise Lines</a>
-      <a href="/hotels/">Hotels &amp; Resorts</a>
+      {page !== 'home' && <><a href="/">Cruise Lines</a><a href="/hotels/">Hotels &amp; Resorts</a></>}
       <a href="/service-recovery/">Service Recovery</a>
       <a href="/crew-recognition/">Recognition</a>
       <a href="/ancillary-revenue/">Ancillary Revenue</a>
@@ -161,7 +160,7 @@ const Footer = ({ cruiseOnly = false }: { cruiseOnly?: boolean }) => (
   <footer className="site-footer">
     <div><strong>TISONIK</strong><span>A product of TSquare Ventures LLC</span></div>
     <p>Guest experience activation for {cruiseOnly ? "cruise lines" : "cruise lines and premium hotels & resorts"}: service recovery, recognition, engagement, discovery and ancillary revenue.</p>
-    <nav className="footer-links" aria-label="Footer navigation"><a href={contactHref}>Contact</a><a href="/imprint/">Imprint</a><a href="/security/">Security</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/cookies/">Cookies</a></nav>
+    <nav className="footer-links" aria-label="Footer navigation"><a href="/">Cruise Lines</a><a href="/hotels/">Hotels &amp; Resorts</a><a href={contactHref}>Contact</a><a href="/imprint/">Imprint</a><a href="/security/">Security</a><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/cookies/">Cookies</a></nav>
   </footer>
 )
 
@@ -240,7 +239,7 @@ const HomeFilm = () => {
   return <section className="film-top" aria-label="What Tisonik does">
     <div className="film-hero">
       <h1>Transform guest experiences. <span>Grow ancillary revenue.</span></h1>
-      <p className="hero-positioning">A white-label experience layer inside the digital journey you already own—not another app for guests to download.</p>
+      <p className="hero-positioning">Not another app for guests to download.</p>
     </div>
     <figure className="film-frame">
       <video ref={video} muted loop playsInline preload="metadata" poster="/media/tisonik-film-cruise-poster-v4.jpg" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label={filmAlt}>
