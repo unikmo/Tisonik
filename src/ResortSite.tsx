@@ -448,7 +448,7 @@ const ResortPilotForm = () => {
       roleTitle: String(form.get('role') || ''),
       message: String(form.get('message') || ''),
       privacyConsent: form.get('privacy_consent') === 'yes',
-      website: String(form.get('website') || ''),
+      website: '',
       sourcePath: '/resort-pilot/',
     }
     try {
@@ -457,7 +457,7 @@ const ResortPilotForm = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      setStatus(response.ok ? 'sent' : 'error')
+      setStatus(response.status === 201 ? 'sent' : 'error')
     } catch {
       setStatus('error')
     }
@@ -474,7 +474,6 @@ const ResortPilotForm = () => {
     <label>Property or hotel group<input required name="company" autoComplete="organization" placeholder="Organisation" /></label>
     <label>What should we know?<textarea required name="message" rows={5} maxLength={4000} placeholder="Target property, current guest app, priorities, timing…" /></label>
     <label className="resort-form-consent"><input required type="checkbox" name="privacy_consent" value="yes" /><span>I agree that TSquare Ventures LLC may use these details to respond to my enquiry, as described in the <a href="/privacy/">privacy policy</a>.</span></label>
-    <label className="resort-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
     <button className="resort-primary-button" type="submit" disabled={status === 'sending'}>
       {status === 'sending' ? 'Sending…' : <>Request a live demo or pilot <Arrow /></>}
     </button>

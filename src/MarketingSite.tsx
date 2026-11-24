@@ -323,11 +323,11 @@ const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) =>
           company: form.get('company'),
           message: form.get('message'),
           privacyConsent: form.get('privacy_consent') === 'yes',
-          website: form.get('_honey') || '',
+          website: '',
           sourcePath: mode === 'contact' ? '/contact/' : '/pilot/',
         }),
       })
-      if (!response.ok) {
+      if (response.status !== 201) {
         const problem = await response.json().catch(() => ({})) as { error?: string, invalidFields?: string[] }
         if (response.status === 400 && problem.error === 'invalid_enquiry') {
           const labels: Record<string,string> = { workEmail:'work email', name:'name', company:'company', roleTitle:'role', message:'message (please enter some text)', privacyConsent:'privacy consent' }
@@ -350,7 +350,6 @@ const PilotContactForm = ({ mode = 'pilot' }: { mode?: 'pilot' | 'contact' }) =>
     {status === 'sent'
       ? <div className="pilot-contact-form" role="status" aria-live="polite"><p className="form-success">Thank you. Your Tisonik enquiry is safely recorded. We’ll reply personally.</p></div>
       : <form className="pilot-contact-form" onSubmit={submitEnquiry}>
-      <input className="form-honeypot" type="text" name="_honey" tabIndex={-1} autoComplete="off" aria-hidden="true" />
       {status === 'error' && <p className="form-error" role="alert">{errorMessage || 'The secure form is temporarily unavailable. Please try again later.'}</p>}
       <label>Work email<input required name="email" type="email" autoComplete="email" placeholder="name@cruiseline.com" /></label>
       <div className="contact-form-row"><label>Name<input required name="name" autoComplete="name" placeholder="Your name" /></label><label>Role<input name="role" autoComplete="organization-title" placeholder="Guest Experience, Digital…" /></label></div>
